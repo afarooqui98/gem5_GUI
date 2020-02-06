@@ -11,6 +11,7 @@ Currently, gem5 is a highly active open source project that simulates different 
 * SimObject - “Simulation Object”, individual components that can be individually configured and connected to other SimObjects to form a system. Examples include CPU, Cache, etc. 
 
 ## System Architecture
+![Sample Mockup for GUI](https://lh3.googleusercontent.com/Mt63W_M_vAmhWoj0TZRSEkX4HImpBlKc7CEHHW4LY3DWzmJIfQ8jLgpQIFRFAdGKx3nag5z9u1npWYqJejgRaT-A8lkSlHBF_XYKfpKS-qpZQwPz0ZaTyY9npvaBcDvN6mKt_2k)
 
 ## Requirements
 
