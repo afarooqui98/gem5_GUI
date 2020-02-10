@@ -5,8 +5,8 @@ from PyQt5.QtCore import Qt
 
 class LineDrawer(QWidget):
     distance_from_center = 0
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.initUI()
         self.setMouseTracking(True)
 
