@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import (QApplication, QLabel, QWidget)
 from PyQt5.QtGui import QPainter, QColor, QPen
 from PyQt5.QtCore import Qt
+import config
 
 class LineDrawer(QWidget):
     distance_from_center = 0
@@ -14,7 +15,6 @@ class LineDrawer(QWidget):
         self.pos1 = None
         self.pos2 = None
         self.line_done = 0
-        self.lines = []
 
     def mousePressEvent(self, event):
         self.pos1 = event.pos()
@@ -26,14 +26,14 @@ class LineDrawer(QWidget):
             self.update()
 
     def mouseReleaseEvent(self, event):
-        self.line_done = 1
-        self.lines.append((self.pos1, self.pos2))
-        self.pos1 = None
-        self.pos2 = None
+        if config.draw_wire_state:
+            self.line_done = 1
+            config.lines.append((self.pos1, self.pos2))
+            self.pos1 = None
+            self.pos2 = None
 
     def paintEvent(self, event):
+        q = QPainter(self)
         if self.pos1 and self.pos2:
-            q = QPainter(self)
             q.drawLine(self.pos1.x(), self.pos1.y(), self.pos2.x(), self.pos2.y())
-            for line in self.lines:
-                q.drawLine(line[0].x(), line[0].y(), line[1].x(), line[1].y())
+        config.drawLines(q)
