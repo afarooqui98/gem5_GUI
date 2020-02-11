@@ -17,13 +17,15 @@ class LineDrawer(QWidget):
         self.line_done = 0
 
     def mousePressEvent(self, event):
-        self.pos1 = event.pos()
-        self.line_done = 0
+        if config.draw_wire_state:
+            self.pos1 = event.pos()
+            self.line_done = 0
 
     def mouseMoveEvent(self, event):
-        self.pos2 = event.pos()
-        if not self.line_done:
-            self.update()
+        if config.draw_wire_state:
+            self.pos2 = event.pos()
+            if not self.line_done:
+                self.update()
 
 
     def mouseReleaseEvent(self, event):

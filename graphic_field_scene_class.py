@@ -50,7 +50,7 @@ class FieldGraphicsScene(QGraphicsScene):
                 print(name)
                 rect_item = QGraphicsRectItem(QtCore.QRectF(x - 50, y + 300, 100, 50))
             else:
-                rect_item = QGraphicsRectItem(QtCore.QRectF(x - 50, y + 100, 500, 500))
+                rect_item = QGraphicsRectItem(QtCore.QRectF(x - 100, y + 100, 500, 500))
 
             rect_item.setFlag(QGraphicsItem.ItemIsMovable, True)
             config.sym_objects.append(rect_item)
