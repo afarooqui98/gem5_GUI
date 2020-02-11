@@ -19,10 +19,16 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QTreeView" name="catalogView"/>
+     <widget class="QTreeWidget" name="treeWidget">
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
+     </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QListView" name="attributeView"/>
+     <widget class="QListWidget" name="attributeList"/>
     </item>
    </layout>
   </widget>
