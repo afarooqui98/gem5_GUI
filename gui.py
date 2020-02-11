@@ -19,8 +19,9 @@ class FieldWindow(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle("gem5")
 
-        self.lines = LineDrawer(self)
+        
         #self.setCentralWidget(self.lines)
+
 
         #create toolbars
         self.tool_bar = QToolBar()
@@ -54,11 +55,10 @@ class FieldWindow(QMainWindow):
 
         self.layout.addWidget(self.field_graphics_view)
 
+        self.main = QWidget()
 
-        self.main_widget = QWidget()
-        self.main_widget.setLayout(self.layout)
-        self.setCentralWidget(self.main_widget)
-
+        self.main.setLayout(self.layout)
+        self.setCentralWidget(self.main)
         #connections
         #self.field_automatic_grow_button.clicked.connect(self.automatically_grow)
         #self.field_manual_grow_button.clicked.connect(self.manually_grow)

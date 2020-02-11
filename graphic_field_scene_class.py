@@ -7,7 +7,7 @@ except:
 from field_class import *
 from graphic_system_item_class import *
 from PyQt5 import QtCore
-
+from lineDrawer import *
 
 class FieldGraphicsScene(QGraphicsScene):
     """this class provides a scene to manage items in the field"""
@@ -19,6 +19,8 @@ class FieldGraphicsScene(QGraphicsScene):
         self.field = Field(max_crops,max_animals)
 
         self.background_brush = QBrush()
+        self.lines = LineDrawer()
+        self.addWidget(self.lines)
         #self.background_picture = QPixmap(":/field_background.png")
         #self.background_brush.setTexture(self.background_picture)
         #self.setBackgroundBrush(self.background_brush)
