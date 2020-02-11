@@ -21,8 +21,6 @@ Back-end: The front and back-end are quite tightly coupled, as all the objects t
 
 ## Requirements
 
-## Requirements
-
 Must Haves:
 
 * As a user I can drag and drop new SimObjects into a model and connect them with wires.
@@ -64,8 +62,6 @@ Could Haves:
 * As a user, I can run simulations from the GUI directly via a one click simulation button to shorten development time.
 
 * As a researcher, I can parameterize objects and run multiple simulations in parallel over these object parameters in order to determine the optimal configurations.
-
-
 
 ## Technologies Employed
 Our GUI will be implemented in Python, using the GUI development framework PyQt5. For the development process, we will use a linux virtual machine running Ubuntu 18.04. We will study the existing GEM5 code base to maintain consistency between the GUI and the backend software. We will also be using JIRA as our product management tool to develop tasks as well as communicate with our client and other gem5 contributors.
