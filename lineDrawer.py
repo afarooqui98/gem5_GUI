@@ -25,6 +25,7 @@ class LineDrawer(QWidget):
         if not self.line_done:
             self.update()
 
+
     def mouseReleaseEvent(self, event):
         self.line_done = 1
         self.lines.append((self.pos1, self.pos2))

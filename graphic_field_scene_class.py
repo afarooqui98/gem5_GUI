@@ -19,8 +19,7 @@ class FieldGraphicsScene(QGraphicsScene):
         self.field = Field(max_crops,max_animals)
 
         self.background_brush = QBrush()
-        self.lines = LineDrawer()
-        self.addWidget(self.lines)
+
         #self.background_picture = QPixmap(":/field_background.png")
         #self.background_brush.setTexture(self.background_picture)
         #self.setBackgroundBrush(self.background_brush)
