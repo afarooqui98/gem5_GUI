@@ -19,7 +19,6 @@ class FieldWindow(QMainWindow):
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setWindowTitle("gem5")
-
         #create toolbars
         self.tool_bar = QToolBar()
 
@@ -45,7 +44,16 @@ class FieldWindow(QMainWindow):
         self.addToolBar(Qt.LeftToolBarArea, self.tool_bar)
 
         self.field_graphics_view = QGraphicsView()
-        self.field_graphics_view.setScene(FieldGraphicsScene(1,5))
+        self.scene = FieldGraphicsScene(1,5)
+
+
+
+        self.lines = LineDrawer()
+        self.proxy = self.scene.addWidget(self.lines)
+        self.proxy.setWidget(self.lines)
+
+        self.field_graphics_view.setScene(self.scene)
+
 
         self.field_graphics_view.setSceneRect(0,0,700,1200)
         self.field_graphics_view.setHorizontalScrollBarPolicy(1)
@@ -59,10 +67,7 @@ class FieldWindow(QMainWindow):
 
         self.main.setLayout(self.layout)
         self.setCentralWidget(self.main)
-        #connections
-        #self.field_automatic_grow_button.clicked.connect(self.automatically_grow)
-        #self.field_manual_grow_button.clicked.connect(self.manually_grow)
-        #self.field_report_button.clicked.connect(self.report)
+
     def closeEvent(self, event):
         sys.exit()
 
@@ -73,6 +78,7 @@ def main():
     field_window.raise_() #raise instance to top of window stack
     field_simulation.exec_() #monitor application for events
     field_simulation.quit()
+
 
 if __name__ == "__main__":
     main()

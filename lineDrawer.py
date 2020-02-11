@@ -25,6 +25,7 @@ class LineDrawer(QWidget):
         if not self.line_done:
             self.update()
 
+
     def mouseReleaseEvent(self, event):
         if config.draw_wire_state:
             self.line_done = 1
