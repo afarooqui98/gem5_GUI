@@ -17,6 +17,7 @@ draw_wire_state = False
 sym_objects = []
 lines = []
 line_drawer = None
+scene = None
 
 def setDragState():
     for object in sym_objects:

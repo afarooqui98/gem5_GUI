@@ -21,7 +21,9 @@ class FieldGraphicsScene(QGraphicsScene):
         self.background_brush = QBrush()
         self.addWidget(config.line_drawer)
 
-        config.line_drawer.resize(700, 1200) #fix to resize with resizing window
+        #config.line_drawer.resize(700, 1200) #fix to resize with resizing window
+
+
         #self.background_picture = QPixmap(":/field_background.png")
         #self.background_brush.setTexture(self.background_picture)
         #self.setBackgroundBrush(self.background_brush)
@@ -42,6 +44,18 @@ class FieldGraphicsScene(QGraphicsScene):
 
         return drop_x, drop_y
 
+    def _visualise_graphic_item_center(self, type, name):
+        x, y = self.width()/2, self.height()/2
+        if type == "component":
+            print(name)
+            rect_item = QGraphicsRectItem(QtCore.QRectF(x - 60, y, 100, 50))
+        else:
+            rect_item = QGraphicsRectItem(QtCore.QRectF(x - 100, y + 100, 500, 500))
+
+        rect_item.setFlag(QGraphicsItem.ItemIsMovable, True)
+        config.sym_objects.append(rect_item)
+        self.addItem(rect_item)
+
     def _visualise_graphic_item(self, type, name):
             x, y = self._drop_position(self.field._components[-1])
             current_view = self.views()[0]
@@ -58,7 +72,7 @@ class FieldGraphicsScene(QGraphicsScene):
 
     def _add_graphic_item(self,result, type, name):
         if result:
-            self._visualise_graphic_item(type, name)
+            self._visualise_graphic_item_center(type, name)
         else:
             error_message = QMessageBox()
             error_message.setText("No more {0}s can be added to this field".format(graphic_item_type))

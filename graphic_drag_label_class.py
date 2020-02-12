@@ -6,6 +6,7 @@ except:
     from PyQt5.QtGui import QPixmap, QDrag
     from PyQt5.QtCore import *
 
+import config
 
 class QDragLabel(QLabel):
     """this class provides an image label that can be dragged and dropped"""
@@ -15,6 +16,10 @@ class QDragLabel(QLabel):
         super().__init__()
         #self.setPixmap(picture.scaledToWidth(35,1))
         self.setText(text)
+
+
+    def mousePressEvent(self, event):
+        config.scene._visualise_graphic_item_center("component", "test")
 
     def mouseMoveEvent(self,event):
         #if the left mouse button is used

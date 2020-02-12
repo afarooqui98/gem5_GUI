@@ -13,6 +13,7 @@ from wire_button import *
 import sys, random
 import config
 
+
 class FieldWindow(QMainWindow):
     """this class creates a main window to observe the growth of a simulated field"""
 
@@ -44,15 +45,15 @@ class FieldWindow(QMainWindow):
         self.addToolBar(Qt.LeftToolBarArea, self.tool_bar)
 
         self.field_graphics_view = QGraphicsView()
-        self.scene = FieldGraphicsScene(1,5)
+        config.scene = FieldGraphicsScene(1,5)
 
 
 
         self.lines = LineDrawer()
-        self.proxy = self.scene.addWidget(self.lines)
+        self.proxy = config.scene.addWidget(self.lines)
         self.proxy.setWidget(self.lines)
 
-        self.field_graphics_view.setScene(self.scene)
+        self.field_graphics_view.setScene(config.scene)
 
 
         self.field_graphics_view.setSceneRect(0,0,700,1200)
