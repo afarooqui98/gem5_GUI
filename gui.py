@@ -14,7 +14,6 @@ import sys, random
 import config
 import json
 
-
 class FieldWindow(QMainWindow):
     """this class creates a main window to observe the growth of a simulated field"""
     catalog = json.load(open('result.json'))
