@@ -8,9 +8,24 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import json
+import os
+
+
+gem5_path = "/home/parallels/gem5"
+gem5_run_option = "build/X86/gem5.opt"
+
+def get_catalog():
+    script = os.getcwd() + "/../m5_calls/get_catalog.py"
+
+    os.system(gem5_path + "/" + gem5_run_option + " " + script)
+    m5_catalog = json.load(open('result.json'))
+    return m5_catalog
+
+
 
 class Ui_MainWindow(object):
-    catalog = json.load(open('result.json'))
+    #catalog = json.load(open('result.json'))
+    catalog = get_catalog()
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
