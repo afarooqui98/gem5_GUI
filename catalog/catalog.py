@@ -16,22 +16,36 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
         MainWindow.setLayoutDirection(QtCore.Qt.LeftToRight)
+
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
+
         self.treeWidget = QtWidgets.QTreeWidget(self.centralwidget)
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Name")
         self.gridLayout.addWidget(self.treeWidget, 0, 0, 1, 1)
+
         self.attributeList = QtWidgets.QListWidget(self.centralwidget)
         self.attributeList.setObjectName("attributeList")
         self.gridLayout.addWidget(self.attributeList, 1, 0, 1, 1)
+
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
+        #self.label.setText("first line\nsecond line")
+        self.label.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
+        self.gridLayout.addWidget(self.label, 2, 0, 1, 1)
+
+
         MainWindow.setCentralWidget(self.centralwidget)
+
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
+
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -42,6 +56,8 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.treeWidget.itemClicked.connect(self.populateAttributes)
+        self.attributeList.itemClicked.connect(self.populateDescription)
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -49,12 +65,23 @@ class Ui_MainWindow(object):
 
     def populateAttributes(self, item, column):
         self.attributeList.clear()
-        for attribute in self.catalog[item.text(0)]:
+        self.attributes = self.catalog[item.text(0)]
+        for attribute in self.attributes.keys():
             self.attributeList.addItem(attribute)
+
 
     def populate(self):
         for item in self.catalog.keys():
             self.treeWidget.addTopLevelItem(QtWidgets.QTreeWidgetItem([item]))
+
+    def populateDescription(self, item):
+        info = ""
+        info += self.attributes[item.text()]["Description"]
+        info += "\n"
+        info += "Type: " + self.attributes[item.text()]["Type"]
+        if self.attributes[item.text()]["Default"] is not None:
+            info += "\n" + "Default Value: " + self.attributes[item.text()]["Default"]
+        self.label.setText(info)
 
 
 
