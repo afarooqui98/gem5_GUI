@@ -17,16 +17,20 @@ Our primary architecture will be based on this general design mockup. There is a
 
 Front-end: The primary UI interaction and design comprise the front end. Dragging and dropping objects, selecting them, and highlighting multiple objects are all part of the front-end.
 
-Back-end: The front and back-end are quite tightly coupled, as all the objects that are draggable and selectable are mapped to what are called “simObjects” which define the schema and function of a particular computer architectural entity, like a CPU, for example. This list of objects will be colloquially known as the “catalog” which dynamically loads all of the simobjects at program initialization and allows users to select the component they want from a categorized and searchable menu. The description of the objects and their parameters are part of this category. Furthermore, users will commonly use this tool to save their work and subsequently export to a file format suited for running in the gem5 simulation environment. Finally, users will be able to save collections of objects within the GUI and then pull them from the aforementioned catalog, in a separate section dedicated to user collections
+Back-end: The front and back-end are quite tightly coupled, as all the objects that are draggable and selectable are mapped to what are called “SimObjects” which define the schema and function of a particular computer architectural entity, like a CPU, for example. This list of objects will be colloquially known as the “catalog” which dynamically loads all of the SimObjects at program initialization and allows users to select the component they want from a categorized and searchable menu. Each selected object will be its own instance of a specific SimObject, with varying parameters, some of which have default values and some that need to be filled in. The description of the objects and their parameters are part of this category. Furthermore, users will commonly use this tool to save their work and subsequently export to a file format suited for running in the gem5 simulation environment. Finally, users will be able to save collections of objects within the GUI and then pull them from the aforementioned catalog, in a separate section dedicated to user collections.
 
 ## Requirements
 
 Must Haves:
 
-* As a user I can drag and drop new SimObjects into a model and connect them with wires.
+* Users can drag and drop new SimObjects into a model and connect them with wires.
 
-    * Each simObject has a Gui representation which is then stored in what we’ll refer to as a “catalog”
-
+    * Each simObject has a Gui representation which is then stored in what we’ll refer to as a “catalog"
+	 		
+		* These objects will be generated dynamically from the current simObjects available in gem5
+		
+		* SimObjects will be initialized in the GUI, which will allow users to modify the parameters for a specific instance of that SimObject
+			
     * An object can be selected, which will bring up its modifiable parameters which will allow the user the change them as necessary
 
     * Connecting two objects is a matter of dragging a wire from one port to another
@@ -35,33 +39,37 @@ Must Haves:
 
     * Some parameters will have default settings based on the type of object selected
 
-    * In the attribute selection view right clicking each parameter should show the option to display a description of that parameter
+    * In the attribute selection view hovering over each parameter should display a description of that parameter
 
-* As a user, I can use shortcut keys (hot keys) to perform common tasks such as selecting a wire or run simulation.
-
-    * Copy, Paste, Cut, multiple selection (will not bring up an attribute screen but will allow multiple objects to be moved around)
-
-* As a user, I can save model files and access them later to make cross system development easier.
+* Users can save model files and access them later to make cross system development easier.
 
 * As a researcher, I can easily design and test new architectures to shorten the development time.
 
+    * The software should be able to manage multiple designs and load multiple files without any significant performance hit. The most expensive operation should happen at file export, where (ideally) code is generated for a user to run with the gem5 compiler.
+
 Should Haves:
 
-* As a user, I can export the model into different file formats, such as JSON and python files, to examine the configuration scripts and make optimizations if necessary.
+* Users can export the model into a JSON file format
 
     * The current plan is to allow the user to export to different files formats, like a python configuration script, for the obvious purpose of allowing users to continue development in Python if necessary. The actual simulator will be a tertiary feature that we’ll account later down the line
 
-* As a user, I can create new simulation objects derived from existing objects to develop new architectures.
+* Users can create new simulation objects derived from existing objects to develop new architectures.
 
 * As a user I will be able to select multiple objects and save them to the aforementioned catalog.
 
+* Users can use shortcut keys (hot keys) to perform common tasks such as selecting a wire or run simulation.
+
+    * Copy, Paste, Cut, multiple selection (will not bring up an attribute screen but will allow multiple objects to be moved around)
+
 Could Haves:
+
+* Besides a JSON file, users can export a design to multiple file formats, primarily to a python configuration script that can be essentially immediately run .
 
 * As a user, I can visualize simulation results and compare results between different simulations and architectures to easily compare and contrast different systems.
 
-* As a user, I can run simulations from the GUI directly via a one click simulation button to shorten development time.
+* Users can run simulations from the GUI directly via a one click simulation button to shorten development time.
 
-* As a researcher, I can parameterize objects and run multiple simulations in parallel over these object parameters in order to determine the optimal configurations.
+* Parameterize objects and run multiple simulations in parallel over these object parameters in order to determine the optimal configurations.
 
 ## Technologies Employed
 Our GUI will be implemented in Python, using the GUI development framework PyQt5. For the development process, we will use a linux virtual machine running Ubuntu 18.04. We will study the existing GEM5 code base to maintain consistency between the GUI and the backend software. We will also be using JIRA as our product management tool to develop tasks as well as communicate with our client and other gem5 contributors.
