@@ -42,6 +42,8 @@ class FieldWindow(QMainWindow):
         self.label.setFrameStyle(QFrame.Panel | QFrame.Sunken)
         #self.label.setText("first line\nsecond line")
         self.label.setAlignment(Qt.AlignBottom | Qt.AlignLeft)
+        self.label.setWordWrap(True)
+        self.label.setScaledContents(True)
         self.gridLayout.addWidget(self.label, 3, 0, 1, 1)
 
         #create toolbars
