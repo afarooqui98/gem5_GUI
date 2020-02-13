@@ -45,8 +45,8 @@ class FieldGraphicsScene(QGraphicsScene):
 
         return drop_x, drop_y
 
+
     def _visualise_graphic_item_center(self, type, name):
-        x, y = self.width()/2, self.height()/2
 
         if name == "System":
             new_object = SymObject(0, 0, 500, 500, self, name)
@@ -98,14 +98,15 @@ class FieldGraphicsScene(QGraphicsScene):
         else:
             return
 
+    def paintEvent(self, event):
+        q = QPainter(self)
+        config.drawLines(q)
+
+'''
         if event.mimeData().hasFormat("application/x-system"):
             system_added = self.field.add_component(SystemGraphicsPixmapItem())
             self._add_graphic_item(system_added, "system", "system")
         else:
             component_added = self.field.add_component(ComponentGraphicsPixmapItem())
             self._add_graphic_item(component_added, "component", event.mimeData().text())
-
-
-    def paintEvent(self, event):
-        q = QPainter(self)
-        config.drawLines(q)
+'''
