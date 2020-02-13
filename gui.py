@@ -13,7 +13,6 @@ from wire_button import *
 import sys, random
 import config
 
-
 class FieldWindow(QMainWindow):
     """this class creates a main window to observe the growth of a simulated field"""
 
