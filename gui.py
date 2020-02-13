@@ -79,9 +79,9 @@ class FieldWindow(QMainWindow):
         self.field_graphics_view.setScene(config.scene)
 
 
-        self.field_graphics_view.setSceneRect(0,0,700,1200)
-        self.field_graphics_view.setHorizontalScrollBarPolicy(1)
-        self.field_graphics_view.setVerticalScrollBarPolicy(1)
+        self.field_graphics_view.setSceneRect(0,0,700,600)
+        #self.field_graphics_view.setHorizontalScrollBarPolicy(1)
+        #self.field_graphics_view.setVerticalScrollBarPolicy(1)
 
         self.layout = QHBoxLayout()
         self.layout.addLayout(self.gridLayout)

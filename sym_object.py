@@ -11,11 +11,18 @@ from PyQt5 import QtCore
 import config
 
 
-class SymObject():
+class SymObject(QGraphicsItemGroup):
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, scene, component_name):
+        super(SymObject, self).__init__()
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.connected_objects = []
+        first = QGraphicsRectItem(scene.width()/2 - 100, scene.height()/2 - 50, width, height)
+        second = QGraphicsTextItem(component_name)
+        second.setPos(first.boundingRect().center() - second.boundingRect().center())
+
+        self.addToGroup(first)
+        self.addToGroup(second)
