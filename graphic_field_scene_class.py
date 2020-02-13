@@ -9,6 +9,7 @@ from graphic_system_item_class import *
 from lineDrawer import *
 from PyQt5 import QtCore
 import config
+from sym_object import *
 
 class FieldGraphicsScene(QGraphicsScene):
     """this class provides a scene to manage items in the field"""
@@ -21,7 +22,7 @@ class FieldGraphicsScene(QGraphicsScene):
         self.background_brush = QBrush()
         self.addWidget(config.line_drawer)
 
-        #config.line_drawer.resize(700, 1200) #fix to resize with resizing window
+        config.line_drawer.resize(700, 600) #fix to resize with resizing window
 
 
         #self.background_picture = QPixmap(":/field_background.png")
@@ -46,15 +47,16 @@ class FieldGraphicsScene(QGraphicsScene):
 
     def _visualise_graphic_item_center(self, type, name):
         x, y = self.width()/2, self.height()/2
-        if type == "component":
-            print(name)
-            rect_item = QGraphicsRectItem(QtCore.QRectF(x - 60, y, 100, 50))
-        else:
-            rect_item = QGraphicsRectItem(QtCore.QRectF(x - 100, y + 100, 500, 500))
 
-        rect_item.setFlag(QGraphicsItem.ItemIsMovable, True)
-        config.sym_objects.append(rect_item)
-        self.addItem(rect_item)
+        if name == "System":
+            new_object = SymObject(0, 0, 500, 500, self, name)
+        else:
+            new_object = SymObject(0, 0, 100, 50, self, name)
+
+
+        new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
+        config.sym_objects.append(new_object)
+        self.addItem(new_object)
 
     def _visualise_graphic_item(self, type, name):
             x, y = self._drop_position(self.field._components[-1])
