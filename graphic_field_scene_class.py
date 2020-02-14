@@ -22,12 +22,7 @@ class FieldGraphicsScene(QGraphicsScene):
         self.background_brush = QBrush()
         self.addWidget(config.line_drawer)
 
-        config.line_drawer.resize(700, 600) #fix to resize with resizing window
-
-
-        #self.background_picture = QPixmap(":/field_background.png")
-        #self.background_brush.setTexture(self.background_picture)
-        #self.setBackgroundBrush(self.background_brush)
+        config.line_drawer.resize(700, 600)
 
     def _drop_position(self,item):
         cursor_position = QCursor.pos() #global cursor position
@@ -54,16 +49,16 @@ class FieldGraphicsScene(QGraphicsScene):
             new_object = SymObject(0, 0, 100, 50, self, name)
 
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
-        #config.sym_objects.append(new_object)
         config.sym_objects[(new_object.x, new_object.y)] = new_object
         self.addItem(new_object)
 
-    def _add_graphic_item(self,result, type, name):
+    def _add_graphic_item(self, result, type, name):
         if result:
             self._visualise_graphic_item_center(type, name)
         else:
             error_message = QMessageBox()
-            error_message.setText("No more {0}s can be added to this field".format(graphic_item_type))
+            message = "No more " + graphic_item_type + "s can be added to this field"
+            error_message.setText(message)
             error_message.exec()
 
     #this method overrides the parent method

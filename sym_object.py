@@ -35,7 +35,9 @@ class SymObject(QGraphicsItemGroup):
 
         for key in config.sym_objects:
             item = config.sym_objects[key]
-            if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x() + self.width, self.pos().y() + self.height, item.x, item.y, item.x + item.width, item.y + item.height):
+            if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x() +
+            self.width, self.pos().y() + self.height, item.x, item.y, item.x +
+            item.width, item.y + item.height):
                 self.setPos(item.x + item.width + 10, item.y + item.height + 10)
                 self.x = self.pos().x()
                 self.y = self.pos().y()
@@ -56,7 +58,9 @@ class SymObject(QGraphicsItemGroup):
         for key in config.sym_objects:
             item = config.sym_objects[key]
             if self != item:
-                if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x() + self.width, self.pos().y() + self.height, item.x, item.y, item.x + item.width, item.y + item.height):
+                if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x()
+                 + self.width, self.pos().y() + self.height, item.x, item.y,
+                 item.x + item.width, item.y + item.height):
                     self.setPos(self.x, self.y)
 
         # update the object's position parameters

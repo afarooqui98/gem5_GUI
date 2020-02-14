@@ -8,7 +8,7 @@ except:
 from graphic_field_scene_class import *
 from graphic_system_item_class import *
 from graphic_drag_label_class import *
-from wire_button import *
+from button import *
 import sys, random
 
 
