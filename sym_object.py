@@ -28,8 +28,19 @@ class SymObject(QGraphicsItemGroup):
 
         text = QGraphicsTextItem(component_name)
         text.setPos(rect.boundingRect().center() - text.boundingRect().center())
+
+        port1 = QGraphicsEllipseItem(width/2 - config.port_size/2, height,
+                                        config.port_size, config.port_size)
+        port1.setBrush(QColor("Black"))
+
+        port2 = QGraphicsEllipseItem(width/2 - config.port_size/2,
+                        -config.port_size, config.port_size, config.port_size)
+        port2.setBrush(QColor("Black"))
+
         self.addToGroup(rect)
         self.addToGroup(text)
+        self.addToGroup(port1)
+        self.addToGroup(port2)
 
         self.setPos(scene.width()/2 - width, scene.height()/2 - height)
 

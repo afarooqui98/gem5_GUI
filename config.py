@@ -18,6 +18,7 @@ sym_objects = {}
 lines = []
 line_drawer = None
 scene = None
+port_size = 10
 
 def setDragState():
     for object in sym_objects:
