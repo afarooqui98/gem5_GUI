@@ -14,14 +14,14 @@ import sys, random
 
 drag_state = True
 draw_wire_state = False
-sym_objects = []
+sym_objects = {}
 lines = []
 line_drawer = None
 scene = None
 
 def setDragState():
     for object in sym_objects:
-        object.setFlag(QGraphicsItem.ItemIsMovable, drag_state)
+        sym_objects[object].setFlag(QGraphicsItem.ItemIsMovable, drag_state)
 
 def drawLines(q):
     if lines:

@@ -53,24 +53,10 @@ class FieldGraphicsScene(QGraphicsScene):
         else:
             new_object = SymObject(0, 0, 100, 50, self, name)
 
-
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
-        config.sym_objects.append(new_object)
+        #config.sym_objects.append(new_object)
+        config.sym_objects[(new_object.x, new_object.y)] = new_object
         self.addItem(new_object)
-
-    def _visualise_graphic_item(self, type, name):
-            x, y = self._drop_position(self.field._components[-1])
-            current_view = self.views()[0]
-
-            if type == "component":
-                print(name)
-                rect_item = QGraphicsRectItem(QtCore.QRectF(x - 50, y + 300, 100, 50))
-            else:
-                rect_item = QGraphicsRectItem(QtCore.QRectF(x - 100, y + 100, 500, 500))
-
-            rect_item.setFlag(QGraphicsItem.ItemIsMovable, True)
-            config.sym_objects.append(rect_item)
-            self.addItem(rect_item)
 
     def _add_graphic_item(self,result, type, name):
         if result:
