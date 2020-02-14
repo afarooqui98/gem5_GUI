@@ -9,6 +9,7 @@ from graphic_system_item_class import *
 from lineDrawer import *
 from PyQt5 import QtCore
 import config
+from sym_object import *
 
 class FieldGraphicsScene(QGraphicsScene):
     """this class provides a scene to manage items in the field"""
@@ -21,12 +22,7 @@ class FieldGraphicsScene(QGraphicsScene):
         self.background_brush = QBrush()
         self.addWidget(config.line_drawer)
 
-        #config.line_drawer.resize(700, 1200) #fix to resize with resizing window
-
-
-        #self.background_picture = QPixmap(":/field_background.png")
-        #self.background_brush.setTexture(self.background_picture)
-        #self.setBackgroundBrush(self.background_brush)
+        config.line_drawer.resize(700, 600)
 
     def _drop_position(self,item):
         cursor_position = QCursor.pos() #global cursor position
@@ -44,38 +40,25 @@ class FieldGraphicsScene(QGraphicsScene):
 
         return drop_x, drop_y
 
+
     def _visualise_graphic_item_center(self, type, name):
-        x, y = self.width()/2, self.height()/2
-        if type == "component":
-            print(name)
-            rect_item = QGraphicsRectItem(QtCore.QRectF(x - 60, y, 100, 50))
+
+        if name == "System":
+            new_object = SymObject(0, 0, 500, 500, self, name)
         else:
-            rect_item = QGraphicsRectItem(QtCore.QRectF(x - 100, y + 100, 500, 500))
+            new_object = SymObject(0, 0, 100, 50, self, name)
 
-        rect_item.setFlag(QGraphicsItem.ItemIsMovable, True)
-        config.sym_objects.append(rect_item)
-        self.addItem(rect_item)
+        new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
+        config.sym_objects[(new_object.x, new_object.y)] = new_object
+        self.addItem(new_object)
 
-    def _visualise_graphic_item(self, type, name):
-            x, y = self._drop_position(self.field._components[-1])
-            current_view = self.views()[0]
-
-            if type == "component":
-                print(name)
-                rect_item = QGraphicsRectItem(QtCore.QRectF(x - 50, y + 300, 100, 50))
-            else:
-                rect_item = QGraphicsRectItem(QtCore.QRectF(x - 100, y + 100, 500, 500))
-
-            rect_item.setFlag(QGraphicsItem.ItemIsMovable, True)
-            config.sym_objects.append(rect_item)
-            self.addItem(rect_item)
-
-    def _add_graphic_item(self,result, type, name):
+    def _add_graphic_item(self, result, type, name):
         if result:
             self._visualise_graphic_item_center(type, name)
         else:
             error_message = QMessageBox()
-            error_message.setText("No more {0}s can be added to this field".format(graphic_item_type))
+            message = "No more " + graphic_item_type + "s can be added to this field"
+            error_message.setText(message)
             error_message.exec()
 
     #this method overrides the parent method
@@ -96,14 +79,15 @@ class FieldGraphicsScene(QGraphicsScene):
         else:
             return
 
+    def paintEvent(self, event):
+        q = QPainter(self)
+        config.drawLines(q)
+
+'''
         if event.mimeData().hasFormat("application/x-system"):
             system_added = self.field.add_component(SystemGraphicsPixmapItem())
             self._add_graphic_item(system_added, "system", "system")
         else:
             component_added = self.field.add_component(ComponentGraphicsPixmapItem())
             self._add_graphic_item(component_added, "component", event.mimeData().text())
-
-
-    def paintEvent(self, event):
-        q = QPainter(self)
-        config.drawLines(q)
+'''

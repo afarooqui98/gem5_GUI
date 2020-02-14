@@ -5,3 +5,6 @@ def wire_button_pressed():
     config.drag_state = not config.drag_state
     config.draw_wire_state = not config.draw_wire_state
     config.setDragState()
+
+def save_button_pressed():
+    print("saved config")

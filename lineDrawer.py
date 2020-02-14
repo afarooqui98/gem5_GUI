@@ -37,6 +37,7 @@ class LineDrawer(QWidget):
 
     def paintEvent(self, event):
         q = QPainter(self)
+        q.setPen(QPen(Qt.black, 3))
         if self.pos1 and self.pos2:
             q.drawLine(self.pos1.x(), self.pos1.y(), self.pos2.x(), self.pos2.y())
         config.drawLines(q)
