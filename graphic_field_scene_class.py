@@ -22,12 +22,7 @@ class FieldGraphicsScene(QGraphicsScene):
         self.background_brush = QBrush()
         self.addWidget(config.line_drawer)
 
-        config.line_drawer.resize(700, 600) #fix to resize with resizing window
-
-
-        #self.background_picture = QPixmap(":/field_background.png")
-        #self.background_brush.setTexture(self.background_picture)
-        #self.setBackgroundBrush(self.background_brush)
+        config.line_drawer.resize(700, 600)
 
     def _drop_position(self,item):
         cursor_position = QCursor.pos() #global cursor position
@@ -53,31 +48,17 @@ class FieldGraphicsScene(QGraphicsScene):
         else:
             new_object = SymObject(0, 0, 100, 50, self, name)
 
-
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
-        config.sym_objects.append(new_object)
+        config.sym_objects[(new_object.x, new_object.y)] = new_object
         self.addItem(new_object)
 
-    def _visualise_graphic_item(self, type, name):
-            x, y = self._drop_position(self.field._components[-1])
-            current_view = self.views()[0]
-
-            if type == "component":
-                print(name)
-                rect_item = QGraphicsRectItem(QtCore.QRectF(x - 50, y + 300, 100, 50))
-            else:
-                rect_item = QGraphicsRectItem(QtCore.QRectF(x - 100, y + 100, 500, 500))
-
-            rect_item.setFlag(QGraphicsItem.ItemIsMovable, True)
-            config.sym_objects.append(rect_item)
-            self.addItem(rect_item)
-
-    def _add_graphic_item(self,result, type, name):
+    def _add_graphic_item(self, result, type, name):
         if result:
             self._visualise_graphic_item_center(type, name)
         else:
             error_message = QMessageBox()
-            error_message.setText("No more {0}s can be added to this field".format(graphic_item_type))
+            message = "No more " + graphic_item_type + "s can be added to this field"
+            error_message.setText(message)
             error_message.exec()
 
     #this method overrides the parent method

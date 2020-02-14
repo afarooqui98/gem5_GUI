@@ -21,8 +21,8 @@ class SymObject(QGraphicsItemGroup):
         #initializing to (0, 0) so that future positions are relative to (0, 0)
         rect = QGraphicsRectItem(0, 0, width, height)
 
-        self.x = scene.width()/2 - width
-        self.y = scene.height()/2 - height
+        self.x = scene.width() / 2 - width
+        self.y = scene.height() / 2 - height
         self.width = width
         self.height = height
 
@@ -33,8 +33,11 @@ class SymObject(QGraphicsItemGroup):
 
         self.setPos(scene.width()/2 - width, scene.height()/2 - height)
 
-        for item in config.sym_objects:
-            if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x() + self.width, self.pos().y() + self.height, item.x, item.y, item.x + item.width, item.y + item.height):
+        for key in config.sym_objects:
+            item = config.sym_objects[key]
+            if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x() +
+            self.width, self.pos().y() + self.height, item.x, item.y, item.x +
+            item.width, item.y + item.height):
                 self.setPos(item.x + item.width + 10, item.y + item.height + 10)
                 self.x = self.pos().x()
                 self.y = self.pos().y()
@@ -52,9 +55,12 @@ class SymObject(QGraphicsItemGroup):
         super(SymObject, self).mouseReleaseEvent(event)
         #iterate through all sym objects on the screen and check if the object's
         # current position overlaps with any of them
-        for item in config.sym_objects:
+        for key in config.sym_objects:
+            item = config.sym_objects[key]
             if self != item:
-                if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x() + self.width, self.pos().y() + self.height, item.x, item.y, item.x + item.width, item.y + item.height):
+                if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x()
+                 + self.width, self.pos().y() + self.height, item.x, item.y,
+                 item.x + item.width, item.y + item.height):
                     self.setPos(self.x, self.y)
 
         # update the object's position parameters

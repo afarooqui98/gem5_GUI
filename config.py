@@ -8,20 +8,20 @@ except:
 from graphic_field_scene_class import *
 from graphic_system_item_class import *
 from graphic_drag_label_class import *
-from wire_button import *
+from button import *
 import sys, random
 
 
 drag_state = True
 draw_wire_state = False
-sym_objects = []
+sym_objects = {}
 lines = []
 line_drawer = None
 scene = None
 
 def setDragState():
     for object in sym_objects:
-        object.setFlag(QGraphicsItem.ItemIsMovable, drag_state)
+        sym_objects[object].setFlag(QGraphicsItem.ItemIsMovable, drag_state)
 
 def drawLines(q):
     if lines:
