@@ -29,8 +29,8 @@ class FieldWindow(QMainWindow):
         self.gridLayout.setObjectName("gridLayout")
         self.wire_button = QPushButton("draw wire")
         self.gridLayout.addWidget(self.wire_button, 0, 0, 1, 1)
-        self.save_button = QPushButton("save")
-        self.gridLayout.addWidget(self.save_button, 0, 1, 1, 1)
+        self.export_button = QPushButton("export")
+        self.gridLayout.addWidget(self.export_button, 0, 1, 1, 1)
         self.treeWidget = QTreeWidget()
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Name")
@@ -70,7 +70,7 @@ class FieldWindow(QMainWindow):
         self.treeWidget.itemDoubleClicked.connect(self.doubleClickEvent)
         self.attributeList.itemClicked.connect(self.populateDescription)
         self.wire_button.clicked.connect(wire_button_pressed)
-        self.save_button.clicked.connect(save_button_pressed)
+        self.export_button.clicked.connect(export_button_pressed)
 
     def closeEvent(self, event):
         sys.exit()
@@ -86,7 +86,7 @@ class FieldWindow(QMainWindow):
 
 
     def populate(self):
-        for item in self.catalog.keys():
+        for item in sorted(self.catalog.keys()):
             self.treeWidget.addTopLevelItem(QTreeWidgetItem([item]))
 
     def populateDescription(self, item):
