@@ -38,20 +38,23 @@ class Ui_MainWindow(object):
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
 
+        self.edit = QtWidgets.QLineEdit(self.centralwidget)
+        self.gridLayout.addWidget(self.edit, 0, 0, 1, 1)
+
         self.treeWidget = QtWidgets.QTreeWidget(self.centralwidget)
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Name")
-        self.gridLayout.addWidget(self.treeWidget, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.treeWidget, 1, 0, 1, 1)
 
         self.attributeList = QtWidgets.QListWidget(self.centralwidget)
         self.attributeList.setObjectName("attributeList")
-        self.gridLayout.addWidget(self.attributeList, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.attributeList, 2, 0, 1, 1)
 
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
         #self.label.setText("first line\nsecond line")
         self.label.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
-        self.gridLayout.addWidget(self.label, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.label, 3, 0, 1, 1)
 
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -72,6 +75,18 @@ class Ui_MainWindow(object):
 
         self.treeWidget.itemClicked.connect(self.populateAttributes)
         self.attributeList.itemClicked.connect(self.populateDescription)
+        self.edit.textChanged.connect(self.searchItem)
+
+
+    def searchItem(self):
+        search_string = self.edit.text()
+        match_items = self.treeWidget.findItems(search_string, QtCore.Qt.MatchContains)
+
+        root = self.treeWidget.invisibleRootItem()
+        child_count = root.childCount()
+        for i in range(child_count):
+            item = root.child(i)
+            item.setHidden(item not in match_items)
 
 
     def retranslateUi(self, MainWindow):
