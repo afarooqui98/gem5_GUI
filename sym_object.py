@@ -25,6 +25,7 @@ class SymObject(QGraphicsItemGroup):
         self.y = scene.height() / 2 - height
         self.width = width
         self.height = height
+        self.component_name = component_name
 
         text = QGraphicsTextItem(component_name)
         text.setPos(rect.boundingRect().center() - text.boundingRect().center())
@@ -58,7 +59,7 @@ class SymObject(QGraphicsItemGroup):
     #register mouse press events
     def mousePressEvent(self, event):
         super(SymObject, self).mousePressEvent(event)
-
+        config.mainWindow.populateAttributes(None, self.component_name)
 
     # when mouse is release on object, update its position including the case
     # where it overlaps

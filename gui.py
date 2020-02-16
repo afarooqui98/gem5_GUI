@@ -78,9 +78,13 @@ class FieldWindow(QMainWindow):
     def doubleClickEvent(self, item):
         config.scene._visualise_graphic_item_center("component", item.text(0))
 
-    def populateAttributes(self, item, column):
+    def populateAttributes(self, item, name):
         self.attributeList.clear()
-        self.attributes = self.catalog[item.text(0)]
+        if item:
+            self.attributes = self.catalog[item.text(0)]
+        else:
+            self.attributes = self.catalog[name]
+
         for attribute in self.attributes.keys():
             self.attributeList.addItem(attribute)
 
@@ -101,6 +105,7 @@ class FieldWindow(QMainWindow):
 def main():
     field_simulation = QApplication(sys.argv) #create new application
     field_window = FieldWindow() #create new instance of main window
+    config.mainWindow = field_window
     field_window.show() #make instance visible
     field_window.raise_() #raise instance to top of window stack
     field_simulation.exec_() #monitor application for events
