@@ -107,7 +107,8 @@ class FieldWindow(QMainWindow):
         item.setFlags(item.flags() ^ Qt.ItemIsEditable)
         
     def doubleClickEvent(self, item):
-        config.scene._visualise_graphic_item_center("component", item.text(0))
+        config.current_sym_object = config.scene._visualise_graphic_item_center("component", item.text(0))
+        config.current_sym_object.parameters = copy.deepcopy(self.catalog[item.text(0)])
     
     def treeWidgetClicked(self, item, name): #if single clicking from the treeWidget, don't want to set the current sym object
         config.current_sym_object = None
@@ -115,6 +116,11 @@ class FieldWindow(QMainWindow):
 
     def populateAttributes(self, item, name):
         self.attributeList.clear()
+        self.attributeTable.setRowCount(0)
+        
+        if config.current_sym_object != None:
+            print(config.current_sym_object.component_name)
+        
         if item:
             self.attributes = self.catalog[item.text(0)]
         else:
