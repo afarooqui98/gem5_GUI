@@ -16,6 +16,7 @@ class SymObject(QGraphicsItemGroup):
     def __init__(self, x, y, width, height, scene, component_name):
         super(SymObject, self).__init__()
         self.connected_objects = []
+        self.parameters = {}
         self.isMoving = False
 
         #initializing to (0, 0) so that future positions are relative to (0, 0)
@@ -59,6 +60,7 @@ class SymObject(QGraphicsItemGroup):
     #register mouse press events
     def mousePressEvent(self, event):
         super(SymObject, self).mousePressEvent(event)
+        config.current_sym_object = self
         config.mainWindow.populateAttributes(None, self.component_name)
 
     # when mouse is release on object, update its position including the case
