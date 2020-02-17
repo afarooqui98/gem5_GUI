@@ -28,21 +28,12 @@ for i in range(len(test_objects)):
             else:
                 param_attr["Default"] = None
                 param_attr["Value"] = None
+          
             param_dict[pname] = param_attr
         sub_objs[sub_obj] = param_dict
 
     obj_tree[name] = sub_objs
 
-            param_attr["Default"] = str(val.default)
-        else:
-            param_attr["Default"] = None
-        param_dict[key] = param_attr
-        print()
-    print()
-    params = list(obj._params.keys())
-    params.sort()
-    #print(params)
-    obj_param[name] = param_dict
 
 with open('result.json', 'w') as fp:
-    json.dump(obj_param, fp)
+    json.dump(obj_tree, fp)

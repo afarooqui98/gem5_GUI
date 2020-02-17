@@ -10,6 +10,7 @@ from graphic_system_item_class import *
 from graphic_drag_label_class import *
 
 import sys, random
+import copy
 import config
 from button import *
 import json
@@ -25,26 +26,36 @@ class FieldWindow(QMainWindow):
         self.setLayoutDirection(Qt.LeftToRight)
 
         #catalog start
-        self.gridLayout = QGridLayout()
+        self.gridLayout = QVBoxLayout()
         self.gridLayout.setObjectName("gridLayout")
+
         self.wire_button = QPushButton("draw wire")
-        self.gridLayout.addWidget(self.wire_button, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.wire_button)
         self.export_button = QPushButton("export")
-        self.gridLayout.addWidget(self.export_button, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.export_button)
+
         self.treeWidget = QTreeWidget()
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Name")
-        self.gridLayout.addWidget(self.treeWidget, 1, 0, 1, 2)
-        self.attributeList = QListWidget()
-        self.attributeList.setObjectName("attributeList")
-        self.gridLayout.addWidget(self.attributeList, 2, 0, 1, 2)
+        self.gridLayout.addWidget(self.treeWidget)
+
+        self.attributeLayout = QHBoxLayout()
+        self.attributeTable = QTableWidget(0,2)
+        self.attributeTable.setObjectName("attributeTable")
+        self.attributeTable.verticalHeader().setVisible(False)
+        self.attributeTable.horizontalHeader().setVisible(False)
+        header = self.attributeTable.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        self.attributeLayout.addWidget(self.attributeTable)
+        self.gridLayout.addLayout(self.attributeLayout)
 
         self.label = QLabel()
         self.label.setFrameStyle(QFrame.Panel | QFrame.Sunken)
         self.label.setAlignment(Qt.AlignBottom | Qt.AlignLeft)
         self.label.setWordWrap(True)
         self.label.setScaledContents(True)
-        self.gridLayout.addWidget(self.label, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.label)
 
         self.field_graphics_view = QGraphicsView()
         config.scene = FieldGraphicsScene(1,5)
@@ -66,7 +77,7 @@ class FieldWindow(QMainWindow):
         self.setCentralWidget(self.main)
 
         self.populate() #populate treeview
-        self.treeWidget.itemClicked.connect(self.populateAttributes)
+        self.treeWidget.itemClicked.connect(self.treeWidgetClicked)
         self.treeWidget.itemDoubleClicked.connect(self.doubleClickEvent)
         self.attributeTable.itemDoubleClicked.connect(self.makeEditable)
         self.wire_button.clicked.connect(wire_button_pressed)
@@ -96,16 +107,31 @@ class FieldWindow(QMainWindow):
         #item no longer editable, disconnect
         self.attributeTable.itemChanged.disconnect(self.modifyCurrentSym_object)
         item.setFlags(item.flags() ^ Qt.ItemIsEditable)
-        
+
     def doubleClickEvent(self, item):
-        config.scene._visualise_graphic_item_center("component", item.text(0))
+        config.current_sym_object = config.scene._visualise_graphic_item_center("component", item.text(0))
+        config.current_sym_object.parameters = copy.deepcopy(self.catalog[item.text(0)])
+
+    def treeWidgetClicked(self, item, name): #if single clicking from the treeWidget, don't want to set the current sym object
+        config.current_sym_object = None
+        self.populateAttributes(item, name)
 
     def populateAttributes(self, item, name):
-        self.attributeList.clear()
+        self.attributeTable.clear()
+        self.attributeTable.setRowCount(0)
+
+        if config.current_sym_object != None:
+            print(config.current_sym_object.component_name)
+
         if item:
             self.attributes = self.catalog[item.text(0)]
         else:
-            self.attributes = self.catalog[name]
+            if config.current_sym_object != None or config.current_sym_object.component_name == name: #only load from param list if there is a sym object in the context
+                print("filling in current sym obj branch")
+                self.attributes = config.current_sym_object.parameters
+            else: #TODO: check when would this branch happen??
+                print("filling in name branch")
+                self.attributes = self.catalog[name]
 
         for attribute in self.attributes.keys():
             self.attributeTable.insertRow(self.attributeTable.rowCount())
@@ -119,6 +145,7 @@ class FieldWindow(QMainWindow):
             self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 1, QTableWidgetItem(self.attributes[attribute]["Value"]))
             cell = self.attributeTable.item(self.attributeTable.rowCount() - 1, 1)
             cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
+
 
     def populate(self):
         for item in sorted(self.catalog.keys()):

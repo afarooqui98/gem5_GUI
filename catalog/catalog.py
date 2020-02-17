@@ -94,15 +94,22 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
 
     def populateAttributes(self, item, column):
+        if item.parent() is None:
+            return
+
         self.attributeList.clear()
-        self.attributes = self.catalog[item.text(0)]
+        self.attributes = self.catalog[item.parent().text(0)][item.text(0)]
         for attribute in self.attributes.keys():
             self.attributeList.addItem(attribute)
 
 
     def populate(self):
-        for item in self.catalog.keys():
-            self.treeWidget.addTopLevelItem(QtWidgets.QTreeWidgetItem([item]))
+        for item in sorted(self.catalog.keys()):
+            tree_item = QtWidgets.QTreeWidgetItem([item])
+            for sub_item in self.catalog[item].keys():
+                tree_item.addChild(QtWidgets.QTreeWidgetItem([sub_item]))
+            self.treeWidget.addTopLevelItem(tree_item)
+
 
     def populateDescription(self, item):
         info = ""

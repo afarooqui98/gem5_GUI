@@ -59,6 +59,7 @@ class SymObject(QGraphicsItemGroup):
     #register mouse press events
     def mousePressEvent(self, event):
         super(SymObject, self).mousePressEvent(event)
+        config.current_sym_object = self
         config.mainWindow.populateAttributes(None, self.component_name)
 
     # when mouse is release on object, update its position including the case
