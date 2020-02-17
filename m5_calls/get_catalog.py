@@ -1,5 +1,8 @@
+import m5
 from m5 import SimObject
 import json
+from ObjectList import ObjectList
+
 
 
 obj_tree = {}
