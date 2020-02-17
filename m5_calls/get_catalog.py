@@ -1,4 +1,6 @@
+import m5
 from m5 import SimObject
+from ObjectList import ObjectList
 import json
 
 
@@ -22,8 +24,11 @@ for i in range(len(test_objects)):
                 # TODO Must convert default to string for object values
                 #  in order to dump to json. Need way to access object?
                 param_attr["Default"] = str(param.default)
+                param_attr["Value"] = str(param.default)
             else:
                 param_attr["Default"] = None
+                param_attr["Value"] = None
+          
             param_dict[pname] = param_attr
         sub_objs[sub_obj] = param_dict
 

@@ -102,7 +102,7 @@ class FieldWindow(QMainWindow):
         currentRow = self.attributeTable.row(item)
         currentAttribute = self.attributeTable.item(currentRow, currentColumn - 1).text()
         currentValue = item.text()
-        config.current_sym_object.parameters[currentAttribute]["Default"] = currentValue
+        config.current_sym_object.parameters[currentAttribute]["Value"] = currentValue
 
         #item no longer editable, disconnect
         self.attributeTable.itemChanged.disconnect(self.modifyCurrentSym_object)
@@ -142,7 +142,7 @@ class FieldWindow(QMainWindow):
             cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
 
             #set column 1 value
-            self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 1, QTableWidgetItem(self.attributes[attribute]["Default"]))
+            self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 1, QTableWidgetItem(self.attributes[attribute]["Value"]))
             cell = self.attributeTable.item(self.attributeTable.rowCount() - 1, 1)
             cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
 
