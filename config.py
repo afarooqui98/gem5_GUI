@@ -15,6 +15,7 @@ import sys, random
 drag_state = True
 draw_wire_state = False
 sym_objects = {}
+current_sym_object = None
 lines = []
 line_drawer = None
 scene = None
