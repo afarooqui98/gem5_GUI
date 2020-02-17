@@ -25,26 +25,36 @@ class FieldWindow(QMainWindow):
         self.setLayoutDirection(Qt.LeftToRight)
 
         #catalog start
-        self.gridLayout = QGridLayout()
+        self.gridLayout = QVBoxLayout()
         self.gridLayout.setObjectName("gridLayout")
+
         self.wire_button = QPushButton("draw wire")
-        self.gridLayout.addWidget(self.wire_button, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.wire_button)
         self.export_button = QPushButton("export")
-        self.gridLayout.addWidget(self.export_button, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.export_button)
+
         self.treeWidget = QTreeWidget()
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Name")
-        self.gridLayout.addWidget(self.treeWidget, 1, 0, 1, 2)
-        self.attributeList = QListWidget()
-        self.attributeList.setObjectName("attributeList")
-        self.gridLayout.addWidget(self.attributeList, 2, 0, 1, 2)
+        self.gridLayout.addWidget(self.treeWidget)
+
+        self.attributeLayout = QHBoxLayout()
+        self.attributeTable = QTableWidget(0,2)
+        self.attributeTable.setObjectName("attributeTable")
+        self.attributeTable.verticalHeader().setVisible(False)
+        self.attributeTable.horizontalHeader().setVisible(False)
+        header = self.attributeTable.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        self.attributeLayout.addWidget(self.attributeTable)
+        self.gridLayout.addLayout(self.attributeLayout)
 
         self.label = QLabel()
         self.label.setFrameStyle(QFrame.Panel | QFrame.Sunken)
         self.label.setAlignment(Qt.AlignBottom | Qt.AlignLeft)
         self.label.setWordWrap(True)
         self.label.setScaledContents(True)
-        self.gridLayout.addWidget(self.label, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.label)
 
         self.field_graphics_view = QGraphicsView()
         config.scene = FieldGraphicsScene(1,5)
@@ -66,12 +76,11 @@ class FieldWindow(QMainWindow):
         self.setCentralWidget(self.main)
 
         self.populate() #populate treeview
-        self.treeWidget.itemClicked.connect(self.populateAttributes)
+        self.treeWidget.itemClicked.connect(self.treeWidgetClicked)
         self.treeWidget.itemDoubleClicked.connect(self.doubleClickEvent)
         self.attributeTable.itemDoubleClicked.connect(self.makeEditable)
         self.wire_button.clicked.connect(wire_button_pressed)
         self.export_button.clicked.connect(export_button_pressed)
-
     def closeEvent(self, event):
         sys.exit()
 
