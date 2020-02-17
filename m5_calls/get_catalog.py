@@ -1,27 +1,37 @@
+import m5
 from m5 import SimObject
-import json 
+from ObjectList import ObjectList
+import json
 
-print("SimObjects:")
-objects = list(SimObject.allClasses.keys())
-objects.sort()
-obj_param = {}
 
-for name in objects:
-    obj = SimObject.allClasses[name]
-    print("Obj: " + name)
-    param_dict = {}
+obj_tree = {}
 
-    for key, val in obj._params.items():
-        param_attr = {}
-        print("Parameter: " + key)
-        print("Description: " + val.desc)
-        param_attr["Description"] = val.desc
-        param_attr["Type"] = val.ptype_str
-        if hasattr(val, 'default'):
-            print("Default Val: " + str(val.default))
+test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher', 'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject', 'HelloObject', 'GoodbyeObject']
+
+
+for i in range(len(test_objects)):
+    name = test_objects[i]
+    obj_list = ObjectList(getattr(m5.objects, name, None))
+    sub_objs = {}
+    for sub_obj in obj_list._sub_classes.keys():
+        param_dict = {}
+        for pname, param in obj_list._sub_classes[sub_obj]._params.items():
+            param_attr = {}
+            param_attr["Description"] = param.desc
+            param_attr["Type"] = param.ptype_str
+            if hasattr(param, 'default'):
 
                 # TODO Must convert default to string for object values
                 #  in order to dump to json. Need way to access object?
+                param_attr["Default"] = str(param.default)
+                param_attr["Value"] = str(param.default)
+            else:
+                param_attr["Default"] = None
+                param_attr["Value"] = None
+            param_dict[pname] = param_attr
+        sub_objs[sub_obj] = param_dict
+
+    obj_tree[name] = sub_objs
 
             param_attr["Default"] = str(val.default)
         else:
