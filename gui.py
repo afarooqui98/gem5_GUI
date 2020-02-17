@@ -11,6 +11,7 @@ from graphic_drag_label_class import *
 
 import sys, random
 import config
+import copy
 from button import *
 import json
 
