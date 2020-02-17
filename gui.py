@@ -108,6 +108,10 @@ class FieldWindow(QMainWindow):
         
     def doubleClickEvent(self, item):
         config.scene._visualise_graphic_item_center("component", item.text(0))
+    
+    def treeWidgetClicked(self, item, name): #if single clicking from the treeWidget, don't want to set the current sym object
+        config.current_sym_object = None
+        self.populateAttributes(item, name)
 
     def populateAttributes(self, item, name):
         self.attributeList.clear()
