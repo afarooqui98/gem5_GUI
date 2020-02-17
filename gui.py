@@ -79,13 +79,20 @@ class FieldWindow(QMainWindow):
         self.populate() #populate treeview
         self.treeWidget.itemClicked.connect(self.treeWidgetClicked)
         self.treeWidget.itemDoubleClicked.connect(self.doubleClickEvent)
-        self.attributeTable.currentItemChanged.connect(self.modifyCurrentSym_object)
+        self.attributeTable.itemDoubleClicked.connect(self.makeEditable)
         self.wire_button.clicked.connect(wire_button_pressed)
         self.export_button.clicked.connect(export_button_pressed)
 
     def closeEvent(self, event):
         sys.exit()
 
+    #this function feeds into the next one, after the cell is changed it will trigger
+    def makeEditable(self, item):
+        #set item to editable
+        item.setFlags(item.flags() | Qt.ItemIsEditable)
+        self.attributeTable.itemChanged.connect(self.modifyCurrentSym_object)
+
+    #this signal disconnects itself after finishing execution, since we only want to trigger it AFTER a double press
     def modifyCurrentSym_object(self, item):
         if config.current_sym_object == None or item == None:
             return
@@ -96,6 +103,10 @@ class FieldWindow(QMainWindow):
         currentAttribute = self.attributeTable.item(currentRow, currentColumn - 1).text()
         currentValue = item.text()
         config.current_sym_object.parameters[currentAttribute]["Default"] = currentValue
+
+        #item no longer editable, disconnect
+        self.attributeTable.itemChanged.disconnect(self.modifyCurrentSym_object)
+        item.setFlags(item.flags() ^ Qt.ItemIsEditable)
 
     def doubleClickEvent(self, item):
         config.current_sym_object = config.scene._visualise_graphic_item_center("component", item.text(0))
@@ -132,6 +143,8 @@ class FieldWindow(QMainWindow):
 
             #set column 1 value
             self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 1, QTableWidgetItem(self.attributes[attribute]["Default"]))
+            cell = self.attributeTable.item(self.attributeTable.rowCount() - 1, 1)
+            cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
 
 
     def populate(self):
