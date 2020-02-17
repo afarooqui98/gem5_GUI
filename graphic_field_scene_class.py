@@ -51,7 +51,6 @@ class FieldGraphicsScene(QGraphicsScene):
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
         config.sym_objects[(new_object.x, new_object.y)] = new_object
         self.addItem(new_object)
-        return new_object
 
     def _add_graphic_item(self, result, type, name):
         if result:
