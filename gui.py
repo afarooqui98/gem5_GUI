@@ -115,7 +115,7 @@ class FieldWindow(QMainWindow):
         self.populateAttributes(item, name)
 
     def populateAttributes(self, item, name):
-        self.attributeList.clear()
+        self.attributeTable.clear()
         self.attributeTable.setRowCount(0)
         
         if config.current_sym_object != None:
