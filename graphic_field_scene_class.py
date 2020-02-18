@@ -49,7 +49,7 @@ class FieldGraphicsScene(QGraphicsScene):
             new_object = SymObject(0, 0, 100, 50, self, name)
 
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
-        config.sym_objects[(new_object.x, new_object.y)] = new_object
+        config.sym_objects[(new_object.x, new_object.y, "")] = new_object
         config.current_sym_object = new_object
         print(config.sym_objects)
         self.addItem(new_object)
