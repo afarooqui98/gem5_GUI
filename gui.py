@@ -106,7 +106,7 @@ class FieldWindow(QMainWindow):
     def makeEditable(self, item):
         #set item to editable
         item.setFlags(item.flags() | Qt.ItemIsEditable)
-        self.attributeTable.itemChanged.connect(self.modifyCurrentSym_object)
+        self.attributeTable.itemChanged.connect(self.modifyFields)
 
     def addRow(self, value1, value2):
         self.attributeTable.insertRow(self.attributeTable.rowCount())
@@ -121,14 +121,9 @@ class FieldWindow(QMainWindow):
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
 
     #this signal disconnects itself after finishing execution, since we only want to trigger it AFTER a double press
-    def modifyCurrentSym_object(self, item):
+    def modifyFields(self, item):
         if config.current_sym_object == None or item == None:
             return
-#        print(config.sym_objects)
-
-        #get name and connected objects
-        nameItem = self.attributeTable.item(0, 1)
-        connectedObjs = self.attributeTable.item(1, 1)
 
         #get attributes
         currentColumn = self.attributeTable.column(item)
@@ -136,13 +131,18 @@ class FieldWindow(QMainWindow):
         currentAttribute = self.attributeTable.item(currentRow, currentColumn - 1).text()
         currentValue = item.text()
 
-        config.current_sym_object.name = nameItem
-        config.current_sym_object.connected_objects = connectedObjs
-        config.current_sym_object.parameters[currentAttribute]["Value"] = currentValue
+        #if the value is name or connected objects, set the param instead of the dict
+        if currentAttribute == "Name":
+            print("")
+            config.current_sym_object.name = currentValue
+        elif currentAttribute == "Connected Objects":
+            config.current_sym_object.connected_objects = currentValue
+        else:
+            config.current_sym_object.parameters[currentAttribute]["Value"] = currentValue
         print(config.current_sym_object.parameters)
 
         #item no longer editable, disconnect
-        self.attributeTable.itemChanged.disconnect(self.modifyCurrentSym_object)
+        self.attributeTable.itemChanged.disconnect(self.modifyFields)
         item.setFlags(item.flags() ^ Qt.ItemIsEditable)
 
     def doubleClickEvent(self, item):
@@ -150,11 +150,13 @@ class FieldWindow(QMainWindow):
             return
         config.current_sym_object = config.scene._visualise_graphic_item_center("component", item.text(0))
         config.current_sym_object.parameters = copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)])
+        current_x = config.current_sym_object.x
+        curreny_y = config.current_sym_object.y
+        current_name = config.current_sym_object.name
+        config.sym_objects[(current_x, curreny_y, current_name)] = config.current_sym_object
+
 
     def treeWidgetClicked(self, item, name): #if single clicking from the treeWidget, don't want to set the current sym object
-        if config.current_sym_object != None:
-            config.sym_objects[(config.current_sym_object.x, config.current_sym_object.y)] = config.current_sym_object
-
         config.current_sym_object = None
         self.populateAttributes(item, name)
 
@@ -164,8 +166,8 @@ class FieldWindow(QMainWindow):
 
         if config.current_sym_object != None:
             print(config.current_sym_object.component_name)
-            self.addRow("Name", "")
-            self.addRow("Connected Objects", "")
+            self.addRow("Name", config.current_sym_object.name)
+            self.addRow("Connected Objects", config.current_sym_object.connected_objects)
 
         if item:
             if item.parent() is None:
