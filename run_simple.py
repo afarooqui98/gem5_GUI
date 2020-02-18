@@ -35,6 +35,9 @@ import m5
 # import all of the SimObjects
 from m5.objects import *
 
+# set up the root SimObject and start the simulation
+root = Root(full_system = False)
+
 # instantiate all of the objects we've created above
 m5.instantiate()
 

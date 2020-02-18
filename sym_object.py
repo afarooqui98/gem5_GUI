@@ -15,7 +15,7 @@ class SymObject(QGraphicsItemGroup):
 
     def __init__(self, x, y, width, height, scene, component_name):
         super(SymObject, self).__init__()
-        self.connected_objects = []
+        self.connected_objects = "" #TODO: at export, this string will become a list
         self.parameters = {}
         self.isMoving = False
 
@@ -27,6 +27,7 @@ class SymObject(QGraphicsItemGroup):
         self.width = width
         self.height = height
         self.component_name = component_name
+        self.name = ""
 
         text = QGraphicsTextItem(component_name)
         text.setPos(rect.boundingRect().center() - text.boundingRect().center())
