@@ -28,7 +28,6 @@ for i in range(len(test_objects)):
             else:
                 param_attr["Default"] = None
                 param_attr["Value"] = None
-          
             param_dict[pname] = param_attr
         sub_objs[sub_obj] = param_dict
 

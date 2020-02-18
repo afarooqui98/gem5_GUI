@@ -17,7 +17,7 @@ import json
 
 class FieldWindow(QMainWindow):
     """this class creates the main window"""
-    catalog = json.load(open('result.json'))
+    catalog = json.load(open('result_new.json'))
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -33,6 +33,10 @@ class FieldWindow(QMainWindow):
         self.gridLayout.addWidget(self.wire_button)
         self.export_button = QPushButton("export")
         self.gridLayout.addWidget(self.export_button)
+
+        self.edit = QLineEdit()
+        self.edit.setPlaceholderText("Search for an object here!")
+        self.gridLayout.addWidget(self.edit)
 
         self.treeWidget = QTreeWidget()
         self.treeWidget.setObjectName("treeWidget")
@@ -79,12 +83,24 @@ class FieldWindow(QMainWindow):
         self.populate() #populate treeview
         self.treeWidget.itemClicked.connect(self.treeWidgetClicked)
         self.treeWidget.itemDoubleClicked.connect(self.doubleClickEvent)
+        self.edit.textChanged.connect(self.searchItem)
         self.attributeTable.itemDoubleClicked.connect(self.makeEditable)
         self.wire_button.clicked.connect(wire_button_pressed)
         self.export_button.clicked.connect(export_button_pressed)
 
     def closeEvent(self, event):
         sys.exit()
+
+    #make tree view searchable
+    def searchItem(self):
+        search_string = self.edit.text()
+        match_items = self.treeWidget.findItems(search_string, Qt.MatchContains)
+
+        root = self.treeWidget.invisibleRootItem()
+        child_count = root.childCount()
+        for i in range(child_count):
+            item = root.child(i)
+            item.setHidden(item not in match_items)
 
     #this function feeds into the next one, after the cell is changed it will trigger
     def makeEditable(self, item):
@@ -110,7 +126,7 @@ class FieldWindow(QMainWindow):
 
     def doubleClickEvent(self, item):
         config.current_sym_object = config.scene._visualise_graphic_item_center("component", item.text(0))
-        config.current_sym_object.parameters = copy.deepcopy(self.catalog[item.text(0)])
+        config.current_sym_object.parameters = copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)])
 
     def treeWidgetClicked(self, item, name): #if single clicking from the treeWidget, don't want to set the current sym object
         config.current_sym_object = None
@@ -124,7 +140,7 @@ class FieldWindow(QMainWindow):
             print(config.current_sym_object.component_name)
 
         if item:
-            self.attributes = self.catalog[item.text(0)]
+            self.attributes = self.catalog[item.parent().text(0)][item.text(0)]
         else:
             if config.current_sym_object != None or config.current_sym_object.component_name == name: #only load from param list if there is a sym object in the context
                 print("filling in current sym obj branch")
@@ -149,7 +165,10 @@ class FieldWindow(QMainWindow):
 
     def populate(self):
         for item in sorted(self.catalog.keys()):
-            self.treeWidget.addTopLevelItem(QTreeWidgetItem([item]))
+            tree_item = QTreeWidgetItem([item])
+            for sub_item in self.catalog[item].keys():
+                tree_item.addChild(QTreeWidgetItem([sub_item]))
+            self.treeWidget.addTopLevelItem(tree_item)
 
     def populateDescription(self, item):
         info = ""
