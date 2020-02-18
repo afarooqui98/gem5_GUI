@@ -16,6 +16,7 @@ class SymObject(QGraphicsItemGroup):
     def __init__(self, x, y, width, height, scene, component_name):
         super(SymObject, self).__init__()
         self.connected_objects = []
+        self.parameters = {}
         self.isMoving = False
 
         #initializing to (0, 0) so that future positions are relative to (0, 0)
