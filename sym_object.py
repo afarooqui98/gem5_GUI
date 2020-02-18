@@ -61,6 +61,7 @@ class SymObject(QGraphicsItemGroup):
     #register mouse press events
     def mousePressEvent(self, event):
         super(SymObject, self).mousePressEvent(event)
+        print(config.sym_objects)
         config.current_sym_object = self
         config.mainWindow.populateAttributes(None, self.component_name)
 
