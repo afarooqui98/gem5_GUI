@@ -7,7 +7,6 @@ def wire_button_pressed():
     config.setDragState()
 
 def export_button_pressed():
-    print("export config")
     file = open("run_simple.py", "w+")
     file.write("""# -*- coding: utf-8 -*-
 # Copyright (c) 2020 Brownies
@@ -48,7 +47,12 @@ import m5
 from m5.objects import *"""
     )
 
-    
+    file.write("""\n
+# set up the root SimObject and start the simulation
+root = Root(full_system = False)"""
+    )
+
+    config.getSymObjects()
 
     file.write("""\n
 # instantiate all of the objects we've created above

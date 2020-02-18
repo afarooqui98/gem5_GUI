@@ -108,27 +108,53 @@ class FieldWindow(QMainWindow):
         item.setFlags(item.flags() | Qt.ItemIsEditable)
         self.attributeTable.itemChanged.connect(self.modifyCurrentSym_object)
 
+    def addRow(self, value1, value2):
+        self.attributeTable.insertRow(self.attributeTable.rowCount())
+        #set column 0 value
+        self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 0, QTableWidgetItem(value1))
+        cell = self.attributeTable.item(self.attributeTable.rowCount() - 1, 0)
+        cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
+
+        #set column 1 value
+        self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 1, QTableWidgetItem(value2))
+        cell = self.attributeTable.item(self.attributeTable.rowCount() - 1, 1)
+        cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
+
     #this signal disconnects itself after finishing execution, since we only want to trigger it AFTER a double press
     def modifyCurrentSym_object(self, item):
         if config.current_sym_object == None or item == None:
             return
-        print(config.current_sym_object.parameters)
-        print(config.sym_objects)
+#        print(config.sym_objects)
+
+        #get name and connected objects
+        nameItem = self.attributeTable.item(0, 1)
+        connectedObjs = self.attributeTable.item(1, 1)
+
+        #get attributes
         currentColumn = self.attributeTable.column(item)
         currentRow = self.attributeTable.row(item)
         currentAttribute = self.attributeTable.item(currentRow, currentColumn - 1).text()
         currentValue = item.text()
+
+        config.current_sym_object.name = nameItem
+        config.current_sym_object.connected_objects = connectedObjs
         config.current_sym_object.parameters[currentAttribute]["Value"] = currentValue
+        print(config.current_sym_object.parameters)
 
         #item no longer editable, disconnect
         self.attributeTable.itemChanged.disconnect(self.modifyCurrentSym_object)
         item.setFlags(item.flags() ^ Qt.ItemIsEditable)
 
     def doubleClickEvent(self, item):
+        if item.parent() is None:
+            return
         config.current_sym_object = config.scene._visualise_graphic_item_center("component", item.text(0))
         config.current_sym_object.parameters = copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)])
 
     def treeWidgetClicked(self, item, name): #if single clicking from the treeWidget, don't want to set the current sym object
+        if config.current_sym_object != None:
+            config.sym_objects[(config.current_sym_object.x, config.current_sym_object.y)] = config.current_sym_object
+
         config.current_sym_object = None
         self.populateAttributes(item, name)
 
@@ -138,8 +164,12 @@ class FieldWindow(QMainWindow):
 
         if config.current_sym_object != None:
             print(config.current_sym_object.component_name)
+            self.addRow("Name", "")
+            self.addRow("Connected Objects", "")
 
         if item:
+            if item.parent() is None:
+                return
             self.attributes = self.catalog[item.parent().text(0)][item.text(0)]
         else:
             if config.current_sym_object != None or config.current_sym_object.component_name == name: #only load from param list if there is a sym object in the context
@@ -150,17 +180,7 @@ class FieldWindow(QMainWindow):
                 self.attributes = self.catalog[name]
 
         for attribute in self.attributes.keys():
-            self.attributeTable.insertRow(self.attributeTable.rowCount())
-
-            #set column 0 value
-            self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 0, QTableWidgetItem(attribute))
-            cell = self.attributeTable.item(self.attributeTable.rowCount() - 1, 0)
-            cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
-
-            #set column 1 value
-            self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 1, QTableWidgetItem(self.attributes[attribute]["Value"]))
-            cell = self.attributeTable.item(self.attributeTable.rowCount() - 1, 1)
-            cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
+            self.addRow(attribute, self.attributes[attribute]["Value"])
 
 
     def populate(self):

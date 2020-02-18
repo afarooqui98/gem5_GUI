@@ -50,6 +50,8 @@ class FieldGraphicsScene(QGraphicsScene):
 
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
         config.sym_objects[(new_object.x, new_object.y)] = new_object
+        config.current_sym_object = new_object
+        print(config.sym_objects)
         self.addItem(new_object)
         return new_object
 
@@ -66,6 +68,7 @@ class FieldGraphicsScene(QGraphicsScene):
     def dragEnterEvent(self,event):
         #what to do if an object is dragged into the scene
         if config.drag_state:
+            print("drag")
             event.accept()
 
     #this method overrides the parent method

@@ -15,6 +15,7 @@ import sys, random
 drag_state = True
 draw_wire_state = False
 sym_objects = {}
+current_sym_object = None
 lines = []
 line_drawer = None
 scene = None
@@ -29,3 +30,10 @@ def drawLines(q):
     if lines:
         for line in lines:
             q.drawLine(line[0].x(), line[0].y(), line[1].x(), line[1].y())
+
+def getSymObjects():
+    res = ""
+    for object in sym_objects.values():
+        for key, val in object.parameters.items():
+            if val['Default'] != val['Value']:
+                print("changed param " + key + "for object " + object.component_name)
