@@ -54,6 +54,7 @@ class FieldWindow(QMainWindow):
         self.attributeLayout.addWidget(self.attributeTable)
         self.gridLayout.addLayout(self.attributeLayout)
 
+
         self.label = QLabel()
         self.label.setFrameStyle(QFrame.Panel | QFrame.Sunken)
         self.label.setAlignment(Qt.AlignBottom | Qt.AlignLeft)
@@ -132,7 +133,7 @@ class FieldWindow(QMainWindow):
         item.setFlags(item.flags() | Qt.ItemIsEditable)
         self.attributeTable.itemChanged.connect(self.modifyFields)
 
-    def addRow(self, value1, value2):
+    def addRow(self, value1, value2, isTreeWidgetClick):
         self.attributeTable.insertRow(self.attributeTable.rowCount())
         #set column 0 value
         self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 0, QTableWidgetItem(value1))
@@ -143,6 +144,8 @@ class FieldWindow(QMainWindow):
         self.attributeTable.setItem(self.attributeTable.rowCount() - 1, 1, QTableWidgetItem(value2))
         cell = self.attributeTable.item(self.attributeTable.rowCount() - 1, 1)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
+        if not isTreeWidgetClick and value2 == None:
+            cell.setBackground(QColor("indianred"))
 
     #this signal disconnects itself after finishing execution, since we only want to trigger it AFTER a double press
     def modifyFields(self, item):
@@ -184,16 +187,16 @@ class FieldWindow(QMainWindow):
 
     def treeWidgetClicked(self, item, name): #if single clicking from the treeWidget, don't want to set the current sym object
         config.current_sym_object = None
-        self.populateAttributes(item, name)
+        self.populateAttributes(item, name, True)
 
-    def populateAttributes(self, item, name):
+    def populateAttributes(self, item, name, isTreeWidgetClick):
         self.attributeTable.clear()
         self.attributeTable.setRowCount(0)
 
         if config.current_sym_object != None:
             print(config.current_sym_object.component_name)
-            self.addRow("Name", config.current_sym_object.name)
-            self.addRow("Connected Objects", config.current_sym_object.connected_objects)
+            self.addRow("Name", config.current_sym_object.name, isTreeWidgetClick)
+            self.addRow("Connected Objects", config.current_sym_object.connected_objects, isTreeWidgetClick)
 
         if item:
             if item.parent() is None:
@@ -208,7 +211,8 @@ class FieldWindow(QMainWindow):
                 self.attributes = self.catalog[name]
 
         for attribute in self.attributes.keys():
-            self.addRow(attribute, self.attributes[attribute]["Value"])
+            self.addRow(attribute, self.attributes[attribute]["Value"],
+                                                    isTreeWidgetClick)
 
 
     def populate(self):
