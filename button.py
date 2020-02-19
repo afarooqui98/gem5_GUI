@@ -44,15 +44,10 @@ from __future__ import absolute_import
 # import the m5 (gem5) library created when gem5 is built
 import m5
 # import all of the SimObjects
-from m5.objects import *"""
+from m5.objects import *\n"""
     )
 
-    file.write("""\n
-# set up the root SimObject and start the simulation
-root = Root(full_system = False)"""
-    )
-
-    config.getSymObjects()
+    file.write(config.getSymObjects())
 
     file.write("""\n
 # instantiate all of the objects we've created above

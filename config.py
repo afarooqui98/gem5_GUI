@@ -14,7 +14,8 @@ import sys, random
 
 drag_state = True
 draw_wire_state = False
-sym_objects = {}
+coord_map = {} # Map coordinates to (user-defined) name of symobject
+sym_objects = {} # Map name to actual symobject (has coords)
 current_sym_object = None
 lines = []
 line_drawer = None
@@ -34,6 +35,26 @@ def drawLines(q):
 def getSymObjects():
     res = ""
     for object in sym_objects.values():
-        for key, val in object.parameters.items():
-            if val['Default'] != val['Value']:
-                print("changed param " + key + "for object " + object.component_name)
+        if object.to_export:
+            res += object.name + " = " + object.component_name + "("
+            param = extractValue(object.parameters.items())
+            if param:
+                res += param
+
+            connected_objects = object.connected_objects.split(",")
+            for child in connected_objects:
+                res += object.name + "." + child + " = " + sym_objects[child].component_name + "("
+                param = extractValue(sym_objects[child].parameters.items())
+                if param:
+                    res += param
+    return res
+
+
+def extractValue(parameters):
+    param = ""
+    for key, val in parameters:
+        if val['Default'] != val['Value']:
+            param += key + " = " + val['Value'] + ","
+    param = param.rstrip(',')
+    param += ")\n"
+    return param
