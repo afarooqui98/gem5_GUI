@@ -10,6 +10,7 @@ from lineDrawer import *
 from PyQt5 import QtCore
 import config
 from sym_object import *
+import string
 
 class FieldGraphicsScene(QGraphicsScene):
     """this class provides a scene to manage items in the field"""
@@ -49,9 +50,10 @@ class FieldGraphicsScene(QGraphicsScene):
             new_object = SymObject(0, 0, 100, 50, self, name)
 
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
-        config.sym_objects[(new_object.x, new_object.y, "")] = new_object
+        var_name = ''.join(random.choice(string.ascii_lowercase) for i in range(7))
+        config.coord_map[(new_object.x, new_object.y)] = var_name
+        config.sym_objects[var_name] = new_object
         config.current_sym_object = new_object
-        print(config.sym_objects)
         self.addItem(new_object)
         return new_object
 
@@ -68,7 +70,6 @@ class FieldGraphicsScene(QGraphicsScene):
     def dragEnterEvent(self,event):
         #what to do if an object is dragged into the scene
         if config.drag_state:
-            print("drag")
             event.accept()
 
     #this method overrides the parent method
@@ -86,12 +87,3 @@ class FieldGraphicsScene(QGraphicsScene):
     def paintEvent(self, event):
         q = QPainter(self)
         config.drawLines(q)
-
-'''
-        if event.mimeData().hasFormat("application/x-system"):
-            system_added = self.field.add_component(SystemGraphicsPixmapItem())
-            self._add_graphic_item(system_added, "system", "system")
-        else:
-            component_added = self.field.add_component(ComponentGraphicsPixmapItem())
-            self._add_graphic_item(component_added, "component", event.mimeData().text())
-'''

@@ -133,13 +133,20 @@ class FieldWindow(QMainWindow):
 
         #if the value is name or connected objects, set the param instead of the dict
         if currentAttribute == "Name":
-            print("")
             config.current_sym_object.name = currentValue
+            current_x = config.current_sym_object.x
+            current_y = config.current_sym_object.y
+            current_name = config.current_sym_object.name
+            if (current_x, current_y) in config.coord_map:
+                del config.sym_objects[config.coord_map[(current_x, current_y)]]
+
+            config.coord_map[(current_x, current_y)] = current_name
+            config.sym_objects[current_name] = config.current_sym_object
         elif currentAttribute == "Connected Objects":
             config.current_sym_object.connected_objects = currentValue
+            config.sym_objects[currentValue].to_export = 0
         else:
             config.current_sym_object.parameters[currentAttribute]["Value"] = currentValue
-        print(config.current_sym_object.parameters)
 
         #item no longer editable, disconnect
         self.attributeTable.itemChanged.disconnect(self.modifyFields)
@@ -150,11 +157,6 @@ class FieldWindow(QMainWindow):
             return
         config.current_sym_object = config.scene._visualise_graphic_item_center("component", item.text(0))
         config.current_sym_object.parameters = copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)])
-        current_x = config.current_sym_object.x
-        curreny_y = config.current_sym_object.y
-        current_name = config.current_sym_object.name
-        config.sym_objects[(current_x, curreny_y, current_name)] = config.current_sym_object
-
 
     def treeWidgetClicked(self, item, name): #if single clicking from the treeWidget, don't want to set the current sym object
         config.current_sym_object = None
