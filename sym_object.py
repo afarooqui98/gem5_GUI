@@ -28,6 +28,7 @@ class SymObject(QGraphicsItemGroup):
         self.height = height
         self.component_name = component_name
         self.name = ""
+        self.to_export = 1
 
         text = QGraphicsTextItem(component_name)
         text.setPos(rect.boundingRect().center() - text.boundingRect().center())
@@ -61,7 +62,6 @@ class SymObject(QGraphicsItemGroup):
     #register mouse press events
     def mousePressEvent(self, event):
         super(SymObject, self).mousePressEvent(event)
-        print(config.sym_objects)
         config.current_sym_object = self
         config.mainWindow.populateAttributes(None, self.component_name)
 
