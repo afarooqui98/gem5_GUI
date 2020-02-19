@@ -12,20 +12,11 @@ import os
 
 
 gem5_path = "/home/parallels/gem5"
-gem5_run_option = "build/X86/gem5.opt"
-
-def get_catalog():
-    script = os.getcwd() + "/../m5_calls/get_catalog.py"
-
-    os.system(gem5_path + "/" + gem5_run_option + " " + script)
-    m5_catalog = json.load(open('result.json'))
-    return m5_catalog
-
-
 
 class Ui_MainWindow(object):
-    #catalog = json.load(open('result.json'))
-    catalog = get_catalog()
+
+    def __init__(self, catalog):
+        self.catalog = catalog
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -121,28 +112,60 @@ class Ui_MainWindow(object):
         self.label.setText(info)
 
 
+def get_obj_lists():
+    obj_tree = {}
+
+    test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher', 'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject', 'HelloObject', 'GoodbyeObject']
+
+    for i in range(len(test_objects)):
+        name = test_objects[i]
+        obj_list = ObjectList.ObjectList(getattr(m5.objects, name, None))
+        sub_objs = {}
+        for sub_obj in obj_list._sub_classes.keys():
+            param_dict = {}
+            for pname, param in obj_list._sub_classes[sub_obj]._params.items():
+                param_attr = {}
+                param_attr["Description"] = param.desc
+                param_attr["Type"] = param.ptype_str
+                if hasattr(param, 'default'):
+
+                    param_attr["Default"] = str(param.default)
+                    param_attr["Value"] = str(param.default)
+                else:
+                    param_attr["Default"] = None
+                    param_attr["Value"] = None
+                param_dict[pname] = param_attr
+            sub_objs[sub_obj] = param_dict
+
+        obj_tree[name] = sub_objs
+    return obj_tree
+
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
+
+    catalog = json.load(open('result.json'))
+
+    ui = Ui_MainWindow(catalog)
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
 
 if __name__ == "__m5_main__":
     import sys
-    sys.path.append('configs')
+    sys.path.append('/home/parallels/gem5/configs')
     import m5.objects
     from common import ObjectList
 
-    mem_list = ObjectList.mem_list
-    mem_list.print()
+    #mem_list = ObjectList.mem_list
+    #mem_list.print()
+    obj_tree = get_obj_lists()
 
     app = QtWidgets.QApplication([])
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
+    ui = Ui_MainWindow(obj_tree)
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
