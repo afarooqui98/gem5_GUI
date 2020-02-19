@@ -52,6 +52,7 @@ class FieldWindow(QMainWindow):
         header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(1, QHeaderView.Stretch)
         self.attributeLayout.addWidget(self.attributeTable)
+
         self.gridLayout.addLayout(self.attributeLayout)
 
         self.label = QLabel()
@@ -210,12 +211,16 @@ class FieldWindow(QMainWindow):
 
 
     def populate(self):
-        for item in sorted(self.catalog.keys()):
+        """
+        This function populates the tree view with sym-objects
+        """
+        for item in sorted(self.catalog.keys()): #Go through every inheritable sym-object
             tree_item = QTreeWidgetItem([item])
-            for sub_item in self.catalog[item].keys():
+            for sub_item in self.catalog[item].keys(): # Go through every specialized sym-object
                 tree_item.addChild(QTreeWidgetItem([sub_item]))
             self.treeWidget.addTopLevelItem(tree_item)
 
+    #TODO still need this function to get description of parametrs
     def populateDescription(self, item):
         info = ""
         info += self.attributes[item.text()]["Description"]
