@@ -2,6 +2,8 @@ import m5
 from m5 import SimObject
 from ObjectList import ObjectList
 import json
+from ObjectList import ObjectList
+
 
 
 obj_tree = {}

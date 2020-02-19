@@ -93,14 +93,38 @@ class FieldWindow(QMainWindow):
 
     #make tree view searchable
     def searchItem(self):
+        """
+        Searches treeview whenever a user types something in the search bar
+        """
+        # Get string in the search bar and use treeview's search fn
         search_string = self.edit.text()
-        match_items = self.treeWidget.findItems(search_string, Qt.MatchContains)
+        match_items = self.treeWidget.findItems(search_string, Qt.MatchContains | Qt.MatchRecursive)
 
         root = self.treeWidget.invisibleRootItem()
         child_count = root.childCount()
+
+        # Iterate through top-level items
         for i in range(child_count):
             item = root.child(i)
-            item.setHidden(item not in match_items)
+            if len(match_items) == 0: # Hide all items if no matches
+                item.setHidden(True)
+
+            elif search_string == "": # if empty string don't hide or expand
+                item.setHidden(False)
+                item.setExpanded(False)
+
+            else:
+                # Go through sub items for each top-level item
+                gchild_count = item.childCount()
+                # see if any sub item is a match
+                not_found = False
+                for j in range(gchild_count):
+                    grand_item = item.child(j)
+                    not_found = not_found or (grand_item in match_items)
+                # hide and expand top-level item based on if sub-level item
+                #   is a match
+                item.setHidden(not not_found)
+                item.setExpanded(not_found)
 
     #this function feeds into the next one, after the cell is changed it will trigger
     def makeEditable(self, item):
