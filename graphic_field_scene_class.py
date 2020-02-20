@@ -54,7 +54,7 @@ class FieldGraphicsScene(QGraphicsScene):
 
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
-        config.coord_map[(new_object.x, new_object.y)] = name
+        #config.coord_map[(new_object.x, new_object.y)] = name
         config.sym_objects[name] = new_object
         config.current_sym_object = new_object
         self.addItem(new_object)
