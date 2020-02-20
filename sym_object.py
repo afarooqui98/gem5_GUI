@@ -63,7 +63,7 @@ class SymObject(QGraphicsItemGroup):
     def mousePressEvent(self, event):
         super(SymObject, self).mousePressEvent(event)
         config.current_sym_object = self
-        config.mainWindow.populateAttributes(None, self.component_name)
+        config.mainWindow.populateAttributes(None, self.component_name, False)
 
     # when mouse is release on object, update its position including the case
     # where it overlaps
