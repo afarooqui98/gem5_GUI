@@ -42,17 +42,20 @@ class FieldGraphicsScene(QGraphicsScene):
         return drop_x, drop_y
 
 
-    def _visualise_graphic_item_center(self, type, name):
+    def _visualise_graphic_item_center(self, type, component_name, name):
 
-        if name == "System":
-            new_object = SymObject(0, 0, 500, 500, self, name)
+        if not name:
+            name = ''.join(random.choice(string.ascii_lowercase) for i in range(7))
+
+        if component_name == "System":
+            new_object = SymObject(0, 0, 500, 500, self, component_name, name)
         else:
-            new_object = SymObject(0, 0, 100, 50, self, name)
+            new_object = SymObject(0, 0, 100, 50, self, component_name, name)
 
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
-        var_name = ''.join(random.choice(string.ascii_lowercase) for i in range(7))
-        config.coord_map[(new_object.x, new_object.y)] = var_name
-        config.sym_objects[var_name] = new_object
+
+        config.coord_map[(new_object.x, new_object.y)] = name
+        config.sym_objects[name] = new_object
         config.current_sym_object = new_object
         self.addItem(new_object)
         return new_object

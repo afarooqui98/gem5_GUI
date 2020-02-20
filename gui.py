@@ -183,8 +183,14 @@ class FieldWindow(QMainWindow):
     def doubleClickEvent(self, item):
         if item.parent() is None:
             return
-        config.current_sym_object = config.scene._visualise_graphic_item_center("component", item.text(0))
+
+        name, ok = QInputDialog.getText(self, "Alert", "New SymObject name:")
+        if not ok:
+            return
+
+        config.current_sym_object = config.scene._visualise_graphic_item_center("component", item.text(0), name)
         config.current_sym_object.parameters = copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)])
+
 
     def treeWidgetClicked(self, item, name): #if single clicking from the treeWidget, don't want to set the current sym object
         config.current_sym_object = None

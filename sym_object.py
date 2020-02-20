@@ -13,7 +13,7 @@ import config
 
 class SymObject(QGraphicsItemGroup):
 
-    def __init__(self, x, y, width, height, scene, component_name):
+    def __init__(self, x, y, width, height, scene, component_name, name):
         super(SymObject, self).__init__()
         self.connected_objects = "" #TODO: at export, this string will become a list
         self.parameters = {}
@@ -27,7 +27,7 @@ class SymObject(QGraphicsItemGroup):
         self.width = width
         self.height = height
         self.component_name = component_name
-        self.name = ""
+        self.name = name
         self.to_export = 1
 
         text = QGraphicsTextItem(component_name)
