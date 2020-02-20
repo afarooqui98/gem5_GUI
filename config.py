@@ -43,6 +43,9 @@ def getSymObjects():
 
             connected_objects = object.connected_objects.split(",")
             for child in connected_objects:
+                if not child:
+                    break
+
                 res += object.name + "." + child + " = " + sym_objects[child].component_name + "("
                 param = extractValue(sym_objects[child].parameters.items())
                 if param:

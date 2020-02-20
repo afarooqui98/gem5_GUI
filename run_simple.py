@@ -34,9 +34,9 @@ from __future__ import absolute_import
 import m5
 # import all of the SimObjects
 from m5.objects import *
+shivam = AtomicSimpleCPU()
+shivam.desai = O3Checker()
 
-# set up the root SimObject and start the simulation
-root = Root(full_system = False)
 
 # instantiate all of the objects we've created above
 m5.instantiate()
