@@ -54,8 +54,10 @@ class SymObject(QGraphicsItemGroup):
             self.width, self.pos().y() + self.height, item.x, item.y, item.x +
             item.width, item.y + item.height):
                 self.setPos(item.x + item.width + 10, item.y + item.height + 10)
+                del config.coord_map[(self.x, self.y)]
                 self.x = self.pos().x()
                 self.y = self.pos().y()
+                config.coord_map[(self.x, self.y)] = self.name
 
         self.setAcceptDrops(True)
 
