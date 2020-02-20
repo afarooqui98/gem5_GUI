@@ -44,7 +44,7 @@ from __future__ import absolute_import
 # import the m5 (gem5) library created when gem5 is built
 import m5
 # import all of the SimObjects
-from m5.objects import *\n"""
+from m5.objects import *\n\n"""
     )
 
     file.write(config.getSymObjects())
