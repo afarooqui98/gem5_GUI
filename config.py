@@ -1,9 +1,7 @@
-try:
-    from PyQt4.QtCore import *
-    from PyQt4.QtGui import *
-except:
-    from PyQt5.QtCore import *
-    from PyQt5.QtWidgets import *
+
+from PySide2.QtGui import *
+from PySide2.QtCore import *
+from PySide2.QtWidgets import *
 
 from graphic_field_scene_class import *
 from graphic_system_item_class import *

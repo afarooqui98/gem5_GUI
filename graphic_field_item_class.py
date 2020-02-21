@@ -1,8 +1,5 @@
-try:
-    from PyQt4.QtGui import QPixmap, QGraphicsPixmapItem, QGraphicsItem, QMenu
-except:
-    from PyQt5.QtGui import QPixmap
-    from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsItem, QMenu
+from PySide2.QtGui import QPixmap
+from PySide2.QtWidgets import QGraphicsPixmapItem, QGraphicsItem, QMenu
 
 class FieldItemGraphicsPixmapItem(QGraphicsPixmapItem):
     """this class provides a pixmap item with a preset image for the item"""

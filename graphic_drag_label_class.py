@@ -1,10 +1,10 @@
 try:
-    from PyQt4.QtGui import QLabel, QPixmap, QDrag
-    from PyQt4.QtCore import *
+    from PySide2.QtGui import QLabel, QPixmap, QDrag
+    from PySide2.QtCore import *
 except:
-    from PyQt5.QtWidgets import QLabel
-    from PyQt5.QtGui import QPixmap, QDrag
-    from PyQt5.QtCore import *
+    from PySide2.QtWidgets import QLabel
+    from PySide2.QtGui import QPixmap, QDrag
+    from PySide2.QtCore import *
 
 import config
 
