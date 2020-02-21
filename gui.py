@@ -33,6 +33,10 @@ class FieldWindow(QMainWindow):
         self.gridLayout.addWidget(self.wire_button)
         self.export_button = QPushButton("export")
         self.gridLayout.addWidget(self.export_button)
+        self.saveUI_button = QPushButton("Save Configuration")
+        self.gridLayout.addWidget(self.saveUI_button)
+        self.openUI_button = QPushButton("Open Configuration")
+        self.gridLayout.addWidget(self.openUI_button)
 
         self.edit = QLineEdit()
         self.edit.setPlaceholderText("Search for an object here!")
@@ -89,6 +93,8 @@ class FieldWindow(QMainWindow):
         self.attributeTable.itemDoubleClicked.connect(self.makeEditable)
         self.wire_button.clicked.connect(wire_button_pressed)
         self.export_button.clicked.connect(export_button_pressed)
+        self.saveUI_button.clicked.connect(saveUI_button_pressed)
+        self.openUI_button.clicked.connect(openUI_button_pressed)
 
     def closeEvent(self, event):
         sys.exit()
