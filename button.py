@@ -1,5 +1,6 @@
 import config
 from graphic_field_scene_class import *
+import json
 
 def wire_button_pressed():
     config.drag_state = not config.drag_state
@@ -44,7 +45,7 @@ from __future__ import absolute_import
 # import the m5 (gem5) library created when gem5 is built
 import m5
 # import all of the SimObjects
-from m5.objects import *\n"""
+from m5.objects import *\n\n"""
     )
 
     file.write(config.getSymObjects())
@@ -57,3 +58,46 @@ print("Beginning simulation!")
 exit_event = m5.simulate()
 print('Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause()))"""
     )
+
+def openUI_button_pressed():
+
+    filename = QFileDialog.getOpenFileName(None, 'Open file',
+   '',"gem5 UI Files (*.ui)")[0]
+
+    if not filename:
+        return
+
+    #clear out existing object before loading from file
+    for object in config.sym_objects.values():
+        config.scene.removeItem(object)
+
+    config.sym_objects.clear()
+    config.coord_map.clear()
+
+    with open(filename) as json_file:
+        data = json.load(json_file)
+        for key in data:
+            object = data[key]
+            config.scene.loadSavedObject("component", key, object)
+
+def saveUI_button_pressed():
+    savedObjects = {}
+    for object in config.sym_objects.values():
+        newObject = {}
+        newObject["x"] = object.x
+        newObject["y"] = object.y
+        newObject["width"] = object.width
+        newObject["height"] = object.height
+        newObject["component_name"] = object.component_name
+
+        newObject["parameters"] = object.parameters
+        savedObjects[object.name] = newObject
+
+    filename = QFileDialog.getSaveFileName(None, "",
+                                       "",
+                                       "gem5 UI Files (*.ui)")[0]
+    if not filename:
+        return
+
+    with open(filename, 'w') as outfile:
+        json.dump(savedObjects, outfile)

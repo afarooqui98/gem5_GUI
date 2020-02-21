@@ -18,6 +18,7 @@ coord_map = {} # Map coordinates to (user-defined) name of symobject
 sym_objects = {} # Map name to actual symobject (has coords)
 current_sym_object = None
 lines = []
+sub_object_lines = []
 line_drawer = None
 scene = None
 port_size = 10
@@ -27,7 +28,7 @@ def setDragState():
     for object in sym_objects:
         sym_objects[object].setFlag(QGraphicsItem.ItemIsMovable, drag_state)
 
-def drawLines(q):
+def drawLines(q, lines):
     if lines:
         for line in lines:
             q.drawLine(line[0].x(), line[0].y(), line[1].x(), line[1].y())
@@ -43,6 +44,9 @@ def getSymObjects():
 
             connected_objects = object.connected_objects.split(",")
             for child in connected_objects:
+                if not child:
+                    break
+
                 res += object.name + "." + child + " = " + sym_objects[child].component_name + "("
                 param = extractValue(sym_objects[child].parameters.items())
                 if param:
