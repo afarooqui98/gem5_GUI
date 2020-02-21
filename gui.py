@@ -186,6 +186,8 @@ class FieldWindow(QMainWindow):
         #item no longer editable, disconnect
         self.attributeTable.itemChanged.disconnect(self.modifyFields)
         item.setFlags(item.flags() ^ Qt.ItemIsEditable)
+        if currentValue:
+            item.setBackground(QColor("white"))
 
     def doubleClickEvent(self, item):
         if item.parent() is None:
