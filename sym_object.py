@@ -96,6 +96,7 @@ class SymObject(QGraphicsItemGroup):
 
     def delete(self):
         config.scene.removeItem(self)
+        config.current_sym_object = None
         del config.coord_map[(self.x, self.y)]
         del config.sym_objects[self.name]
 
