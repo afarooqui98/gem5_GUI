@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QLabel, QWidget)
 from PyQt5.QtGui import QPainter, QColor, QPen
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPoint
 import config
 
 class LineDrawer(QWidget):
@@ -37,7 +37,29 @@ class LineDrawer(QWidget):
 
     def paintEvent(self, event):
         q = QPainter(self)
+
+        #draw port lines
         q.setPen(QPen(Qt.black, 3))
         if self.pos1 and self.pos2:
             q.drawLine(self.pos1.x(), self.pos1.y(), self.pos2.x(), self.pos2.y())
-        config.drawLines(q)
+        config.drawLines(q, config.lines)
+
+        #draw sub object lines
+        q.setPen(QPen(Qt.black, 2, Qt.DotLine))
+        config.drawLines(q, config.sub_object_lines)
+
+    def connectSubObject(self, parent_name, child_name):
+        parent = config.sym_objects[parent_name]
+        child = config.sym_objects[child_name]
+        #x1, y1, x2, y2 = self.calculateShortestDistance(parent_name, child_name)
+        pos1 = QPoint()
+        pos2 = QPoint()
+        pos1.setX(parent.x + parent.width / 2)
+        pos1.setY(parent.y + parent.height / 2)
+        pos2.setX(child.x + child.width / 2)
+        pos2.setY(child.y + child.height / 2)
+        config.sub_object_lines.append((pos1, pos2))
+        self.update()
+
+    def calculateShortestDistance(self, parent_name, child_name):
+        pass

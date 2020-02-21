@@ -179,6 +179,7 @@ class FieldWindow(QMainWindow):
         elif currentAttribute == "Connected Objects":
             config.current_sym_object.connected_objects = currentValue
             config.sym_objects[currentValue].to_export = 0
+            config.line_drawer.connectSubObject(config.current_sym_object.name, currentValue)
         else:
             config.current_sym_object.parameters[currentAttribute]["Value"] = currentValue
 

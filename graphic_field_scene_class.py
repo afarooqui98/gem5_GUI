@@ -109,4 +109,4 @@ class FieldGraphicsScene(QGraphicsScene):
 
     def paintEvent(self, event):
         q = QPainter(self)
-        config.drawLines(q)
+        config.drawLines(q, config.lines)
