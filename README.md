@@ -7,6 +7,7 @@
 
 ## Installation
 *Note:* This install process assumes you have already installed python**3.7.5**. Visit [here](https://www.python.org/downloads/release/python-375/) to download. Virtualenv can also be installed with ```pip install virtualenv```.
+
 ### Step 1
 Clone our repository using:
 
@@ -30,4 +31,4 @@ Download dependencies using:
 ## Proof of Concept
 In order to run the gui:
 
-    python .\gui.py
+    python gui.py
