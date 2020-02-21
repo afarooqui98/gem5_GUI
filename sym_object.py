@@ -13,7 +13,7 @@ import config
 
 class SymObject(QGraphicsItemGroup):
 
-    def __init__(self, x, y, width, height, scene, component_name, name):
+    def __init__(self, x, y, width, height, scene, component_name, name, loadingFromFile):
         super(SymObject, self).__init__()
         self.connected_objects = "" #TODO: at export, this string will become a list
         self.parameters = {}
@@ -51,9 +51,16 @@ class SymObject(QGraphicsItemGroup):
         self.addToGroup(port1)
         self.addToGroup(port2)
         self.addToGroup(self.deleteButton)
+        self.setAcceptDrops(True)
+
+        if loadingFromFile:
+            self.x = x
+            self.y = y
+            self.setPos(x, y)
+            config.coord_map[(self.x, self.y)] = self.name
+            return
 
         self.setPos(scene.width()/2 - width, scene.height()/2 - height)
-        self.setAcceptDrops(True)
 
         for key in config.sym_objects:
             item = config.sym_objects[key]
@@ -69,6 +76,7 @@ class SymObject(QGraphicsItemGroup):
         self.x = self.pos().x()
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
+
 
     #register mouse press events
     def mousePressEvent(self, event):
@@ -87,7 +95,7 @@ class SymObject(QGraphicsItemGroup):
         config.mainWindow.populateAttributes(None, self.component_name, False)
 
     def delete(self):
-        self.scene.removeItem(self)
+        config.scene.removeItem(self)
         del config.coord_map[(self.x, self.y)]
         del config.sym_objects[self.name]
 

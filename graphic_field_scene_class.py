@@ -42,15 +42,35 @@ class FieldGraphicsScene(QGraphicsScene):
         return drop_x, drop_y
 
 
+    def loadSavedObject(self, type, name, newObject):
+
+        x = newObject["x"]
+        y = newObject["y"]
+        component_name = newObject["component_name"]
+        parameters = newObject["parameters"]
+
+        if component_name == "System":
+            new_object = SymObject(0, 0, 500, 500, self, component_name, name, True)
+        else:
+            new_object = SymObject(x, y, 100, 50, self, component_name, name, True)
+
+        new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
+        new_object.parameters = parameters
+
+        config.sym_objects[name] = new_object
+        config.current_sym_object = new_object
+        self.addItem(new_object)
+        return new_object
+
     def _visualise_graphic_item_center(self, type, component_name, name):
 
         if not name:
             name = ''.join(random.choice(string.ascii_lowercase) for i in range(7))
 
         if component_name == "System":
-            new_object = SymObject(0, 0, 500, 500, self, component_name, name)
+            new_object = SymObject(0, 0, 500, 500, self, component_name, name, False)
         else:
-            new_object = SymObject(0, 0, 100, 50, self, component_name, name)
+            new_object = SymObject(0, 0, 100, 50, self, component_name, name, False)
 
         new_object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
