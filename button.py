@@ -1,5 +1,5 @@
 import config
-from graphic_field_scene_class import *
+from graphic_scene import *
 import json
 
 def wire_button_pressed():
@@ -61,27 +61,34 @@ print('Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause()))"""
 
 def openUI_button_pressed():
 
+    # show dialog box for user to select a file to open
     filename = QFileDialog.getOpenFileName(None, 'Open file',
    '',"gem5 UI Files (*.ui)")[0]
 
+   # stop if cancel is pressed or there is an error
     if not filename:
         return
 
-    #clear out existing object before loading from file
+    #clear out existing objects before loading from file
     for object in config.sym_objects.values():
         config.scene.removeItem(object)
 
     config.sym_objects.clear()
     config.coord_map.clear()
 
+    # read data in from the file and load each object
     with open(filename) as json_file:
         data = json.load(json_file)
         for key in data:
             object = data[key]
             config.scene.loadSavedObject("component", key, object)
 
+
 def saveUI_button_pressed():
     savedObjects = {}
+
+    # iterate through the current objects on the scene and create a new JSON
+    # object for each one
     for object in config.sym_objects.values():
         newObject = {}
         newObject["x"] = object.x
@@ -93,11 +100,14 @@ def saveUI_button_pressed():
         newObject["parameters"] = object.parameters
         savedObjects[object.name] = newObject
 
+    # show dialog box to let user create output file
     filename = QFileDialog.getSaveFileName(None, "",
                                        "",
                                        "gem5 UI Files (*.ui)")[0]
+    # stop if cancel is pressed
     if not filename:
         return
 
+    # with the selected file write our JSON object
     with open(filename, 'w') as outfile:
         json.dump(savedObjects, outfile)
