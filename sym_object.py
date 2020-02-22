@@ -19,7 +19,8 @@ class SymObject(QGraphicsItemGroup):
 
         #initializing to (0, 0) so that future positions are relative to (0, 0)
         rect = QGraphicsRectItem(0, 0, width, height)
-
+        rect.setBrush(QColor("White"))
+        
         self.x = scene.width() / 2 - width
         self.y = scene.height() / 2 - height
         self.width = width
