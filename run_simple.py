@@ -35,8 +35,8 @@ import m5
 # import all of the SimObjects
 from m5.objects import *
 
-shivam = AtomicSimpleCPU()
-shivam.desai = NonCachingSimpleCPU()
+root = Root(full_system = False)
+root.hello = HelloObject(number_of_fires = 5,time_to_wait = '2us')
 
 
 # instantiate all of the objects we've created above

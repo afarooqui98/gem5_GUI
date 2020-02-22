@@ -20,15 +20,19 @@ scene = None
 port_size = 10
 mainWindow = None
 
+# sets objects in scene as draggable or not draggable based on drag_state
 def setDragState():
     for object in sym_objects:
         sym_objects[object].setFlag(QGraphicsItem.ItemIsMovable, drag_state)
 
+# draws each line in lines using the QPen q
 def drawLines(q, lines):
     if lines:
         for line in lines:
             q.drawLine(line[0].x(), line[0].y(), line[1].x(), line[1].y())
 
+
+# parses the sym_object dictionary to build the exported python file
 def getSymObjects():
     res = ""
     for object in sym_objects.values():
@@ -50,7 +54,7 @@ def getSymObjects():
                     res += param
     return res
 
-
+# extracts parameter values for a given sym_object
 def extractValue(parameters):
     param = ""
     for key, val in parameters:

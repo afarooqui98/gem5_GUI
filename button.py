@@ -2,11 +2,14 @@ import config
 from graphic_scene import *
 import json
 
+# changes gui state to allow for wire drawing and disable object dragging
 def wire_button_pressed():
     config.drag_state = not config.drag_state
     config.draw_wire_state = not config.draw_wire_state
     config.setDragState()
 
+
+# creates a python file that can be run with gem5
 def export_button_pressed():
     file = open("run_simple.py", "w+")
     file.write("""# -*- coding: utf-8 -*-
@@ -59,6 +62,7 @@ exit_event = m5.simulate()
 print('Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause()))"""
     )
 
+# loads .ui file into gui
 def openUI_button_pressed():
 
     # show dialog box for user to select a file to open
@@ -84,6 +88,7 @@ def openUI_button_pressed():
             config.scene.loadSavedObject("component", key, object)
 
 
+# saves gui state to a .ui file
 def saveUI_button_pressed():
     savedObjects = {}
 
