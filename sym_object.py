@@ -1,6 +1,3 @@
-
-from field_class import *
-from graphic_system_item_class import *
 from lineDrawer import *
 from PySide2 import QtCore
 from PySide2.QtGui import *
@@ -11,16 +8,15 @@ import config
 
 class SymObject(QGraphicsItemGroup):
 
-    def __init__(self, x, y, width, height, scene, component_name, name, loadingFromFile):
+    def __init__(self, x, y, width, height, scene, component_name, name,
+                    loadingFromFile):
         super(SymObject, self).__init__()
-        self.connected_objects = "" #TODO: at export, this string will become a list
+        #TODO: at export, this string will become a list
+        self.connected_objects = ""
         self.parameters = {}
         self.isMoving = False
 
-        #initializing to (0, 0) so that future positions are relative to (0, 0)
-        rect = QGraphicsRectItem(0, 0, width, height)
-        rect.setBrush(QColor("White"))
-        
+        # set initial attributes for new symobject
         self.x = scene.width() / 2 - width
         self.y = scene.height() / 2 - height
         self.width = width
@@ -30,13 +26,21 @@ class SymObject(QGraphicsItemGroup):
         self.to_export = 1
         self.scene = scene
 
+        # initializing to (0, 0) so that future positions are relative to (0, 0)
+        rect = QGraphicsRectItem(0, 0, width, height)
+        rect.setBrush(QColor("White"))
+
+        # textbox to display component name
         text = QGraphicsTextItem(component_name)
         text.setPos(rect.boundingRect().center() - text.boundingRect().center())
 
+        # create delete button
         self.deleteButton = QGraphicsTextItem('X')
-        self.deleteButton.setPos(rect.boundingRect().topRight() - self.deleteButton.boundingRect().topRight())
+        self.deleteButton.setPos(rect.boundingRect().topRight() -
+                                    self.deleteButton.boundingRect().topRight())
         self.deleteButton.hide()
 
+        # create ports
         port1 = QGraphicsEllipseItem(width/2 - config.port_size/2, height,
                                         config.port_size, config.port_size)
         port1.setBrush(QColor("Black"))
@@ -45,13 +49,19 @@ class SymObject(QGraphicsItemGroup):
                         -config.port_size, config.port_size, config.port_size)
         port2.setBrush(QColor("Black"))
 
+        # add objects created above to group
         self.addToGroup(rect)
         self.addToGroup(text)
         self.addToGroup(port1)
         self.addToGroup(port2)
         self.addToGroup(self.deleteButton)
-        self.setAcceptDrops(True)
 
+        # set flags
+        self.setAcceptDrops(True)
+        self.setFlag(QGraphicsItem.ItemIsMovable, True)
+
+        # if we are loading from a file, we dont need to check for overlapping
+        # and can set position
         if loadingFromFile:
             self.x = x
             self.y = y
@@ -59,8 +69,11 @@ class SymObject(QGraphicsItemGroup):
             config.coord_map[(self.x, self.y)] = self.name
             return
 
+        # set initial position to center of scene
         self.setPos(scene.width()/2 - width, scene.height()/2 - height)
 
+        # iterate through existing objects and check if current object overlaps
+        # with any of them
         for key in config.sym_objects:
             item = config.sym_objects[key]
             if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x() +
@@ -76,23 +89,27 @@ class SymObject(QGraphicsItemGroup):
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
 
-
     #register mouse press events
     def mousePressEvent(self, event):
         super(SymObject, self).mousePressEvent(event)
 
+        # hide button on previously selected object
         config.current_sym_object.deleteButton.hide()
+        # show button for current object
         self.deleteButton.show()
 
+        # check if mouse press is on delete button
         deletePressed = self.deleteButtonPressed()
         if deletePressed:
             print("Deleting", self.name)
             self.delete()
             return
 
+        # set currentsymobject to self and update attributes for it
         config.current_sym_object = self
         config.mainWindow.populateAttributes(None, self.component_name, False)
 
+    # remove visual and backend respresentations of object
     def delete(self):
         config.scene.removeItem(self)
         config.current_sym_object = None
@@ -132,7 +149,8 @@ class SymObject(QGraphicsItemGroup):
         deleteButton_x = self.deleteButton.pos().x()
         deleteButton_y = self.deleteButton.pos().y()
 
-        if (abs(click_x - deleteButton_x) <= 5) and (abs(click_y - deleteButton_y) <= 5):
+        if (abs(click_x - deleteButton_x) <= 5) and
+            (abs(click_y - deleteButton_y) <= 5):
             return True
 
         return False

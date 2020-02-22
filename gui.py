@@ -3,9 +3,7 @@ from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 
-from graphic_field_scene_class import *
-from graphic_system_item_class import *
-from graphic_drag_label_class import *
+from graphic_scene import *
 
 import sys, random
 import copy
@@ -66,7 +64,7 @@ class MainWindow(QMainWindow):
         self.gridLayout.addWidget(self.label)
 
         self.field_graphics_view = QGraphicsView()
-        config.scene = FieldGraphicsScene(1,5)
+        config.scene = GraphicsScene()
 
         self.lines = LineDrawer()
         self.proxy = config.scene.addWidget(self.lines)
@@ -201,12 +199,12 @@ class MainWindow(QMainWindow):
         if item.parent() is None:
             return
 
-        name, ok = QInputDialog.getText(self, "Alert", "New SymObject name:")
+        name, ok = QInputDialog.getText(self, "Alert", "New SimObject name:")
         if not ok:
             return
 
         config.current_sym_object = config.scene. \
-                _visualise_graphic_item_center("component", item.text(0), name)
+                addObjectToScene("component", item.text(0), name)
         config.current_sym_object.parameters = copy.deepcopy(
                             self.catalog[item.parent().text(0)][item.text(0)])
 

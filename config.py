@@ -3,9 +3,7 @@ from PySide2.QtGui import *
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 
-from graphic_field_scene_class import *
-from graphic_system_item_class import *
-from graphic_drag_label_class import *
+from graphic_scene import *
 from button import *
 import sys, random
 
@@ -45,7 +43,8 @@ def getSymObjects():
                 if not child:
                     break
 
-                res += object.name + "." + child + " = " + sym_objects[child].component_name + "("
+                res += object.name + "." + child + " = " + \
+                        sym_objects[child].component_name + "("
                 param = extractValue(sym_objects[child].parameters.items())
                 if param:
                     res += param
