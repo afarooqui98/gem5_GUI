@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtWidgets import (QApplication, QLabel, QWidget)
-from PyQt5.QtGui import QPainter, QColor, QPen
-from PyQt5.QtCore import Qt, QPoint
+from PySide2.QtWidgets import (QApplication, QLabel, QWidget)
+from PySide2.QtGui import QPainter, QColor, QPen
+from PySide2.QtCore import Qt, QPoint
 import config
 
 class LineDrawer(QWidget):

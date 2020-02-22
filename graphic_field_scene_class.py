@@ -1,13 +1,11 @@
-try:
-    from PyQt4.QtGui import *
-except:
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtGui import *
+
+from PySide2.QtWidgets import *
+from PySide2.QtGui import *
 
 from field_class import *
 from graphic_system_item_class import *
 from lineDrawer import *
-from PyQt5 import QtCore
+from PySide2 import QtCore
 import config
 from sym_object import *
 import string

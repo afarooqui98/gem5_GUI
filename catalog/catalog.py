@@ -42,7 +42,8 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.attributeList, 2, 0, 1, 1)
 
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
+        self.label.setFrameStyle(QtWidgets.QFrame.Panel |
+            QtWidgets.QFrame.Sunken)
         #self.label.setText("first line\nsecond line")
         self.label.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
         self.gridLayout.addWidget(self.label, 3, 0, 1, 1)
@@ -71,7 +72,8 @@ class Ui_MainWindow(object):
 
     def searchItem(self):
         search_string = self.edit.text()
-        match_items = self.treeWidget.findItems(search_string, QtCore.Qt.MatchContains)
+        match_items = self.treeWidget.findItems(search_string,
+            QtCore.Qt.MatchContains)
 
         root = self.treeWidget.invisibleRootItem()
         child_count = root.childCount()
@@ -108,14 +110,17 @@ class Ui_MainWindow(object):
         info += "\n"
         info += "Type: " + self.attributes[item.text()]["Type"]
         if self.attributes[item.text()]["Default"] is not None:
-            info += "\n" + "Default Value: " + self.attributes[item.text()]["Default"]
+            info += "\n" + "Default Value: " +
+                self.attributes[item.text()]["Default"]
         self.label.setText(info)
 
 
 def get_obj_lists():
     obj_tree = {}
 
-    test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher', 'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject', 'HelloObject', 'GoodbyeObject']
+    test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher',
+        'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject',
+        'HelloObject', 'GoodbyeObject']
 
     for i in range(len(test_objects)):
         name = test_objects[i]
