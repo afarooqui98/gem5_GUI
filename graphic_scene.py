@@ -43,10 +43,12 @@ class GraphicsScene(QGraphicsScene):
 
     def addObjectToScene(self, type, component_name, name):
 
+        # generate random string name for object
         if not name:
             name = ''.join(random.choice(string.ascii_lowercase)
                             for i in range(7))
 
+        # add object rectangle to scene
         if component_name == "System":
             new_object = SymObject(0, 0, 500, 500, self, component_name, name,
                                     False)

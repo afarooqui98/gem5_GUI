@@ -141,6 +141,7 @@ class SymObject(QGraphicsItemGroup):
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
 
+    # checks if the delete button was pressed
     def deleteButtonPressed(self):
         click_x, click_y = self.getClickCoords(self.deleteButton)
         click_x = click_x - self.x
@@ -155,7 +156,8 @@ class SymObject(QGraphicsItemGroup):
 
         return False
 
-    def getClickCoords(self,item):
+    # get coordinates of current mouse clock
+    def getClickCoords(self, item):
         cursor_position = QCursor.pos() #global cursor position
         current_view = config.scene.views()[0]
         scene_position = current_view.mapFromGlobal(cursor_position)
@@ -168,6 +170,7 @@ class SymObject(QGraphicsItemGroup):
 
         return drop_x, drop_y
 
+    # checks if two objects overlap
     def doOverlap(self, l1_x, l1_y, r1_x, r1_y, l2_x, l2_y, r2_x, r2_y):
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap

@@ -5,13 +5,14 @@ from PySide2.QtCore import Qt, QPoint
 import config
 
 class LineDrawer(QWidget):
-    distance_from_center = 0
 
+    # constructor
     def __init__(self):
         super().__init__()
         self.initUI()
         self.setMouseTracking(True)
 
+    # sets up the line position objects and state variable
     def initUI(self):
         self.pos1 = None
         self.pos2 = None
@@ -49,6 +50,8 @@ class LineDrawer(QWidget):
         q.setPen(QPen(Qt.black, 2, Qt.DotLine))
         config.drawLines(q, config.sub_object_lines)
 
+
+    # connects a parent and child object with a dotted line
     def connectSubObject(self, parent_name, child_name):
         parent = config.sym_objects[parent_name]
         child = config.sym_objects[child_name]
@@ -56,12 +59,16 @@ class LineDrawer(QWidget):
                                                             child_name)
         pos1 = QPoint()
         pos2 = QPoint()
+        # draw line from middle of parent to middle of child
         pos1.setX(parent.x + parent.width / 2)
         pos1.setY(parent.y + parent.height / 2)
         pos2.setX(child.x + child.width / 2)
         pos2.setY(child.y + child.height / 2)
+        # add line to sub_object_lines list
         config.sub_object_lines.append((pos1, pos2))
+        # triggers paint event to redraw scene
         self.update()
 
+    # used to draw line between parent and child (unimplemented)
     def calculateShortestDistance(self, parent_name, child_name):
         pass
