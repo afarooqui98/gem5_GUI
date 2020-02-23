@@ -13,10 +13,10 @@ import json
 
 class MainWindow(QMainWindow):
     """this class creates the main window"""
-    catalog = json.load(open('result_new.json'))
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, catalog):
+        super(MainWindow, self).__init__()
+        self.catalog = catalog
         self.setWindowTitle("gem5 GUI")
         self.main = QWidget()
         self.setLayoutDirection(Qt.LeftToRight)
@@ -268,9 +268,10 @@ class MainWindow(QMainWindow):
                     self.attributes[item.text()]["Default"]
         self.label.setText(info)
 
-def main():
+if __name__ == "__main__":
     gui_application = QApplication() #create new application
-    main_window = MainWindow() #create new instance of main window
+    catalog = json.load(open('result_new.json'))
+    main_window = MainWindow(catalog) #create new instance of main window
     config.mainWindow = main_window
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack
@@ -278,5 +279,20 @@ def main():
     gui_application.quit()
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__m5_main__":
+    import sys
+    sys.path.append('/home/parallels/gem5/configs')
+    import m5.objects
+    from common import ObjectList
+    from m5_calls import get_obj_lists
+
+    # use gem5 to get list of objects
+    obj_tree = get_obj_lists()
+
+    gui_application = QApplication() #create new application
+    main_window = MainWindow(obj_tree) #create new instance of main window
+    config.mainWindow = main_window
+    main_window.show() #make instance visible
+    main_window.raise_() #raise instance to top of window stack
+    gui_application.exec_() #monitor application for events
+    gui_application.quit()
