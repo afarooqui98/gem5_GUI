@@ -150,7 +150,7 @@ class SymObject(QGraphicsItemGroup):
         deleteButton_x = self.deleteButton.pos().x()
         deleteButton_y = self.deleteButton.pos().y()
 
-        if (abs(click_x - deleteButton_x) <= 5) and
+        if (abs(click_x - deleteButton_x) <= 5) and \
             (abs(click_y - deleteButton_y) <= 5):
             return True
 

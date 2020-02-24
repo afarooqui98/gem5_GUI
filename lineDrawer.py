@@ -56,7 +56,7 @@ class LineDrawer(QWidget):
         parent = config.sym_objects[parent_name]
         child = config.sym_objects[child_name]
         #x1, y1, x2, y2 = self.calculateShortestDistance(parent_name,
-                                                            child_name)
+        #                                                    child_name)
         pos1 = QPoint()
         pos2 = QPoint()
         # draw line from middle of parent to middle of child
