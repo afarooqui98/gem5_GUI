@@ -46,7 +46,8 @@ class LineDrawer(QWidget):
 
     def paintEvent(self, event):
         q = QPainter(self)
-        self.update()
+        if config.draw_wire_state:
+            self.update()
         #draw port lines
         q.setPen(QPen(Qt.black, 3))
         if self.pos1 and self.pos2:
