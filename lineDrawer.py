@@ -2,13 +2,13 @@ import sys
 from PySide2.QtWidgets import (QApplication, QLabel, QWidget)
 from PySide2.QtGui import QPainter, QColor, QPen
 from PySide2.QtCore import Qt, QPoint
-import config
+from gui_views import config
 
 class LineDrawer(QWidget):
 
     # constructor
     def __init__(self):
-        super().__init__()
+        super(LineDrawer, self).__init__()
         self.initUI()
         self.setMouseTracking(True)
 
