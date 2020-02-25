@@ -35,6 +35,9 @@ class SymObject(QGraphicsItemGroup):
         text = QGraphicsTextItem(component_name)
         text.setPos(rect.boundingRect().center() - text.boundingRect().center())
 
+        # textbox to display symObject name
+        name_text = QGraphicsTextItem(name)
+
         # create delete button
         self.deleteButton = QGraphicsTextItem('X')
         self.deleteButton.setPos(rect.boundingRect().topRight() -
@@ -52,6 +55,7 @@ class SymObject(QGraphicsItemGroup):
 
         # add objects created above to group
         self.addToGroup(rect)
+        self.addToGroup(name_text)
         self.addToGroup(text)
         self.addToGroup(port1)
         self.addToGroup(port2)
