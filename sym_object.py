@@ -14,6 +14,7 @@ class SymObject(QGraphicsItemGroup):
         #TODO: at export, this string will become a list
         self.connected_objects = ""
         self.parameters = {}
+        self.connections = {}
         self.isMoving = False
 
         # set initial attributes for new symobject
@@ -88,13 +89,21 @@ class SymObject(QGraphicsItemGroup):
         self.x = self.pos().x()
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
+        # might need this code for attaching objects later
+        # if config.sym_objects:
+        #     print("skjfdns")
+        #     for object in config.sym_objects.values():
+        #         object.addToGroup(self)
+        #         break
+        config.current_sym_object = self
 
     #register mouse press events
     def mousePressEvent(self, event):
         super(SymObject, self).mousePressEvent(event)
 
         # hide button on previously selected object
-        config.current_sym_object.deleteButton.hide()
+        if config.current_sym_object:
+            config.current_sym_object.deleteButton.hide()
         # show button for current object
         self.deleteButton.show()
 
