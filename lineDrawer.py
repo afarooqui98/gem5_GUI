@@ -1,5 +1,5 @@
 import sys
-from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QInputDialog)
+from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QMessageBox)
 from PySide2.QtGui import QPainter, QColor, QPen
 from PySide2.QtCore import Qt, QPoint
 import config
@@ -38,7 +38,7 @@ class LineDrawer(QWidget):
                 config.lines.append((self.pos1, self.pos2))
                 print(config.current_sym_object.connections)
             else:
-                name, ok = QInputDialog.getText(self, "Alert", "Invalid line")
+                ok = QMessageBox.about(self, "Alert", "Invalid line")
                 if not ok:
                     pass
             self.pos1 = None
