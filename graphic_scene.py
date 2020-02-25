@@ -30,7 +30,7 @@ class GraphicsScene(QGraphicsScene):
             new_object = SymObject(0, 0, 500, 500, self, component_name, name,
                                     True)
         else:
-            new_object = SymObject(x, y, 100, 50, self, component_name, name,
+            new_object = SymObject(x, y, 120, 60, self, component_name, name,
                                     True)
 
         new_object.parameters = parameters
@@ -53,7 +53,7 @@ class GraphicsScene(QGraphicsScene):
             new_object = SymObject(0, 0, 500, 500, self, component_name, name,
                                     False)
         else:
-            new_object = SymObject(0, 0, 100, 50, self, component_name, name,
+            new_object = SymObject(0, 0, 120, 60, self, component_name, name,
                                     False)
 
         config.sym_objects[name] = new_object
