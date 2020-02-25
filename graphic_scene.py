@@ -4,7 +4,7 @@ from PySide2.QtGui import *
 
 from lineDrawer import *
 from PySide2 import QtCore
-import config
+from gui_views.config import *
 from sym_object import *
 import string
 
@@ -13,7 +13,7 @@ class GraphicsScene(QGraphicsScene):
 
     # constructor
     def __init__(self):
-        super().__init__()
+        super(GraphicsScene, self).__init__()
         config.line_drawer = LineDrawer()
         self.addWidget(config.line_drawer)
         config.line_drawer.resize(700, 600)

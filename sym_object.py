@@ -3,7 +3,7 @@ from PySide2 import QtCore
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
-import config
+from gui_views.config import *
 
 
 class SymObject(QGraphicsItemGroup):
