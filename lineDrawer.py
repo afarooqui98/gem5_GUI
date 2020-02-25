@@ -33,8 +33,7 @@ class LineDrawer(QWidget):
     def mouseReleaseEvent(self, event):
         if config.draw_wire_state:
             self.line_done = 1
-            ret = self.setObjectConnection()
-            if ret >= 0:
+            if self.setObjectConnection() >= 0:
                 config.lines.append((self.pos1, self.pos2))
                 print(config.current_sym_object.connections)
             else:
@@ -91,6 +90,7 @@ class LineDrawer(QWidget):
     def connectSubObject(self, parent_name, child_name):
         parent = config.sym_objects[parent_name]
         child = config.sym_objects[child_name]
+        #implement later
         #x1, y1, x2, y2 = self.calculateShortestDistance(parent_name,
         #                                                    child_name)
         pos1 = QPoint()

@@ -89,7 +89,7 @@ class SymObject(QGraphicsItemGroup):
         self.x = self.pos().x()
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
-        # print("adding")
+        # might need this code for attaching objects later
         # if config.sym_objects:
         #     print("skjfdns")
         #     for object in config.sym_objects.values():
