@@ -4,7 +4,6 @@ from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 
 from graphic_scene import *
-from gui_views import button
 import sys, random
 
 

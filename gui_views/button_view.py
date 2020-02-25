@@ -6,11 +6,11 @@ from graphic_scene import *
 import sys, random
 import copy
 from gui_views import config
-from gui_views import button
 import json
 
 class ButtonView(): #export, draw line, save and load configuration buttons
     def __init__(self, layout):
+        # create buttons and add to layout
         self.wireButton = QPushButton("draw wire")
         layout.addWidget(self.wireButton)
         self.exportButton = QPushButton("export")
@@ -20,10 +20,11 @@ class ButtonView(): #export, draw line, save and load configuration buttons
         self.openUIButton = QPushButton("Open Configuration")
         layout.addWidget(self.openUIButton)
 
-        self.wireButton.clicked.connect(button.wire_button_pressed)
-        self.exportButton.clicked.connect(button.export_button_pressed)
-        self.saveUIButton.clicked.connect(button.saveUI_button_pressed)
-        self.openUIButton.clicked.connect(button.openUI_button_pressed)
+        # connect each button to its event handler
+        self.wireButton.clicked.connect(wire_button_pressed)
+        self.exportButton.clicked.connect(export_button_pressed)
+        self.saveUIButton.clicked.connect(saveUI_button_pressed)
+        self.openUIButton.clicked.connect(openUI_button_pressed)
 
 # changes gui state to allow for wire drawing and disable object dragging
 def wire_button_pressed():
