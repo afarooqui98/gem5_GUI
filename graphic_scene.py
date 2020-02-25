@@ -4,7 +4,7 @@ from PySide2.QtGui import *
 
 from lineDrawer import *
 from PySide2 import QtCore
-from gui_views.config import *
+from gui_views import config
 from sym_object import *
 import string
 

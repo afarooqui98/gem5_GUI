@@ -5,8 +5,8 @@ from graphic_scene import *
 
 import sys, random
 import copy
-import config
-from button import *
+from gui_views import config
+from gui_views import button
 import json
 
 class ButtonView(): #export, draw line, save and load configuration buttons
@@ -20,7 +20,7 @@ class ButtonView(): #export, draw line, save and load configuration buttons
         self.openUIButton = QPushButton("Open Configuration")
         layout.addWidget(self.openUIButton)
 
-        self.wireButton.clicked.connect(wire_button_pressed)
-        self.exportButton.clicked.connect(export_button_pressed)
-        self.saveUIButton.clicked.connect(saveUI_button_pressed)
-        self.openUIButton.clicked.connect(openUI_button_pressed)
+        self.wireButton.clicked.connect(button.wire_button_pressed)
+        self.exportButton.clicked.connect(button.export_button_pressed)
+        self.saveUIButton.clicked.connect(button.saveUI_button_pressed)
+        self.openUIButton.clicked.connect(button.openUI_button_pressed)

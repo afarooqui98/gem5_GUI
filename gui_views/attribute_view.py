@@ -5,7 +5,7 @@ from graphic_scene import *
 
 import sys, random
 import copy
-import config
+from gui_views import config
 import json
 
 class AttributeView(): #table view for parameters, as well as the description

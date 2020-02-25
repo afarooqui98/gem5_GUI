@@ -1,4 +1,4 @@
-import config
+from gui_views import config
 from graphic_scene import *
 import json
 

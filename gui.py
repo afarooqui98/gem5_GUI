@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         self.gridLayout.setObjectName("gridLayout")
 
         self.buttonView = ButtonView(self.gridLayout) #add button view
-        self.catalogView = CatalogView(self.gridLayout) #add catalog view
+        self.catalogView = CatalogView(self.gridLayout, catalog) #add catalog view
         self.attributeView = AttributeView(self.gridLayout) #add attributes
 
         self.field_graphics_view = QGraphicsView()
@@ -56,10 +56,10 @@ class MainWindow(QMainWindow):
         sys.exit()
 
     def addRow(self, value1, value2, isTreeWidgetClick):
-        table = self.AttributeView.attributeTable
-        table.insertRow(self.attributeTable.rowCount())
+        table = self.attributeView.attributeTable
+        table.insertRow(table.rowCount())
         # set column 0 value
-        table.setItem(self.attributeTable.rowCount() - 1, 0,
+        table.setItem(table.rowCount() - 1, 0,
                                     QTableWidgetItem(value1))
         cell = table.item(table.rowCount() - 1, 0)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         self.populateAttributes(item, name, True)
 
     def populateAttributes(self, item, name, isTreeWidgetClick):
-        table = self.AttributeView.attributeTable
+        table = self.attributeView.attributeTable
         table.clear()
         table.setRowCount(0)
 

@@ -5,12 +5,12 @@ from graphic_scene import *
 
 import sys, random
 import copy
-import config
+from gui_views import config
 import json
 
 class CatalogView(): #dropdown and search bar
-    def __init__(self, layout):
-
+    def __init__(self, layout, catalog):
+        self.catalog = catalog
         #search bar
         self.edit = QLineEdit()
         self.edit.setPlaceholderText("Search for an object here!")
@@ -31,7 +31,7 @@ class CatalogView(): #dropdown and search bar
         if item.parent() is None:
             return
 
-        name, ok = QInputDialog.getText(self, "Alert", "New SimObject name:")
+        name, ok = QInputDialog.getText(config.mainWindow, "Alert", "New SimObject name:")
         if not ok:
             return
 
@@ -70,7 +70,7 @@ class CatalogView(): #dropdown and search bar
                 not_found = False
                 for j in range(gchild_count):
                     grand_item = item.child(j)
-                    not_found = not_found or (grand_item in match_items)
+                    not_found = not_found or (grand_item in set(match_items))
                 # hide and expand top-level item based on if sub-level item
                 #   is a match
                 item.setHidden(not not_found)

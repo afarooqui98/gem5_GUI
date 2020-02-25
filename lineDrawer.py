@@ -2,7 +2,7 @@ import sys
 from PySide2.QtWidgets import (QApplication, QLabel, QWidget)
 from PySide2.QtGui import QPainter, QColor, QPen
 from PySide2.QtCore import Qt, QPoint
-from gui_views.config import *
+from gui_views import config
 
 class LineDrawer(QWidget):
 
