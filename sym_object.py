@@ -12,7 +12,7 @@ class SymObject(QGraphicsItemGroup):
                     loadingFromFile):
         super(SymObject, self).__init__()
         #TODO: at export, this string will become a list
-        self.connected_objects = ""
+        self.connected_objects = []
         self.parameters = {}
         self.connections = {}
         self.isMoving = False
@@ -24,6 +24,7 @@ class SymObject(QGraphicsItemGroup):
         self.height = height
         self.component_name = component_name
         self.name = name
+        self.parent_name = None
         self.to_export = 1
         self.scene = scene
 
@@ -141,7 +142,7 @@ class SymObject(QGraphicsItemGroup):
         # current position overlaps with any of them
         for key in config.sym_objects:
             item = config.sym_objects[key]
-            if self != item:
+            if self != item and self.parent_name != item.name and item.parent_name != self.name:
                 if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x()
                  + self.width, self.pos().y() + self.height, item.x, item.y,
                  item.x + item.width, item.y + item.height):
@@ -151,13 +152,19 @@ class SymObject(QGraphicsItemGroup):
                     item.removeFromGroup(item.name_text)
                     item.removeFromGroup(item.text)
                     item.removeFromGroup(item.deleteButton)
-                    item.rect = QGraphicsRectItem(item.x, item.y, 300, 300)
+                    item.rect = QGraphicsRectItem(item.x, item.y, item.width * 2, item.height * 2)
+                    #item.x = item.pos().x()
+                    #item.y = item.pos().y()
+                    #item.width *= 2
+                    #item.height *= 2
                     item.rect.setBrush(QColor("White"))
                     item.addToGroup(item.rect)
                     item.addToGroup(item.name_text)
                     item.addToGroup(item.deleteButton)
                     item.addToGroup(item.text)
                     item.addToGroup(self)
+                    self.parent_name = item.name
+                    item.connected_objects.append(self.name)
                     return
 
         # update the object's position parameters
