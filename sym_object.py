@@ -20,6 +20,7 @@ class SymObject(QGraphicsItemGroup):
         # set initial attributes for new symobject
         self.x = scene.width() / 2 - width
         self.y = scene.height() / 2 - height
+        self.z = 0
         self.width = width
         self.height = height
         self.component_name = component_name
@@ -40,7 +41,7 @@ class SymObject(QGraphicsItemGroup):
             return
 
         # set initial position to center of scene
-        self.setPos(scene.width()/2 - width, scene.height()/2 - height)
+        self.setPos(scene.width() / 2 - width, scene.height() / 2 - height)
 
         # iterate through existing objects and check if current object overlaps
         # with any of them
@@ -58,12 +59,6 @@ class SymObject(QGraphicsItemGroup):
         self.x = self.pos().x()
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
-        # might need this code for attaching objects later
-        # if config.sym_objects:
-        #     print("skjfdns")
-        #     for object in config.sym_objects.values():
-        #         object.addToGroup(self)
-        #         break
         config.current_sym_object = self
 
 
@@ -113,7 +108,6 @@ class SymObject(QGraphicsItemGroup):
         # check if mouse press is on delete button
         deletePressed = self.deleteButtonPressed(event)
         if deletePressed:
-            print("Deleting", self.name)
             self.delete()
             return
 
@@ -136,26 +130,54 @@ class SymObject(QGraphicsItemGroup):
         if self.x == self.pos().x() and self.y == self.pos().y():
             return
 
+        z_score = -1
+        parent = None
         #iterate through all sym objects on the screen and check if the object's
         # current position overlaps with any of them
         for key in config.sym_objects:
             item = config.sym_objects[key]
-            if self != item and self.parent_name != item.name \
-                                    and item.parent_name != self.name:
+            if self != item and not self.isAncestor(item) and \
+            not self.isDescendant(item):
                 if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x()
                  + self.width, self.pos().y() + self.height, item.x, item.y,
                  item.x + item.width, item.y + item.height):
-                    self.resizeUIObject(item)
-                    self.parent_name = item.name
-                    item.connected_objects.append(self.name)
-                    break
+
+                    if item.z > z_score:
+                        z_score = item.z
+                        parent = item
+
+        if parent:
+            self.resizeUIObject(parent, 0)
+            self.parent_name = parent.name #add new parent
+            self.z = z_score + 1 #update z index
+            if not self.name in parent.connected_objects:
+                parent.connected_objects.append(self.name) #add new child
 
         # update the object's position parameters
-        del config.coord_map[(self.x, self.y)]
+        #del config.coord_map[(self.x, self.y)]
         self.x = self.pos().x()
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
         self.detachChildren()
+
+
+    def isAncestor(self, item):
+        if not self.parent_name:
+            return False
+        current_item = self
+        while current_item.parent_name:
+            if current_item.parent_name == item.name:
+                return True
+            current_item = config.sym_objects[current_item.parent_name]
+        return False
+
+
+    def isDescendant(self, item):
+        if item.name in self.connected_objects:
+            return True
+        for child_name in self.connected_objects:
+            return config.sym_objects[child_name].isDescendant(item)
+        return False
 
     # checks if the delete button was pressed based on mouse click
     def deleteButtonPressed(self, event):
@@ -183,7 +205,7 @@ class SymObject(QGraphicsItemGroup):
         return not notoverlap
 
     # resizes a sym_object when another object is placed in it
-    def resizeUIObject(self, item):
+    def resizeUIObject(self, item, force_resize):
         item.removeFromGroup(item.rect)
         config.scene.removeItem(item.rect)
         item.removeFromGroup(item.name_text)
@@ -194,16 +216,21 @@ class SymObject(QGraphicsItemGroup):
         config.scene.removeItem(item.deleteButton)
         item.x = item.pos().x()
         item.y = item.pos().y()
-        item.width *= 2
-        item.height *= 2
+        if not item.connected_objects or force_resize:
+            if item.parent_name:
+                self.resizeUIObject(config.sym_objects[item.parent_name], 1)
+            item.width *= 2
+            item.height *= 2
         self.initUIObject(item, item.x, item.y)
 
     # attaches all children of the current sym_object to it so they move as one
     def attachChildren(self):
         for child_name in self.connected_objects:
             self.addToGroup(config.sym_objects[child_name])
+            config.sym_objects[child_name].attachChildren() #attach descendants
 
     # detaches children to allow for independent movement
     def detachChildren(self):
         for child_name in self.connected_objects:
+            #config.sym_objects[child_name].detachChildren()
             self.removeFromGroup(config.sym_objects[child_name])
