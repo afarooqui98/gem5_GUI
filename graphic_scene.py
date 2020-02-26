@@ -12,11 +12,11 @@ class GraphicsScene(QGraphicsScene):
     """this class provides a scene to manage objects"""
 
     # constructor
-    def __init__(self):
-        super(GraphicsScene, self).__init__()
+    def __init__(self, x, y, width, height):
+        super(GraphicsScene, self).__init__(x, y, width, height)
         config.line_drawer = LineDrawer()
+        config.line_drawer.resize(self.width(), self.height())
         self.addWidget(config.line_drawer)
-        config.line_drawer.resize(700, 600)
 
     # load object from saved UI file
     def loadSavedObject(self, type, name, newObject):
