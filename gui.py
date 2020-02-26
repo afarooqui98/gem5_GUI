@@ -28,24 +28,22 @@ class MainWindow(QMainWindow):
         self.gridLayout.setObjectName("gridLayout")
 
         self.buttonView = ButtonView(self.gridLayout) #add button view
-        self.catalogView = CatalogView(self.gridLayout, catalog) #add catalog view
+        #add catalog view
+        self.catalogView = CatalogView(self.gridLayout, catalog)
         self.attributeView = AttributeView(self.gridLayout) #add attributes
 
-
         config.scene = GraphicsScene(0,0, 1750, 1250)
+        self.graphics_view = QGraphicsView(config.scene)
 
+        # might need this code later for drawing lines
         #self.lines = LineDrawer()
         #self.proxy = config.scene.addWidget(self.lines)
         #self.proxy.setWidget(self.lines)
-
-        self.graphics_view = QGraphicsView(config.scene)
-
         #self.graphics_view.setSceneRect(0,0, 1750, 1250)
 
         self.layout = QHBoxLayout()
         self.layout.addLayout(self.gridLayout)
         self.layout.addWidget(self.graphics_view)
-        print(self.graphics_view.size())
 
         self.main.setLayout(self.layout)
         self.setCentralWidget(self.main)
