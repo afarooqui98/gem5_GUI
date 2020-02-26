@@ -106,11 +106,12 @@ class SymObject(QGraphicsItemGroup):
         # hide button on previously selected object
         if config.current_sym_object:
             config.current_sym_object.deleteButton.hide()
+
         # show button for current object
         self.deleteButton.show()
 
         # check if mouse press is on delete button
-        deletePressed = self.deleteButtonPressed()
+        deletePressed = self.deleteButtonPressed(event)
         if deletePressed:
             print("Deleting", self.name)
             self.delete()
@@ -156,34 +157,25 @@ class SymObject(QGraphicsItemGroup):
         config.coord_map[(self.x, self.y)] = self.name
         self.detachChildren()
 
-    # checks if the delete button was pressed
-    def deleteButtonPressed(self):
-        click_x, click_y = self.getClickCoords(self.deleteButton)
-        click_x = click_x - self.x
-        click_y = click_y - self.y
+    # checks if the delete button was pressed based on mouse click
+    def deleteButtonPressed(self, event):
+        # get x and y coordinate of mouse click
+        click_x, click_y = event.pos().x(), event.pos().y()
 
-        deleteButton_x = self.deleteButton.pos().x()
-        deleteButton_y = self.deleteButton.pos().y()
+        # get coordinate and dimension info from deletebutton
+        delete_button_x = self.deleteButton.pos().x()
+        delete_button_y = self.deleteButton.pos().y()
+        delete_button_width = self.deleteButton.boundingRect().size().width()
+        delete_button_height = self.deleteButton.boundingRect().size().height()
 
-        if (abs(click_x - deleteButton_x) <= 5) and \
-            (abs(click_y - deleteButton_y) <= 5):
+        # if the click position is within the text item's bounding box, return
+        # true
+        if (click_x > delete_button_x and click_x < delete_button_x + \
+            delete_button_width and click_y > delete_button_y and click_y < \
+            delete_button_y + delete_button_width):
             return True
 
         return False
-
-    # get coordinates of current mouse clock
-    def getClickCoords(self, item):
-        cursor_position = QCursor.pos() #global cursor position
-        current_view = config.scene.views()[0]
-        scene_position = current_view.mapFromGlobal(cursor_position)
-
-        width = item.boundingRect().width()
-        height = item.boundingRect().height()
-
-        drop_x = scene_position.x()
-        drop_y = scene_position.y()
-
-        return drop_x, drop_y
 
     # checks if two objects overlap
     def doOverlap(self, l1_x, l1_y, r1_x, r1_y, l2_x, l2_y, r2_x, r2_y):

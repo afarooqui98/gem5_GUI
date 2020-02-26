@@ -14,6 +14,13 @@ class CatalogView(): #dropdown and search bar
         #search bar
         self.edit = QLineEdit()
         self.edit.setPlaceholderText("Search for an object here!")
+
+        #adding fix width on one of the widgets in the catalog area will
+        #implicitly set a fixed width on the rest of the widgets
+        #we do this so that the catalog retains its original dimensions while
+        #resizing the window
+        self.edit.setFixedWidth(250)
+
         layout.addWidget(self.edit)
 
         #dropdown for SimObjects
