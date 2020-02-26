@@ -87,7 +87,7 @@ class MainWindow(QMainWindow):
             self.addRow("Name", config.current_sym_object.name,
                         isTreeWidgetClick)
             self.addRow("Child Objects",
-                        config.current_sym_object.connected_objects,
+                        ", ".join(config.current_sym_object.connected_objects),
                         isTreeWidgetClick)
 
         if item:

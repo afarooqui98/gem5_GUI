@@ -153,10 +153,10 @@ class SymObject(QGraphicsItemGroup):
                     item.removeFromGroup(item.text)
                     item.removeFromGroup(item.deleteButton)
                     item.rect = QGraphicsRectItem(item.x, item.y, item.width * 2, item.height * 2)
-                    #item.x = item.pos().x()
-                    #item.y = item.pos().y()
-                    #item.width *= 2
-                    #item.height *= 2
+                    item.x = item.pos().x()
+                    item.y = item.pos().y()
+                    item.width *= 2
+                    item.height *= 2
                     item.rect.setBrush(QColor("White"))
                     item.addToGroup(item.rect)
                     item.addToGroup(item.name_text)
