@@ -104,6 +104,7 @@ class SymObject(QGraphicsItemGroup):
 
     #register mouse press events
     def mousePressEvent(self, event):
+        self.attachChildren()
         super(SymObject, self).mousePressEvent(event)
 
         # hide button on previously selected object
@@ -146,32 +147,17 @@ class SymObject(QGraphicsItemGroup):
                 if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x()
                  + self.width, self.pos().y() + self.height, item.x, item.y,
                  item.x + item.width, item.y + item.height):
-                    #self.setPos(self.x, self.y)
-                    item.removeFromGroup(item.rect)
-                    config.scene.removeItem(item.rect)
-                    item.removeFromGroup(item.name_text)
-                    item.removeFromGroup(item.text)
-                    item.removeFromGroup(item.deleteButton)
-                    item.rect = QGraphicsRectItem(item.x, item.y, item.width * 2, item.height * 2)
-                    item.x = item.pos().x()
-                    item.y = item.pos().y()
-                    item.width *= 2
-                    item.height *= 2
-                    item.rect.setBrush(QColor("White"))
-                    item.addToGroup(item.rect)
-                    item.addToGroup(item.name_text)
-                    item.addToGroup(item.deleteButton)
-                    item.addToGroup(item.text)
-                    item.addToGroup(self)
+                    self.resizeUIObject(item)
                     self.parent_name = item.name
                     item.connected_objects.append(self.name)
-                    return
+                    break
 
         # update the object's position parameters
         del config.coord_map[(self.x, self.y)]
         self.x = self.pos().x()
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
+        self.detachChildren()
 
     # checks if the delete button was pressed
     def deleteButtonPressed(self):
@@ -206,3 +192,31 @@ class SymObject(QGraphicsItemGroup):
     def doOverlap(self, l1_x, l1_y, r1_x, r1_y, l2_x, l2_y, r2_x, r2_y):
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap
+
+    # resizes a sym_object when another object is placed in it
+    def resizeUIObject(self, item):
+        item.removeFromGroup(item.rect)
+        config.scene.removeItem(item.rect)
+        item.removeFromGroup(item.name_text)
+        item.removeFromGroup(item.text)
+        item.removeFromGroup(item.deleteButton)
+        item.rect = QGraphicsRectItem(item.x, item.y, item.width * 2, item.height * 2)
+        item.x = item.pos().x()
+        item.y = item.pos().y()
+        item.width *= 2
+        item.height *= 2
+        item.rect.setBrush(QColor("White"))
+        item.addToGroup(item.rect)
+        item.addToGroup(item.name_text)
+        item.addToGroup(item.deleteButton)
+        item.addToGroup(item.text)
+
+    # attaches all children of the current sym_object to it so they move as one
+    def attachChildren(self):
+        for child_name in self.connected_objects:
+            self.addToGroup(config.sym_objects[child_name])
+
+    # detaches children to allow for independent movement
+    def detachChildren(self):
+        for child_name in self.connected_objects:
+            self.removeFromGroup(config.sym_objects[child_name])
