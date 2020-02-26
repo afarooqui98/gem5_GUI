@@ -28,19 +28,19 @@ class SymObject(QGraphicsItemGroup):
         self.scene = scene
 
         # initializing to (0, 0) so that future positions are relative to (0, 0)
-        rect = QGraphicsRectItem(0, 0, width, height)
-        rect.setBrush(QColor("White"))
+        self.rect = QGraphicsRectItem(0, 0, width, height)
+        self.rect.setBrush(QColor("White"))
 
         # textbox to display component name
-        text = QGraphicsTextItem(component_name)
-        text.setPos(rect.boundingRect().center() - text.boundingRect().center())
+        self.text = QGraphicsTextItem(component_name)
+        self.text.setPos(self.rect.boundingRect().center() - self.text.boundingRect().center())
 
         # textbox to display symObject name
-        name_text = QGraphicsTextItem(name)
+        self.name_text = QGraphicsTextItem(name)
 
         # create delete button
         self.deleteButton = QGraphicsTextItem('X')
-        self.deleteButton.setPos(rect.boundingRect().topRight() -
+        self.deleteButton.setPos(self.rect.boundingRect().topRight() -
                                     self.deleteButton.boundingRect().topRight())
         self.deleteButton.hide()
 
@@ -54,9 +54,9 @@ class SymObject(QGraphicsItemGroup):
         port2.setBrush(QColor("Black"))
 
         # add objects created above to group
-        self.addToGroup(rect)
-        self.addToGroup(name_text)
-        self.addToGroup(text)
+        self.addToGroup(self.rect)
+        self.addToGroup(self.name_text)
+        self.addToGroup(self.text)
         self.addToGroup(port1)
         self.addToGroup(port2)
         self.addToGroup(self.deleteButton)
@@ -145,7 +145,19 @@ class SymObject(QGraphicsItemGroup):
                 if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x()
                  + self.width, self.pos().y() + self.height, item.x, item.y,
                  item.x + item.width, item.y + item.height):
-                    self.setPos(self.x, self.y)
+                    #self.setPos(self.x, self.y)
+                    item.removeFromGroup(item.rect)
+                    config.scene.removeItem(item.rect)
+                    item.removeFromGroup(item.name_text)
+                    item.removeFromGroup(item.text)
+                    item.removeFromGroup(item.deleteButton)
+                    item.rect = QGraphicsRectItem(item.x, item.y, 300, 300)
+                    item.rect.setBrush(QColor("White"))
+                    item.addToGroup(item.rect)
+                    item.addToGroup(item.name_text)
+                    item.addToGroup(item.deleteButton)
+                    item.addToGroup(item.text)
+                    item.addToGroup(self)
                     return
 
         # update the object's position parameters
