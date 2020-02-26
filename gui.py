@@ -87,7 +87,7 @@ class MainWindow(QMainWindow):
             self.addRow("Name", config.current_sym_object.name,
                         isTreeWidgetClick)
             self.addRow("Child Objects",
-                        config.current_sym_object.connected_objects,
+                        ", ".join(config.current_sym_object.connected_objects),
                         isTreeWidgetClick)
 
         if item:
@@ -98,7 +98,6 @@ class MainWindow(QMainWindow):
             # only load from param list if there is a sym object in the context
             if config.current_sym_object != None or \
                 config.current_sym_object.component_name == name:
-                print("filling in current sym obj branch")
                 self.attributes = config.current_sym_object.parameters
             else: # TODO: check when would this branch happen??
                 print("filling in name branch")

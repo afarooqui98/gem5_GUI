@@ -41,8 +41,7 @@ def getSymObjects():
             if param:
                 res += param
 
-            connected_objects = object.connected_objects.split(",")
-            for child in connected_objects:
+            for child in object.connected_objects:
                 if not child:
                     break
 

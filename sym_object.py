@@ -12,7 +12,7 @@ class SymObject(QGraphicsItemGroup):
                     loadingFromFile):
         super(SymObject, self).__init__()
         #TODO: at export, this string will become a list
-        self.connected_objects = ""
+        self.connected_objects = []
         self.parameters = {}
         self.connections = {}
         self.isMoving = False
@@ -24,46 +24,11 @@ class SymObject(QGraphicsItemGroup):
         self.height = height
         self.component_name = component_name
         self.name = name
+        self.parent_name = None
         self.to_export = 1
         self.scene = scene
 
-        # initializing to (0, 0) so that future positions are relative to (0, 0)
-        rect = QGraphicsRectItem(0, 0, width, height)
-        rect.setBrush(QColor("White"))
-
-        # textbox to display component name
-        text = QGraphicsTextItem(component_name)
-        text.setPos(rect.boundingRect().center() - text.boundingRect().center())
-
-        # textbox to display symObject name
-        name_text = QGraphicsTextItem(name)
-
-        # create delete button
-        self.deleteButton = QGraphicsTextItem('X')
-        self.deleteButton.setPos(rect.boundingRect().topRight() -
-                                    self.deleteButton.boundingRect().topRight())
-        self.deleteButton.hide()
-
-        # create ports
-        port1 = QGraphicsEllipseItem(width/2 - config.port_size/2, height,
-                                        config.port_size, config.port_size)
-        port1.setBrush(QColor("Black"))
-
-        port2 = QGraphicsEllipseItem(width/2 - config.port_size/2,
-                        -config.port_size, config.port_size, config.port_size)
-        port2.setBrush(QColor("Black"))
-
-        # add objects created above to group
-        self.addToGroup(rect)
-        self.addToGroup(name_text)
-        self.addToGroup(text)
-        self.addToGroup(port1)
-        self.addToGroup(port2)
-        self.addToGroup(self.deleteButton)
-
-        # set flags
-        self.setAcceptDrops(True)
-        self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self.initUIObject(self, 0, 0)
 
         # if we are loading from a file, we dont need to check for overlapping
         # and can set position
@@ -101,8 +66,41 @@ class SymObject(QGraphicsItemGroup):
         #         break
         config.current_sym_object = self
 
+
+
+    def initUIObject(self, object, x, y):
+        # initializing to (x, y) so that future positions are relative to (x, y)
+        object.rect = QGraphicsRectItem(x, y, object.width, object.height)
+        object.rect.setBrush(QColor("White"))
+
+        # textbox to display component name
+        object.text = QGraphicsTextItem(object.component_name)
+        object.text.setPos(object.rect.boundingRect().center()
+                            - object.text.boundingRect().center())
+
+        # textbox to display symObject name
+        object.name_text = QGraphicsTextItem(object.name)
+        object.name_text.setPos(object.rect.boundingRect().topLeft())
+
+        # create delete button
+        object.deleteButton = QGraphicsTextItem('X')
+        object.deleteButton.setPos(object.rect.boundingRect().topRight() -
+                                object.deleteButton.boundingRect().topRight())
+        object.deleteButton.hide()
+
+        # add objects created above to group
+        object.addToGroup(object.rect)
+        object.addToGroup(object.name_text)
+        object.addToGroup(object.text)
+        object.addToGroup(object.deleteButton)
+
+        # set flags
+        object.setAcceptDrops(True)
+        object.setFlag(QGraphicsItem.ItemIsMovable, True)
+
     #register mouse press events
     def mousePressEvent(self, event):
+        self.attachChildren()
         super(SymObject, self).mousePressEvent(event)
 
         # hide button on previously selected object
@@ -141,18 +139,22 @@ class SymObject(QGraphicsItemGroup):
         # current position overlaps with any of them
         for key in config.sym_objects:
             item = config.sym_objects[key]
-            if self != item:
+            if self != item and self.parent_name != item.name \
+                                    and item.parent_name != self.name:
                 if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x()
                  + self.width, self.pos().y() + self.height, item.x, item.y,
                  item.x + item.width, item.y + item.height):
-                    self.setPos(self.x, self.y)
-                    return
+                    self.resizeUIObject(item)
+                    self.parent_name = item.name
+                    item.connected_objects.append(self.name)
+                    break
 
         # update the object's position parameters
         del config.coord_map[(self.x, self.y)]
         self.x = self.pos().x()
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
+        self.detachChildren()
 
     # checks if the delete button was pressed
     def deleteButtonPressed(self):
@@ -187,3 +189,29 @@ class SymObject(QGraphicsItemGroup):
     def doOverlap(self, l1_x, l1_y, r1_x, r1_y, l2_x, l2_y, r2_x, r2_y):
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap
+
+    # resizes a sym_object when another object is placed in it
+    def resizeUIObject(self, item):
+        item.removeFromGroup(item.rect)
+        config.scene.removeItem(item.rect)
+        item.removeFromGroup(item.name_text)
+        config.scene.removeItem(item.name_text)
+        item.removeFromGroup(item.text)
+        config.scene.removeItem(item.text)
+        item.removeFromGroup(item.deleteButton)
+        config.scene.removeItem(item.deleteButton)
+        item.x = item.pos().x()
+        item.y = item.pos().y()
+        item.width *= 2
+        item.height *= 2
+        self.initUIObject(item, item.x, item.y)
+
+    # attaches all children of the current sym_object to it so they move as one
+    def attachChildren(self):
+        for child_name in self.connected_objects:
+            self.addToGroup(config.sym_objects[child_name])
+
+    # detaches children to allow for independent movement
+    def detachChildren(self):
+        for child_name in self.connected_objects:
+            self.removeFromGroup(config.sym_objects[child_name])
