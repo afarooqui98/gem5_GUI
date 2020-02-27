@@ -23,15 +23,12 @@ class GraphicsScene(QGraphicsScene):
 
         x = newObject["x"]
         y = newObject["y"]
+        width = newObject["width"]
+        height = newObject["height"]
         component_name = newObject["component_name"]
         parameters = newObject["parameters"]
 
-        if component_name == "System":
-            new_object = SymObject(0, 0, 500, 500, self, component_name, name,
-                                    True)
-        else:
-            new_object = SymObject(x, y, 120, 60, self, component_name, name,
-                                    True)
+        new_object = SymObject(x, y, width, height, self, component_name, name, True)
 
         new_object.parameters = parameters
 

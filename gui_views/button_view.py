@@ -122,11 +122,16 @@ def saveUI_button_pressed():
         newObject = {}
         newObject["x"] = object.x
         newObject["y"] = object.y
+        newObject["z"] = object.z
         newObject["width"] = object.width
         newObject["height"] = object.height
         newObject["component_name"] = object.component_name
+        newObject["name"] = object.name
+        newObject["parent_name"] = object.parent_name
 
         newObject["parameters"] = object.parameters
+        newObject["connected_objects"] = object.connected_objects
+        newObject["connections"] = object.connections
         savedObjects[object.name] = newObject
 
     # show dialog box to let user create output file
