@@ -15,7 +15,7 @@ class SymObject(QGraphicsItemGroup):
         self.connected_objects = []
         self.parameters = {}
         self.connections = {}
-        
+
         # set initial attributes for new symobject
         self.x = scene.width() / 2 - width
         self.y = scene.height() / 2 - height
@@ -46,9 +46,7 @@ class SymObject(QGraphicsItemGroup):
         # with any of them
         for key in config.sym_objects:
             item = config.sym_objects[key]
-            if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x() +
-            self.width, self.pos().y() + self.height, item.x, item.y, item.x +
-            item.width, item.y + item.height):
+            if self.doesOverlap(item):
                 self.setPos(item.x + item.width + 10, item.y + item.height + 10)
                 #del config.coord_map[(self.x, self.y)]
                 self.x = self.pos().x()
@@ -137,9 +135,7 @@ class SymObject(QGraphicsItemGroup):
             item = config.sym_objects[key]
             if self != item and not self.isAncestor(item) and \
             not self.isDescendant(item):
-                if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x()
-                 + self.width, self.pos().y() + self.height, item.x, item.y,
-                 item.x + item.width, item.y + item.height):
+                if self.doesOverlap(item):
 
                     if item.z > z_score:
                         z_score = item.z
@@ -199,7 +195,15 @@ class SymObject(QGraphicsItemGroup):
         return False
 
     # checks if two objects overlap
-    def doOverlap(self, l1_x, l1_y, r1_x, r1_y, l2_x, l2_y, r2_x, r2_y):
+    def doesOverlap(self, item):
+        l1_x = self.pos().x()
+        l1_y = self.pos().y()
+        r1_x = self.pos().x() + self.width
+        r1_y = self.pos().y() + self.height
+        l2_x = item.x
+        l2_y = item.y
+        r2_x = item.x + item.width
+        r2_y = item.y + item.height
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap
 
