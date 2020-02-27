@@ -136,7 +136,6 @@ class SymObject(QGraphicsItemGroup):
             if self != item and not self.isAncestor(item) and \
             not self.isDescendant(item):
                 if self.doesOverlap(item):
-
                     if item.z > z_score:
                         z_score = item.z
                         parent = item
@@ -219,11 +218,28 @@ class SymObject(QGraphicsItemGroup):
         config.scene.removeItem(item.deleteButton)
         item.x = item.pos().x()
         item.y = item.pos().y()
+
         if not item.connected_objects or force_resize:
             if item.parent_name:
                 self.resizeUIObject(config.sym_objects[item.parent_name], 1)
-            item.width *= 2
-            item.height *= 2
+            item.width += 120
+            item.height += 120
+            self.setPos(item.x, item.y + item.height - self.height)
+
+        print("child: ", self.name)
+        print("parent: ", item.name)
+
+        if item.connected_objects:
+            item.width += 120
+            next_x = item.x
+            child_y = item.y + item.height - self.height
+            for child in item.connected_objects:
+                cur_child = config.sym_objects[child]
+                cur_child.setPos(next_x, child_y)
+                next_x += cur_child.width + 10
+
+            self.setPos(next_x, child_y)
+
         self.initUIObject(item, item.x, item.y)
 
     # attaches all children of the current sym_object to it so they move as one

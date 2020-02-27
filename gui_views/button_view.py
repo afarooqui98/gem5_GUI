@@ -111,6 +111,15 @@ def openUI_button_pressed():
             object = data[key]
             config.scene.loadSavedObject("component", key, object)
 
+    for parent in config.sym_objects:
+        children = config.sym_objects[parent].connected_objects
+        print("parent: ", parent)
+        print("children: ", children)
+        if children:
+            for child in children:
+                config.sym_objects[child].resizeUIObject(\
+                                                config.sym_objects[parent], 0)
+
 
 # saves gui state to a .ui file
 def saveUI_button_pressed():

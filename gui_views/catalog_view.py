@@ -38,8 +38,16 @@ class CatalogView(): #dropdown and search bar
         if item.parent() is None:
             return
 
-        name, ok = QInputDialog.getText(config.mainWindow, "Alert", "New SimObject name:")
+        name, ok = QInputDialog.getText(config.mainWindow, "Alert", \
+                                        "New SimObject name:")
         if not ok:
+            return
+
+        if name in config.sym_objects:
+            ok = QMessageBox.about(config.mainWindow, "Alert", \
+                            "SimObject with name: " + name + " already exists!")
+            if not ok:
+                pass
             return
 
         config.current_sym_object = \
