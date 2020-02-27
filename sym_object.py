@@ -131,19 +131,21 @@ class SymObject(QGraphicsItemGroup):
         parent = None
         #iterate through all sym objects on the screen and check if the object's
         # current position overlaps with any of them
-        for key in config.sym_objects:
-            item = config.sym_objects[key]
-            if self != item and not self.isAncestor(item) and \
-            not self.isDescendant(item):
-                if self.doesOverlap(item):
-                    if item.z > z_score:
-                        z_score = item.z
-                        parent = item
+        #for key in config.sym_objects:
+        #    item = config.sym_objects[key]
+        #    if self != item and not self.isAncestor(item) and \
+        #    not self.isDescendant(item):
+        #        if self.doesOverlap(item):
+        #            if item.z > z_score:
+        #                z_score = item.z
+        #                parent = item
+        parent = self.getFrontmostOverLappingObject()
 
         if parent:
+            print(parent.name)
             self.resizeUIObject(parent, 0)
             self.parent_name = parent.name #add new parent
-            self.z = z_score + 1 #update z index
+            self.z = parent.z + 1 #update z index
             if not self.name in parent.connected_objects:
                 parent.connected_objects.append(self.name) #add new child
 
@@ -153,6 +155,20 @@ class SymObject(QGraphicsItemGroup):
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
         self.detachChildren()
+
+    def getFrontmostOverLappingObject(self):
+        frontmost_object = None
+        highest_zscore = -1
+        for key in config.sym_objects:
+            object = config.sym_objects[key]
+            if self != object and not self.isAncestor(object) and \
+               not self.isDescendant(object):
+                if self.doesOverlap(object):
+                    if object.z > highest_zscore:
+                        highest_zscore = object.z
+                        frontmost_object = object
+
+        return frontmost_object
 
 
     def isAncestor(self, item):
@@ -208,6 +224,8 @@ class SymObject(QGraphicsItemGroup):
 
     # resizes a sym_object when another object is placed in it
     def resizeUIObject(self, item, force_resize):
+        print("child: ", self.name)
+        print("parent: ", item.name)
         item.removeFromGroup(item.rect)
         config.scene.removeItem(item.rect)
         item.removeFromGroup(item.name_text)
@@ -220,14 +238,11 @@ class SymObject(QGraphicsItemGroup):
         item.y = item.pos().y()
 
         if not item.connected_objects or force_resize:
-            if item.parent_name:
-                self.resizeUIObject(config.sym_objects[item.parent_name], 1)
             item.width += 120
             item.height += 120
             self.setPos(item.x, item.y + item.height - self.height)
-
-        print("child: ", self.name)
-        print("parent: ", item.name)
+            if item.parent_name:
+                item.resizeUIObject(config.sym_objects[item.parent_name], 1)
 
         if item.connected_objects:
             item.width += 120
@@ -236,7 +251,11 @@ class SymObject(QGraphicsItemGroup):
             for child in item.connected_objects:
                 cur_child = config.sym_objects[child]
                 cur_child.setPos(next_x, child_y)
-                next_x += cur_child.width + 10
+                if cur_child.connected_objects:
+                    next_x += (cur_child.width * \
+                                    (len(cur_child.connected_objects) + 1)) + 10
+                else:
+                    next_x += cur_child.width + 10
 
             self.setPos(next_x, child_y)
 
