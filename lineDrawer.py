@@ -3,13 +3,14 @@ from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QMessageBox)
 from PySide2.QtGui import QPainter, QColor, QPen
 from PySide2.QtCore import Qt, QPoint
 from connection import *
-from gui_views import config
+from gui_views import state
 
 class LineDrawer(QWidget):
 
     # constructor
-    def __init__(self):
+    def __init__(self, state):
         super(LineDrawer, self).__init__()
+        self.state = state
         self.initUI()
         self.setMouseTracking(True)
 
@@ -20,22 +21,22 @@ class LineDrawer(QWidget):
         self.line_done = 0
 
     def mousePressEvent(self, event):
-        if config.draw_wire_state:
+        if self.state.draw_wire_state:
             self.pos1 = event.pos()
             self.line_done = 0
 
     def mouseMoveEvent(self, event):
-        if config.draw_wire_state:
+        if self.state.draw_wire_state:
             self.pos2 = event.pos()
             if not self.line_done:
                 self.update()
 
     def mouseReleaseEvent(self, event):
-        if config.draw_wire_state:
+        if self.state.draw_wire_state:
             self.line_done = 1
             if self.setObjectConnection() >= 0:
-                config.lines.append((self.pos1, self.pos2))
-                print(config.current_sym_object.connections)
+                self.state.lines.append((self.pos1, self.pos2))
+                print(self.state.current_sym_object.connections)
             else:
                 ok = QMessageBox.about(self, "Alert", "Invalid line")
                 if not ok:
@@ -46,26 +47,21 @@ class LineDrawer(QWidget):
 
     def paintEvent(self, event):
         q = QPainter(self)
-        if config.draw_wire_state:
+        if self.state.draw_wire_state:
             self.update()
         #draw port lines
         q.setPen(QPen(Qt.black, 3))
         if self.pos1 and self.pos2:
             q.drawLine(self.pos1.x(), self.pos1.y(), self.pos2.x(),
                         self.pos2.y())
-        config.drawLines(q, config.lines)
-
-        #draw sub object lines
-        q.setPen(QPen(Qt.black, 2, Qt.DotLine))
-        config.drawLines(q, config.sub_object_lines)
-
+        self.state.drawLines(q)
 
     def setObjectConnection(self):
         parent_loc = self.pos1
         child_loc = self.pos2
         parent, child = None, None
-        for key, val in config.coord_map.items():
-            sym_object = config.sym_objects[val]
+        for key, val in self.state.coord_map.items():
+            sym_object = self.state.sym_objects[val]
             if key[0] < parent_loc.x() and \
                     parent_loc.x() < key[0] + sym_object.width:
                 if key[1] < parent_loc.y() and \
@@ -89,8 +85,8 @@ class LineDrawer(QWidget):
 
     # connects a parent and child object with a dotted line
     def connectSubObject(self, parent_name, child_name):
-        parent = config.sym_objects[parent_name]
-        child = config.sym_objects[child_name]
+        parent = self.state.sym_objects[parent_name]
+        child = self.state.sym_objects[child_name]
         #implement later
         #x1, y1, x2, y2 = self.calculateShortestDistance(parent_name,
         #                                                    child_name)
@@ -102,7 +98,7 @@ class LineDrawer(QWidget):
         pos2.setX(child.x + child.width / 2)
         pos2.setY(child.y + child.height / 2)
         # add line to sub_object_lines list
-        config.sub_object_lines.append((pos1, pos2))
+        self.state.sub_object_lines.append((pos1, pos2))
         # triggers paint event to redraw scene
         self.update()
 

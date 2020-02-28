@@ -5,11 +5,12 @@ from graphic_scene import *
 
 import sys, random
 import copy
-from gui_views import config
+from gui_views import state
 import json
 
-class ButtonView(): #export, draw line, save and load configuration buttons
-    def __init__(self, layout):
+class ButtonView(): #export, draw line, save and load self.stateuration buttons
+    def __init__(self, layout, state):
+        self.state = state
         # create buttons and add to layout
         self.wireButton = QPushButton("draw wire")
         layout.addWidget(self.wireButton)
@@ -28,9 +29,9 @@ class ButtonView(): #export, draw line, save and load configuration buttons
 
 # changes gui state to allow for wire drawing and disable object dragging
 def wire_button_pressed():
-    config.drag_state = not config.drag_state
-    config.draw_wire_state = not config.draw_wire_state
-    config.setDragState()
+    self.state.drag_state = not self.state.drag_state
+    self.state.draw_wire_state = not self.state.draw_wire_state
+    self.state.setDragState()
 
 
 # creates a python file that can be run with gem5
@@ -75,7 +76,7 @@ import m5
 from m5.objects import *\n\n"""
     )
 
-    file.write(config.getSymObjects())
+    file.write(self.state.getSymObjects())
 
     file.write("""\n
 # instantiate all of the objects we've created above
@@ -98,27 +99,27 @@ def openUI_button_pressed():
         return
 
     #clear out existing objects before loading from file
-    for object in config.sym_objects.values():
-        config.scene.removeItem(object)
+    for object in self.state.sym_objects.values():
+        self.state.scene.removeItem(object)
 
-    config.sym_objects.clear()
-    config.coord_map.clear()
+    self.state.sym_objects.clear()
+    self.state.coord_map.clear()
 
     # read data in from the file and load each object
     with open(filename) as json_file:
         data = json.load(json_file)
         for key in data:
             object = data[key]
-            config.scene.loadSavedObject("component", key, object)
+            self.state.scene.loadSavedObject("component", key, object)
 
-    for parent in config.sym_objects:
-        children = config.sym_objects[parent].connected_objects
+    for parent in self.state.sym_objects:
+        children = self.state.sym_objects[parent].connected_objects
         print("parent: ", parent)
         print("children: ", children)
         if children:
             for child in children:
-                config.sym_objects[child].resizeUIObject(\
-                                                config.sym_objects[parent], 0)
+                self.state.sym_objects[child].resizeUIObject(\
+                                                self.state.sym_objects[parent], 0)
 
 
 # saves gui state to a .ui file
@@ -127,7 +128,7 @@ def saveUI_button_pressed():
 
     # iterate through the current objects on the scene and create a new JSON
     # object for each one
-    for object in config.sym_objects.values():
+    for object in self.state.sym_objects.values():
         newObject = {}
         newObject["x"] = object.x
         newObject["y"] = object.y

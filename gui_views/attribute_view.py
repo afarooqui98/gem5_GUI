@@ -5,11 +5,12 @@ from graphic_scene import *
 
 import sys, random
 import copy
-from gui_views import config
+from gui_views import state
 import json
 
 class AttributeView(): #table view for parameters, as well as the description
-    def __init__(self, layout):
+    def __init__(self, layout, state):
+        self.state = state
         #attribute table for an object, is editable
         self.attributeLayout = QHBoxLayout()
         self.attributeTable = QTableWidget(0,2)
@@ -44,7 +45,7 @@ class AttributeView(): #table view for parameters, as well as the description
     # this signal disconnects itself after finishing execution, since we only
     # want to trigger it AFTER a double press
     def modifyFields(self, item):
-        if config.current_sym_object == None or not item:
+        if self.state.current_sym_object == None or not item:
             return
 
         # get attributes
@@ -57,22 +58,22 @@ class AttributeView(): #table view for parameters, as well as the description
         # if the value is name or connected objects, set the param instead of
         # the dict
         if currentAttribute == "Name":
-            config.current_sym_object.name = currentValue
-            current_x = config.current_sym_object.x
-            current_y = config.current_sym_object.y
-            current_name = config.current_sym_object.name
-            if (current_x, current_y) in config.coord_map:
-                del config.sym_objects[config.coord_map[(current_x, current_y)]]
+            self.state.current_sym_object.name = currentValue
+            current_x = self.state.current_sym_object.x
+            current_y = self.state.current_sym_object.y
+            current_name = self.state.current_sym_object.name
+            if (current_x, current_y) in self.state.coord_map:
+                del self.state.sym_objects[self.state.coord_map[(current_x, current_y)]]
 
-            config.coord_map[(current_x, current_y)] = current_name
-            config.sym_objects[current_name] = config.current_sym_object
+            self.state.coord_map[(current_x, current_y)] = current_name
+            self.state.sym_objects[current_name] = self.state.current_sym_object
         elif currentAttribute == "Child Objects":
-            config.current_sym_object.connected_objects = currentValue
-            config.sym_objects[currentValue].to_export = 0
-            config.line_drawer.connectSubObject(config.current_sym_object.name,
+            self.state.current_sym_object.connected_objects = currentValue
+            self.state.sym_objects[currentValue].to_export = 0
+            self.state.line_drawer.connectSubObject(self.state.current_sym_object.name,
                                                 currentValue)
         else:
-            config.current_sym_object.parameters[currentAttribute]["Value"] = \
+            self.state.current_sym_object.parameters[currentAttribute]["Value"] = \
                                                                     currentValue
 
         # item no longer editable, disconnect
