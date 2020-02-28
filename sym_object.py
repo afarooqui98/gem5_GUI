@@ -114,10 +114,13 @@ class SymObject(QGraphicsItemGroup):
 
     # remove visual and backend respresentations of object
     def delete(self):
+        name = self.name
         config.scene.removeItem(self)
+        if self.parent_name:
+            config.sym_objects[self.parent_name].connected_objects.remove(name)
         config.current_sym_object = None
         del config.coord_map[(self.x, self.y)]
-        del config.sym_objects[self.name]
+        del config.sym_objects[name]
 
     # when mouse is release on object, update its position including the case
     # where it overlaps
