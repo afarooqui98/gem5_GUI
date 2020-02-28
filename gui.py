@@ -16,12 +16,12 @@ import json
 
 class MainWindow(QMainWindow):
     """this class creates the main window"""
-    catalog = json.load(open('result_new.json'))
 
     def __init__(self, catalog):
         super(MainWindow, self).__init__()
         self.setWindowTitle("gem5 GUI")
         self.main = QWidget()
+        self.catalog = catalog
         self.setLayoutDirection(Qt.LeftToRight)
 
         self.gridLayout = QVBoxLayout()
@@ -144,6 +144,7 @@ if __name__ == "__main__":
 
 if __name__ == "__m5_main__":
     import sys
+    import os
     sys.path.append('configs')
     import m5.objects
     from common import ObjectList

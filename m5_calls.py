@@ -15,7 +15,11 @@ def get_obj_lists():
     #TODO this list is predetermined, must compile final list of all objects
     test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher',
         'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject',
-        'HelloObject', 'GoodbyeObject']
+        'HelloObject', 'GoodbyeObject', 'System', 'SimpleMemory']
+
+    System : {CPU_name1, mem_name, cache_name}
+    setattr(System, name, component_name)
+    System.dict[name] = dict1[component_name]()
 
     for i in range(len(test_objects)):
         # Create ObjectLists for each base element
@@ -41,3 +45,4 @@ def get_obj_lists():
             sub_objs[sub_obj] = param_dict
 
         obj_tree[name] = sub_objs
+    return obj_tree
