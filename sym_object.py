@@ -92,25 +92,29 @@ class SymObject(QGraphicsItemGroup):
 
     #register mouse press events
     def mousePressEvent(self, event):
-        self.attachChildren()
-        super(SymObject, self).mousePressEvent(event)
+        clicked = self.getClickedObject(event)
+        if not clicked:
+            clicked = self
+
+        clicked.attachChildren()
+        super(SymObject, clicked).mousePressEvent(event)
 
         # hide button on previously selected object
         if config.current_sym_object:
             config.current_sym_object.deleteButton.hide()
 
         # show button for current object
-        self.deleteButton.show()
+        clicked.deleteButton.show()
 
         # check if mouse press is on delete button
-        deletePressed = self.deleteButtonPressed(event)
+        deletePressed = clicked.deleteButtonPressed(event)
         if deletePressed:
-            self.delete()
+            clicked.delete()
             return
 
         # set currentsymobject to self and update attributes for it
-        config.current_sym_object = self
-        config.mainWindow.populateAttributes(None, self.component_name, False)
+        config.current_sym_object = clicked
+        config.mainWindow.populateAttributes(None, clicked.component_name, False)
 
     # remove visual and backend respresentations of object
     # delete children as well?
@@ -158,6 +162,19 @@ class SymObject(QGraphicsItemGroup):
         config.coord_map[(self.x, self.y)] = self.name
         self.detachChildren()
 
+    def getClickedObject(self, event):
+        frontmost_object = None
+        highest_zscore = -1
+        for key in config.sym_objects:
+            object = config.sym_objects[key]
+            if self != object:
+                if self.isClicked(event):
+                    if object.z > highest_zscore:
+                        highest_zscore = object.z
+                        frontmost_object = object
+
+        return frontmost_object
+
     def getFrontmostOverLappingObject(self):
         frontmost_object = None
         highest_zscore = -1
@@ -172,6 +189,16 @@ class SymObject(QGraphicsItemGroup):
 
         return frontmost_object
 
+    def isClicked(self, event):
+        click_x, click_y = event.pos().x(), event.pos().y()
+        # if the click position is within the text item's bounding box, return
+        # true
+        if (click_x > self.pos().x() and click_x < self.pos().x() + \
+            self.width and click_y > self.pos().y() and click_y < \
+            self.pos().y() + self.height):
+            return True
+
+        return False
 
     def isAncestor(self, item):
         if not self.parent_name:
