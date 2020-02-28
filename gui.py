@@ -8,7 +8,7 @@ from gui_views.catalog_view import *
 from gui_views.button_view import *
 from gui_views.catalog_view import *
 from gui_views.attribute_view import *
-from gui_views.config import *
+from gui_views.state import *
 
 import sys, random
 import copy
@@ -19,6 +19,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, catalog):
         super(MainWindow, self).__init__()
+        self.state = State()
         self.setWindowTitle("gem5 GUI")
         self.main = QWidget()
         self.catalog = catalog
@@ -27,17 +28,17 @@ class MainWindow(QMainWindow):
         self.gridLayout = QVBoxLayout()
         self.gridLayout.setObjectName("gridLayout")
 
-        self.buttonView = ButtonView(self.gridLayout) #add button view
+        self.buttonView = ButtonView(self.gridLayout, self.state) #add button view
         #add catalog view
-        self.catalogView = CatalogView(self.gridLayout, catalog)
-        self.attributeView = AttributeView(self.gridLayout) #add attributes
+        self.catalogView = CatalogView(self.gridLayout, catalog, self.state)
+        self.attributeView = AttributeView(self.gridLayout, self.state) #add attributes
 
-        config.scene = GraphicsScene(0,0, 1750, 1250)
-        self.graphics_view = QGraphicsView(config.scene)
+        self.state.scene = GraphicsScene(0,0, 1750, 1250, self.state)
+        self.graphics_view = QGraphicsView(self.state.scene)
 
         # might need this code later for drawing lines
         #self.lines = LineDrawer()
-        #self.proxy = config.scene.addWidget(self.lines)
+        #self.proxy = self.state.scene.addWidget(self.lines)
         #self.proxy.setWidget(self.lines)
         #self.graphics_view.setSceneRect(0,0, 1750, 1250)
 
@@ -74,7 +75,7 @@ class MainWindow(QMainWindow):
     # if single clicking from the treeWidget, don't want to set the current sym
     # object
     def treeWidgetClicked(self, item, name):
-        config.current_sym_object = None
+        self.state.current_sym_object = None
         self.populateAttributes(item, name, True)
 
     def populateAttributes(self, item, name, isTreeWidgetClick):
@@ -82,12 +83,12 @@ class MainWindow(QMainWindow):
         table.clear()
         table.setRowCount(0)
 
-        if config.current_sym_object != None:
-            print(config.current_sym_object.component_name)
-            self.addRow("Name", config.current_sym_object.name,
+        if self.state.current_sym_object != None:
+            print(self.state.current_sym_object.component_name)
+            self.addRow("Name", self.state.current_sym_object.name,
                         isTreeWidgetClick)
             self.addRow("Child Objects",
-                        ", ".join(config.current_sym_object.connected_objects),
+                        ", ".join(self.state.current_sym_object.connected_objects),
                         isTreeWidgetClick)
 
         if item:
@@ -96,9 +97,9 @@ class MainWindow(QMainWindow):
             self.attributes = self.catalog[item.parent().text(0)][item.text(0)]
         else:
             # only load from param list if there is a sym object in the context
-            if config.current_sym_object != None or \
-                config.current_sym_object.component_name == name:
-                self.attributes = config.current_sym_object.parameters
+            if self.state.current_sym_object != None or \
+                self.state.current_sym_object.component_name == name:
+                self.attributes = self.state.current_sym_object.parameters
             else: # TODO: check when would this branch happen??
                 print("filling in name branch")
                 self.attributes = self.catalog[name]
@@ -135,7 +136,7 @@ if __name__ == "__main__":
     gui_application = QApplication() #create new application
     catalog = json.load(open('result_new.json'))
     main_window = MainWindow(catalog) #create new instance of main window
-    config.mainWindow = main_window
+    main_window.state.mainWindow = main_window
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack
     gui_application.exec_() #monitor application for events
@@ -145,7 +146,7 @@ if __name__ == "__main__":
 if __name__ == "__m5_main__":
     import sys
     import os
-    sys.path.append('configs')
+    sys.path.append('self.states')
     import m5.objects
     from common import ObjectList
     from m5_calls import get_obj_lists
@@ -155,7 +156,7 @@ if __name__ == "__m5_main__":
 
     gui_application = QApplication() #create new application
     main_window = MainWindow(obj_tree) #create new instance of main window
-    config.mainWindow = main_window
+    main_window.state.mainWindow = main_window
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack
     gui_application.exec_() #monitor application for events

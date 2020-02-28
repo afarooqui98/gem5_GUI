@@ -4,7 +4,7 @@ from PySide2.QtGui import *
 
 from lineDrawer import *
 from PySide2 import QtCore
-from gui_views import config
+from gui_views import state
 from sym_object import *
 import string
 
@@ -12,11 +12,12 @@ class GraphicsScene(QGraphicsScene):
     """this class provides a scene to manage objects"""
 
     # constructor
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, state):
         super(GraphicsScene, self).__init__(x, y, width, height)
-        config.line_drawer = LineDrawer()
-        config.line_drawer.resize(self.width(), self.height())
-        self.addWidget(config.line_drawer)
+        self.state = state
+        self.state.line_drawer = LineDrawer(state)
+        self.state.line_drawer.resize(self.width(), self.height())
+        self.addWidget(self.state.line_drawer)
 
     # load object from saved UI file
     def loadSavedObject(self, type, name, newObject):
@@ -33,10 +34,10 @@ class GraphicsScene(QGraphicsScene):
 
         new_object.parameters = parameters
         new_object.connected_objects = connected_objects
-        
+
         # add new object to backend datastructures
-        config.sym_objects[name] = new_object
-        config.current_sym_object = new_object
+        self.state.sym_objects[name] = new_object
+        self.state.current_sym_object = new_object
         self.addItem(new_object)
         return new_object
 
@@ -48,31 +49,28 @@ class GraphicsScene(QGraphicsScene):
                             for i in range(7))
 
         # add object rectangle to scene
-        if component_name == "System":
-            new_object = SymObject(0, 0, 500, 500, self, component_name, name,
-                                    False)
-        else:
-            new_object = SymObject(0, 0, 120, 60, self, component_name, name,
-                                    False)
 
-        config.sym_objects[name] = new_object
-        config.current_sym_object = new_object
+        new_object = SymObject(0, 0, 120, 60, self, component_name, name,
+                                False, self.state)
+
+        self.state.sym_objects[name] = new_object
+        self.state.current_sym_object = new_object
         self.addItem(new_object)
         return new_object
 
     # if an object is dragged into the scene
     def dragEnterEvent(self,event):
-        if config.drag_state:
+        if self.state.drag_state:
             event.accept()
 
     # if an object is dragged around on the scene
     def dragMoveEvent(self,event):
-        if config.drag_state:
+        if self.state.drag_state:
             event.accept()
 
     # if an object is dropped on the scene
     def dropEvent(self,event):
-        if config.drag_state:
+        if self.state.drag_state:
             event.accept()
         else:
             return
@@ -80,4 +78,4 @@ class GraphicsScene(QGraphicsScene):
     # paint event to draw lines
     def paintEvent(self, event):
         q = QPainter(self)
-        config.drawLines(q, config.lines)
+        self.state.drawLines(q, self.state.lines)

@@ -5,11 +5,12 @@ from graphic_scene import *
 
 import sys, random
 import copy
-from gui_views import config
+from gui_views import state
 import json
 
 class CatalogView(): #dropdown and search bar
-    def __init__(self, layout, catalog):
+    def __init__(self, layout, catalog, state):
+        self.state = state
         self.catalog = catalog
         #search bar
         self.edit = QLineEdit()
@@ -38,21 +39,21 @@ class CatalogView(): #dropdown and search bar
         if item.parent() is None:
             return
 
-        name, ok = QInputDialog.getText(config.mainWindow, "Alert", \
+        name, ok = QInputDialog.getText(self.state.mainWindow, "Alert", \
                                         "New SimObject name:")
         if not ok:
             return
 
-        if name in config.sym_objects:
-            ok = QMessageBox.about(config.mainWindow, "Alert", \
+        if name in self.state.sym_objects:
+            ok = QMessageBox.about(self.state.mainWindow, "Alert", \
                             "SimObject with name: " + name + " already exists!")
             if not ok:
                 pass
             return
 
-        config.current_sym_object = \
-            config.scene.addObjectToScene("component", item.text(0), name)
-        config.current_sym_object.parameters = \
+        self.state.current_sym_object = \
+            self.state.scene.addObjectToScene("component", item.text(0), name)
+        self.state.current_sym_object.parameters = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)])
 
     # make tree view searchable
