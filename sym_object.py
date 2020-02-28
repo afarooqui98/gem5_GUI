@@ -224,8 +224,6 @@ class SymObject(QGraphicsItemGroup):
 
     # resizes a sym_object when another object is placed in it
     def resizeUIObject(self, item, force_resize):
-        print("child: ", self.name)
-        print("parent: ", item.name)
         item.removeFromGroup(item.rect)
         config.scene.removeItem(item.rect)
         item.removeFromGroup(item.name_text)
@@ -237,29 +235,67 @@ class SymObject(QGraphicsItemGroup):
         item.x = item.pos().x()
         item.y = item.pos().y()
 
-        if not item.connected_objects or force_resize:
+        if not item.connected_objects: # or force_resize:
             item.width += 120
             item.height += 120
             self.setPos(item.x, item.y + item.height - self.height)
-            if item.parent_name:
-                item.resizeUIObject(config.sym_objects[item.parent_name], 1)
+
+        rightmost_object = item.rightMostChild(self)
+        lowest_object = item.lowestChild(self)
+
+        y_diff = lowest_object.pos().y() + lowest_object.height - item.pos().y() - item.height
+        x_diff = item.pos().x() + item.width - rightmost_object.pos().x() - rightmost_object.width
 
         if item.connected_objects:
-            item.width += 120
+            if x_diff < 120:
+                item.width = item.width + 120
+            if y_diff > 0:
+                item.height += y_diff
+
             next_x = item.x
-            child_y = item.y + item.height - self.height
+
             for child in item.connected_objects:
                 cur_child = config.sym_objects[child]
+                child_y = item.y + item.height - cur_child.height
                 cur_child.setPos(next_x, child_y)
                 if cur_child.connected_objects:
-                    next_x += (cur_child.width * \
-                                    (len(cur_child.connected_objects) + 1)) + 10
+                    next_x += (120 * len(cur_child.connected_objects)) + 10 + 120
                 else:
                     next_x += cur_child.width + 10
 
-            self.setPos(next_x, child_y)
+            if not force_resize:
+                self.setPos(next_x, child_y)
+
+        if item.parent_name:
+            item.resizeUIObject(config.sym_objects[item.parent_name], 1)
+            # if not item.connected_objects:
+            #     item.resizeUIObject(config.sym_objects[item.parent_name], 1)
+            # else:
+            #     item.resizeUIObject(config.sym_objects[item.parent_name], 0)
 
         self.initUIObject(item, item.x, item.y)
+
+    def lowestChild(parent, item):
+        lowest = item
+        y_coord = item.pos().x() + item.width
+        for child in parent.connected_objects:
+            cur_child = config.sym_objects[child]
+            if (cur_child.pos().y() + cur_child.height > y_coord):
+                y_coord = cur_child.pos().y() + cur_child.height
+                lowest = cur_child
+
+        return lowest
+
+    def rightMostChild(parent, item):
+        rightmost = item
+        x_coord = item.pos().x() + item.width
+        for child in parent.connected_objects:
+            cur_child = config.sym_objects[child]
+            if (cur_child.pos().x() + cur_child.width > x_coord):
+                x_coord = cur_child.pos().x() + cur_child.width
+                rightmost = cur_child
+
+        return rightmost
 
     # attaches all children of the current sym_object to it so they move as one
     def attachChildren(self):
