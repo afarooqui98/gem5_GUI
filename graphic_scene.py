@@ -49,12 +49,9 @@ class GraphicsScene(QGraphicsScene):
                             for i in range(7))
 
         # add object rectangle to scene
-        if component_name == "System":
-            new_object = SymObject(0, 0, 500, 500, self, component_name, name,
-                                    False, sel.state)
-        else:
-            new_object = SymObject(0, 0, 120, 60, self, component_name, name,
-                                    False, self.state)
+
+        new_object = SymObject(0, 0, 120, 60, self, component_name, name,
+                                False, self.state)
 
         self.state.sym_objects[name] = new_object
         self.state.current_sym_object = new_object
