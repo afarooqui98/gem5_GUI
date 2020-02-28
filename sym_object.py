@@ -113,11 +113,17 @@ class SymObject(QGraphicsItemGroup):
         config.mainWindow.populateAttributes(None, self.component_name, False)
 
     # remove visual and backend respresentations of object
+    # delete children as well?
     def delete(self):
         name = self.name
         config.scene.removeItem(self)
         if self.parent_name:
             config.sym_objects[self.parent_name].connected_objects.remove(name)
+        for child_name in self.connected_objects:
+            #config.sym_objects[child_name].delete()
+            del config.coord_map[(config.sym_objects[child_name].x, config.sym_objects[child_name].y)]
+            del config.sym_objects[child_name]
+
         config.current_sym_object = None
         del config.coord_map[(self.x, self.y)]
         del config.sym_objects[name]
@@ -132,25 +138,18 @@ class SymObject(QGraphicsItemGroup):
 
         z_score = -1
         parent = None
+
         #iterate through all sym objects on the screen and check if the object's
         # current position overlaps with any of them
-        #for key in config.sym_objects:
-        #    item = config.sym_objects[key]
-        #    if self != item and not self.isAncestor(item) and \
-        #    not self.isDescendant(item):
-        #        if self.doesOverlap(item):
-        #            if item.z > z_score:
-        #                z_score = item.z
-        #                parent = item
         parent = self.getFrontmostOverLappingObject()
 
         if parent:
             print(parent.name)
             self.resizeUIObject(parent, 0)
-            self.parent_name = parent.name #add new parent
-            self.z = parent.z + 1 #update z index
+            self.parent_name = parent.name # add new parent
+            self.z = parent.z + 1 # update z index
             if not self.name in parent.connected_objects:
-                parent.connected_objects.append(self.name) #add new child
+                parent.connected_objects.append(self.name) # add new child
 
         # update the object's position parameters
         #del config.coord_map[(self.x, self.y)]
@@ -251,7 +250,7 @@ class SymObject(QGraphicsItemGroup):
 
         if item.connected_objects:
             if x_diff < 120:
-                item.width = item.width + 120
+                item.width += 120
             if y_diff > 0:
                 item.height += y_diff
 
