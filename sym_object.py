@@ -15,7 +15,6 @@ class SymObject(QGraphicsItemGroup):
         self.connected_objects = []
         self.parameters = {}
         self.connections = {}
-        self.isMoving = False
 
         # set initial attributes for new symobject
         self.x = scene.width() / 2 - width
@@ -47,9 +46,7 @@ class SymObject(QGraphicsItemGroup):
         # with any of them
         for key in config.sym_objects:
             item = config.sym_objects[key]
-            if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x() +
-            self.width, self.pos().y() + self.height, item.x, item.y, item.x +
-            item.width, item.y + item.height):
+            if self.doesOverlap(item):
                 self.setPos(item.x + item.width + 10, item.y + item.height + 10)
                 #del config.coord_map[(self.x, self.y)]
                 self.x = self.pos().x()
@@ -116,11 +113,20 @@ class SymObject(QGraphicsItemGroup):
         config.mainWindow.populateAttributes(None, self.component_name, False)
 
     # remove visual and backend respresentations of object
+    # delete children as well?
     def delete(self):
+        name = self.name
         config.scene.removeItem(self)
+        if self.parent_name:
+            config.sym_objects[self.parent_name].connected_objects.remove(name)
+        for child_name in self.connected_objects:
+            #config.sym_objects[child_name].delete()
+            del config.coord_map[(config.sym_objects[child_name].x, config.sym_objects[child_name].y)]
+            del config.sym_objects[child_name]
+
         config.current_sym_object = None
         del config.coord_map[(self.x, self.y)]
-        del config.sym_objects[self.name]
+        del config.sym_objects[name]
 
     # when mouse is release on object, update its position including the case
     # where it overlaps
@@ -132,26 +138,18 @@ class SymObject(QGraphicsItemGroup):
 
         z_score = -1
         parent = None
+
         #iterate through all sym objects on the screen and check if the object's
         # current position overlaps with any of them
-        for key in config.sym_objects:
-            item = config.sym_objects[key]
-            if self != item and not self.isAncestor(item) and \
-            not self.isDescendant(item):
-                if self.doOverlap(self.pos().x(), self.pos().y(), self.pos().x()
-                 + self.width, self.pos().y() + self.height, item.x, item.y,
-                 item.x + item.width, item.y + item.height):
-
-                    if item.z > z_score:
-                        z_score = item.z
-                        parent = item
+        parent = self.getFrontmostOverLappingObject()
 
         if parent:
+            print(parent.name)
             self.resizeUIObject(parent, 0)
-            self.parent_name = parent.name #add new parent
-            self.z = z_score + 1 #update z index
+            self.parent_name = parent.name # add new parent
+            self.z = parent.z + 1 # update z index
             if not self.name in parent.connected_objects:
-                parent.connected_objects.append(self.name) #add new child
+                parent.connected_objects.append(self.name) # add new child
 
         # update the object's position parameters
         #del config.coord_map[(self.x, self.y)]
@@ -159,6 +157,20 @@ class SymObject(QGraphicsItemGroup):
         self.y = self.pos().y()
         config.coord_map[(self.x, self.y)] = self.name
         self.detachChildren()
+
+    def getFrontmostOverLappingObject(self):
+        frontmost_object = None
+        highest_zscore = -1
+        for key in config.sym_objects:
+            object = config.sym_objects[key]
+            if self != object and not self.isAncestor(object) and \
+               not self.isDescendant(object):
+                if self.doesOverlap(object):
+                    if object.z > highest_zscore:
+                        highest_zscore = object.z
+                        frontmost_object = object
+
+        return frontmost_object
 
 
     def isAncestor(self, item):
@@ -200,7 +212,15 @@ class SymObject(QGraphicsItemGroup):
         return False
 
     # checks if two objects overlap
-    def doOverlap(self, l1_x, l1_y, r1_x, r1_y, l2_x, l2_y, r2_x, r2_y):
+    def doesOverlap(self, item):
+        l1_x = self.pos().x()
+        l1_y = self.pos().y()
+        r1_x = self.pos().x() + self.width
+        r1_y = self.pos().y() + self.height
+        l2_x = item.x
+        l2_y = item.y
+        r2_x = item.x + item.width
+        r2_y = item.y + item.height
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap
 
@@ -216,12 +236,68 @@ class SymObject(QGraphicsItemGroup):
         config.scene.removeItem(item.deleteButton)
         item.x = item.pos().x()
         item.y = item.pos().y()
-        if not item.connected_objects or force_resize:
-            if item.parent_name:
-                self.resizeUIObject(config.sym_objects[item.parent_name], 1)
-            item.width *= 2
-            item.height *= 2
+
+        if not item.connected_objects: # or force_resize:
+            item.width += 120
+            item.height += 120
+            self.setPos(item.x, item.y + item.height - self.height)
+
+        rightmost_object = item.rightMostChild(self)
+        lowest_object = item.lowestChild(self)
+
+        y_diff = lowest_object.pos().y() + lowest_object.height - item.pos().y() - item.height
+        x_diff = item.pos().x() + item.width - rightmost_object.pos().x() - rightmost_object.width
+
+        if item.connected_objects:
+            if x_diff < 120:
+                item.width += 120
+            if y_diff > 0:
+                item.height += y_diff
+
+            next_x = item.x
+
+            for child in item.connected_objects:
+                cur_child = config.sym_objects[child]
+                child_y = item.y + item.height - cur_child.height
+                cur_child.setPos(next_x, child_y)
+                if cur_child.connected_objects:
+                    next_x += (120 * len(cur_child.connected_objects)) + 10 + 120
+                else:
+                    next_x += cur_child.width + 10
+
+            if not force_resize:
+                self.setPos(next_x, child_y)
+
+        if item.parent_name:
+            item.resizeUIObject(config.sym_objects[item.parent_name], 1)
+            # if not item.connected_objects:
+            #     item.resizeUIObject(config.sym_objects[item.parent_name], 1)
+            # else:
+            #     item.resizeUIObject(config.sym_objects[item.parent_name], 0)
+
         self.initUIObject(item, item.x, item.y)
+
+    def lowestChild(parent, item):
+        lowest = item
+        y_coord = item.pos().x() + item.width
+        for child in parent.connected_objects:
+            cur_child = config.sym_objects[child]
+            if (cur_child.pos().y() + cur_child.height > y_coord):
+                y_coord = cur_child.pos().y() + cur_child.height
+                lowest = cur_child
+
+        return lowest
+
+    def rightMostChild(parent, item):
+        rightmost = item
+        x_coord = item.pos().x() + item.width
+        for child in parent.connected_objects:
+            cur_child = config.sym_objects[child]
+            if (cur_child.pos().x() + cur_child.width > x_coord):
+                x_coord = cur_child.pos().x() + cur_child.width
+                rightmost = cur_child
+
+        return rightmost
 
     # attaches all children of the current sym_object to it so they move as one
     def attachChildren(self):

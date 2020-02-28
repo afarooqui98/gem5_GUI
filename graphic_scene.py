@@ -23,18 +23,17 @@ class GraphicsScene(QGraphicsScene):
 
         x = newObject["x"]
         y = newObject["y"]
+        width = newObject["width"]
+        height = newObject["height"]
         component_name = newObject["component_name"]
         parameters = newObject["parameters"]
+        connected_objects = newObject["connected_objects"]
 
-        if component_name == "System":
-            new_object = SymObject(0, 0, 500, 500, self, component_name, name,
-                                    True)
-        else:
-            new_object = SymObject(x, y, 120, 60, self, component_name, name,
-                                    True)
+        new_object = SymObject(x, y, width, height, self, component_name, name, True)
 
         new_object.parameters = parameters
-
+        new_object.connected_objects = connected_objects
+        
         # add new object to backend datastructures
         config.sym_objects[name] = new_object
         config.current_sym_object = new_object
