@@ -158,6 +158,7 @@ class SymObject(QGraphicsItemGroup):
         # if an overlapping object is found -> resize, update parent name AND
         # add self to the parent's list of children
         if parent:
+            print(parent.name)
             self.resizeUIObject(parent, 0)
             self.parent_name = parent.name # add new parent
             self.z = parent.z + 1 # update z index

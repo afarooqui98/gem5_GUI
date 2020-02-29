@@ -24,16 +24,20 @@ class GraphicsScene(QGraphicsScene):
 
         x = newObject["x"]
         y = newObject["y"]
+        z = newObject["z"]
         width = newObject["width"]
         height = newObject["height"]
         component_name = newObject["component_name"]
         parameters = newObject["parameters"]
         connected_objects = newObject["connected_objects"]
+        parent = newObject["parent_name"]
 
-        new_object = SymObject(x, y, width, height, self, component_name, name, True)
+        new_object = SymObject(x, y, width, height, self, component_name, name, True, self.state)
 
         new_object.parameters = parameters
         new_object.connected_objects = connected_objects
+        new_object.parent_name = parent
+        new_object.z = z
 
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object
