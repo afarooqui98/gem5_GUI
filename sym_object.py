@@ -341,7 +341,7 @@ class SymObject(QGraphicsItemGroup):
         lowest = item
         y_coord = item.pos().x() + item.width
         for child in parent.connected_objects:
-            cur_child = self.state.sym_objects[child]
+            cur_child = item.state.sym_objects[child]
             if (cur_child.pos().y() + cur_child.height > y_coord):
                 y_coord = cur_child.pos().y() + cur_child.height
                 lowest = cur_child
@@ -352,7 +352,7 @@ class SymObject(QGraphicsItemGroup):
         rightmost = item
         x_coord = item.pos().x() + item.width
         for child in parent.connected_objects:
-            cur_child = self.state.sym_objects[child]
+            cur_child = item.state.sym_objects[child]
             if (cur_child.pos().x() + cur_child.width > x_coord):
                 x_coord = cur_child.pos().x() + cur_child.width
                 rightmost = cur_child
