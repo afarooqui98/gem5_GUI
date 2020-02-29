@@ -177,11 +177,13 @@ class SymObject(QGraphicsItemGroup):
         highest_zscore = -1
         for key in self.state.sym_objects:
             object = self.state.sym_objects[key]
-            if self != object:
-                if self.isClicked(event):
-                    if object.z > highest_zscore:
-                        highest_zscore = object.z
-                        frontmost_object = object
+            if object.isClicked(event):
+                if object.z > highest_zscore:
+                    highest_zscore = object.z
+                    frontmost_object = object
+
+        if (self.z > highest_zscore):
+            frontmost_object = self
 
         return frontmost_object
 
