@@ -123,7 +123,10 @@ class SymObject(QGraphicsItemGroup):
         name = self.name
         self.state.scene.removeItem(self)
         if self.parent_name:
-            self.state.sym_objects[self.parent_name].connected_objects.remove(name)
+            parent = self.state.sym_objects[self.parent_name]
+            parent.connected_objects.remove(name)
+            if not parent.connected_objects:
+                self.resizeUIObject(parent, 1, -120)
         for child_name in self.connected_objects:
             #self.state.sym_objects[child_name].delete()
             del self.state.coord_map[(self.state.sym_objects[child_name].x, self.state.sym_objects[child_name].y)]
@@ -150,7 +153,7 @@ class SymObject(QGraphicsItemGroup):
 
         if parent:
             print(parent.name)
-            self.resizeUIObject(parent, 0)
+            self.resizeUIObject(parent, 0, 120)
             self.parent_name = parent.name # add new parent
             self.z = parent.z + 1 # update z index
             if not self.name in parent.connected_objects:
@@ -253,7 +256,7 @@ class SymObject(QGraphicsItemGroup):
         return not notoverlap
 
     # resizes a sym_object when another object is placed in it
-    def resizeUIObject(self, item, force_resize):
+    def resizeUIObject(self, item, force_resize, size):
         item.removeFromGroup(item.rect)
         self.state.scene.removeItem(item.rect)
         item.removeFromGroup(item.name_text)
@@ -266,8 +269,8 @@ class SymObject(QGraphicsItemGroup):
         item.y = item.pos().y()
 
         if not item.connected_objects: # or force_resize:
-            item.width += 120
-            item.height += 120
+            item.width += size
+            item.height += size
             self.setPos(item.x, item.y + item.height - self.height)
 
         rightmost_object = item.rightMostChild(self)
@@ -277,8 +280,8 @@ class SymObject(QGraphicsItemGroup):
         x_diff = item.pos().x() + item.width - rightmost_object.pos().x() - rightmost_object.width
 
         if item.connected_objects:
-            if x_diff < 120:
-                item.width += 120
+            if x_diff < size:
+                item.width += size
             if y_diff > 0:
                 item.height += y_diff
 
@@ -289,7 +292,7 @@ class SymObject(QGraphicsItemGroup):
                 child_y = item.y + item.height - cur_child.height
                 cur_child.setPos(next_x, child_y)
                 if cur_child.connected_objects:
-                    next_x += (120 * len(cur_child.connected_objects)) + 10 + 120
+                    next_x += (size * len(cur_child.connected_objects)) + 10 + size
                 else:
                     next_x += cur_child.width + 10
 
@@ -297,7 +300,7 @@ class SymObject(QGraphicsItemGroup):
                 self.setPos(next_x, child_y)
 
         if item.parent_name:
-            item.resizeUIObject(self.state.sym_objects[item.parent_name], 1)
+            item.resizeUIObject(self.state.sym_objects[item.parent_name], 1, size)
             # if not item.connected_objects:
             #     item.resizeUIObject(self.state.sym_objects[item.parent_name], 1)
             # else:
