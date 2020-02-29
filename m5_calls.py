@@ -17,9 +17,6 @@ def get_obj_lists():
         'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject',
         'HelloObject', 'GoodbyeObject', 'System', 'SimpleMemory']
 
-    System : {CPU_name1, mem_name, cache_name}
-    setattr(System, name, component_name)
-    System.dict[name] = dict1[component_name]()
 
     for i in range(len(test_objects)):
         # Create ObjectLists for each base element
