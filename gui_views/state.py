@@ -23,7 +23,7 @@ class State():
     # sets objects in scene as draggable or not draggable based on drag_state
     def setDragState(self):
         for object in self.sym_objects:
-            self.sym_objects[object].setFlag(QGraphicsItem.ItemIsMovable, drag_state)
+            self.sym_objects[object].setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
 
     # draws each line in lines using the QPen q
     def drawLines(self, q):

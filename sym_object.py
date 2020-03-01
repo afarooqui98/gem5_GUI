@@ -118,8 +118,8 @@ class SymObject(QGraphicsItemGroup):
 
         # set currentsymobject to self and update attributes for it
         self.state.current_sym_object = clicked
-        self.state.mainWindow.populateAttributes(None, clicked.component_name,
-                                                False)
+        self.state.mainWindow.populateAttributes(None,
+            clicked.component_name, False)
 
     # remove visual and backend respresentations of object
     # delete children as well?
@@ -127,12 +127,14 @@ class SymObject(QGraphicsItemGroup):
         name = self.name
         self.state.scene.removeItem(self)
         if self.parent_name:
-            self.state.sym_objects[self.parent_name].\
-                                                connected_objects.remove(name)
+            parent = self.state.sym_objects[self.parent_name]
+            parent.connected_objects.remove(name)
+            if not parent.connected_objects:
+                self.resizeUIObject(parent, 1, 120 - parent.width)
         for child_name in self.connected_objects:
             #self.state.sym_objects[child_name].delete()
             del self.state.coord_map[(self.state.sym_objects[child_name].x, \
-                                        self.state.sym_objects[child_name].y)]
+                self.state.sym_objects[child_name].y)]
             del self.state.sym_objects[child_name]
 
         self.state.current_sym_object = None
@@ -158,8 +160,7 @@ class SymObject(QGraphicsItemGroup):
         # if an overlapping object is found -> resize, update parent name AND
         # add self to the parent's list of children
         if parent:
-            print(parent.name)
-            self.resizeUIObject(parent, 0)
+            self.resizeUIObject(parent, 1, self.width)
             self.parent_name = parent.name # add new parent
             self.z = parent.z + 1 # update z index
             if not self.name in parent.connected_objects:
@@ -265,7 +266,7 @@ class SymObject(QGraphicsItemGroup):
         return not notoverlap
 
     # resizes a sym_object when another object is placed in it
-    def resizeUIObject(self, item, force_resize):
+    def resizeUIObject(self, item, force_resize, size):
         item.removeFromGroup(item.rect)
         self.state.scene.removeItem(item.rect)
         item.removeFromGroup(item.name_text)
@@ -281,6 +282,7 @@ class SymObject(QGraphicsItemGroup):
         if not item.connected_objects: # or force_resize:
             item.width += self.width
             item.height += self.width
+
             self.setPos(item.pos().x(),
                         item.pos().y() + item.height - self.height)
             self.x = self.pos().x()
@@ -292,15 +294,13 @@ class SymObject(QGraphicsItemGroup):
         lowest_object = item.lowestChild(self)
 
         y_diff = lowest_object.pos().y() + lowest_object.height - \
-                                                    item.pos().y() - item.height
-        x_diff = item.pos().x() + item.width - \
-                            rightmost_object.pos().x() - rightmost_object.width
+            item.pos().y() - item.height
+        x_diff = item.pos().x() + item.width - rightmost_object.pos().x() - \
+            rightmost_object.width
 
         if item.connected_objects:
-            # want distance between right edge of parent and right edge of child
-            # to be at least 120
-            if x_diff < 120:
-                item.width += 120
+            if x_diff < size:
+                item.width += size
             if y_diff > 0:
                 item.height += y_diff
 
@@ -324,26 +324,27 @@ class SymObject(QGraphicsItemGroup):
 
         # recursively traverse upwards and resize each parent
         if item.parent_name:
-            item.resizeUIObject(self.state.sym_objects[item.parent_name], 1)
+            item.resizeUIObject(self.state.sym_objects[item.parent_name], \
+            1, size)
 
         self.initUIObject(item, item.x, item.y)
 
-    def lowestChild(parent, item):
+    def lowestChild(self, item):
         lowest = item
         y_coord = item.pos().y() + item.height
-        for child in parent.connected_objects:
-            cur_child = item.state.sym_objects[child]
+        for child in self.connected_objects:
+            cur_child = self.state.sym_objects[child]
             if (cur_child.pos().y() + cur_child.height > y_coord):
                 y_coord = cur_child.pos().y() + cur_child.height
                 lowest = cur_child
 
         return lowest
 
-    def rightMostChild(parent, item):
+    def rightMostChild(self, item):
         rightmost = item
         x_coord = item.pos().x() + item.width
-        for child in parent.connected_objects:
-            cur_child = item.state.sym_objects[child]
+        for child in self.connected_objects:
+            cur_child = self.state.sym_objects[child]
             if (cur_child.pos().x() + cur_child.width > x_coord):
                 x_coord = cur_child.pos().x() + cur_child.width
                 rightmost = cur_child

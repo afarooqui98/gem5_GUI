@@ -1,4 +1,5 @@
 import sys
+import inspect
 sys.path.append('configs')
 import m5.objects
 from common import ObjectList
@@ -13,24 +14,22 @@ def get_obj_lists():
     obj_tree = {}
 
     #TODO this list is predetermined, must compile final list of all objects
-    test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher',
-        'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject',
-        'HelloObject', 'GoodbyeObject', 'System', 'SimpleMemory']
+    #test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher',
+    #   'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject',
+    #  'HelloObject', 'GoodbyeObject', 'System', 'SimpleMemory', 'SimObject']
+    test_objects = ['SimObject']
+    sim_obj_type = getattr(m5.objects, 'SimObject', None)  
 
-    System : {CPU_name1, mem_name, cache_name}
-    setattr(System, name, component_name)
-    System.dict[name] = dict1[component_name]()
-
-    for i in range(len(test_objects)):
+    for base_obj in test_objects:
         # Create ObjectLists for each base element
-        name = test_objects[i]
-        obj_list = ObjectList.ObjectList(getattr(m5.objects, name, None))
+        
+        obj_list = ObjectList.ObjectList(getattr(m5.objects, base_obj, None))
 
         sub_objs = {}  # Go through each derived class in the Object List
-        for sub_obj in obj_list._sub_classes.keys():
+        for sub_obj_name, sub_obj_val  in obj_list._sub_classes.items():
 
             param_dict = {}  # Go through each parameter item for derived class
-            for pname, param in obj_list._sub_classes[sub_obj]._params.items():
+            for pname, param in obj_list._sub_classes[sub_obj_name]._params.items():
                 param_attr = {}
                 param_attr["Description"] = param.desc
                 param_attr["Type"] = param.ptype_str
@@ -42,7 +41,7 @@ def get_obj_lists():
                     param_attr["Default"] = None
                     param_attr["Value"] = None
                 param_dict[pname] = param_attr
-            sub_objs[sub_obj] = param_dict
+            sub_objs[sub_obj_name] = param_dict
 
-        obj_tree[name] = sub_objs
+        obj_tree[base_obj] = sub_objs
     return obj_tree
