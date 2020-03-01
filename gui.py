@@ -146,7 +146,7 @@ if __name__ == "__main__":
 if __name__ == "__m5_main__":
     import sys
     import os
-    sys.path.append('self.states')
+    sys.path.append('configs')
     import m5.objects
     from common import ObjectList
     from m5_calls import get_obj_lists
