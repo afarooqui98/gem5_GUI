@@ -15,8 +15,8 @@ def get_obj_lists():
 
     #TODO this list is predetermined, must compile final list of all objects
     #test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher',
-     #   'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject',
-      #  'HelloObject', 'GoodbyeObject', 'System', 'SimpleMemory', 'SimObject']
+    #   'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject',
+    #  'HelloObject', 'GoodbyeObject', 'System', 'SimpleMemory', 'SimObject']
     test_objects = ['SimObject']
     sim_obj_type = getattr(m5.objects, 'SimObject', None)  
 
@@ -27,8 +27,6 @@ def get_obj_lists():
 
         sub_objs = {}  # Go through each derived class in the Object List
         for sub_obj, obbb in obj_list._sub_classes.items():
-        #    print(sub_obj)
-    #        print(obbb)
 
             param_dict = {}  # Go through each parameter item for derived class
             for pname, param in obj_list._sub_classes[sub_obj]._params.items():
@@ -46,6 +44,4 @@ def get_obj_lists():
             sub_objs[sub_obj] = param_dict
 
         obj_tree[base_obj] = sub_objs
-        print(base_obj)
-        print(sub_objs)
     return obj_tree
