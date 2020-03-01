@@ -7,6 +7,7 @@ from PySide2 import QtCore
 from gui_views import state
 from sym_object import *
 import string
+import random
 
 class GraphicsScene(QGraphicsScene):
     """this class provides a scene to manage objects"""

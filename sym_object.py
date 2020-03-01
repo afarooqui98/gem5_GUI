@@ -279,8 +279,8 @@ class SymObject(QGraphicsItemGroup):
 
         # if item is a new parent
         if not item.connected_objects: # or force_resize:
-            item.width += 120
-            item.height += 120
+            item.width += self.width
+            item.height += self.width
             self.setPos(item.pos().x(),
                         item.pos().y() + item.height - self.height)
             self.x = self.pos().x()
@@ -315,13 +315,7 @@ class SymObject(QGraphicsItemGroup):
                 cur_child.setPos(next_x, child_y)
                 cur_child.x = cur_child.pos().x()
                 cur_child.y = cur_child.pos().y()
-
-                # calculate x coordinate of next child based on size of current
-                # child + 10 (padding)
-                if cur_child.connected_objects:
-                    next_x += (120 * len(cur_child.connected_objects)) + 130
-                else:
-                    next_x += cur_child.width + 10
+                next_x += cur_child.width + 10
 
             if not force_resize:
                 self.setPos(next_x, child_y)
@@ -331,18 +325,12 @@ class SymObject(QGraphicsItemGroup):
         # recursively traverse upwards and resize each parent
         if item.parent_name:
             item.resizeUIObject(self.state.sym_objects[item.parent_name], 1)
-            # if not item.connected_objects:
-            #     item.resizeUIObject(self.state.sym_objects[item.parent_name],
-            #                                                                 1)
-            # else:
-            #     item.resizeUIObject(self.state.sym_objects[item.parent_name],
-            #                                                                 0)
 
         self.initUIObject(item, item.x, item.y)
 
     def lowestChild(parent, item):
         lowest = item
-        y_coord = item.pos().x() + item.width
+        y_coord = item.pos().y() + item.height
         for child in parent.connected_objects:
             cur_child = item.state.sym_objects[child]
             if (cur_child.pos().y() + cur_child.height > y_coord):
