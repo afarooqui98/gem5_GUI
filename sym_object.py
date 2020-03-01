@@ -161,7 +161,6 @@ class SymObject(QGraphicsItemGroup):
         # add self to the parent's list of children
         if parent:
             self.resizeUIObject(parent, 1, self.width)
-
             self.parent_name = parent.name # add new parent
             self.z = parent.z + 1 # update z index
             if not self.name in parent.connected_objects:
@@ -281,8 +280,9 @@ class SymObject(QGraphicsItemGroup):
 
         # if item is a new parent
         if not item.connected_objects: # or force_resize:
-            item.width += size
-            item.height += size
+            item.width += self.width
+            item.height += self.width
+
             self.setPos(item.pos().x(),
                         item.pos().y() + item.height - self.height)
             self.x = self.pos().x()
@@ -315,14 +315,7 @@ class SymObject(QGraphicsItemGroup):
                 cur_child.setPos(next_x, child_y)
                 cur_child.x = cur_child.pos().x()
                 cur_child.y = cur_child.pos().y()
-
-                # calculate x coordinate of next child based on size of current
-                # child + 10 (padding)
-                if cur_child.connected_objects:
-                    next_x += (size * len(cur_child.connected_objects)) + \
-                        10 + size
-                else:
-                    next_x += cur_child.width + 10
+                next_x += cur_child.width + 10
 
             if not force_resize:
                 self.setPos(next_x, child_y)
@@ -338,7 +331,7 @@ class SymObject(QGraphicsItemGroup):
 
     def lowestChild(self, item):
         lowest = item
-        y_coord = item.pos().x() + item.width
+        y_coord = item.pos().y() + item.height
         for child in self.connected_objects:
             cur_child = self.state.sym_objects[child]
             if (cur_child.pos().y() + cur_child.height > y_coord):
