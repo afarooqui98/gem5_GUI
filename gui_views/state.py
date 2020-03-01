@@ -4,6 +4,7 @@ from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 
 from graphic_scene import *
+from connection import *
 import sys, random
 
 class State():
@@ -22,16 +23,20 @@ class State():
 
     # sets objects in scene as draggable or not draggable based on drag_state
     def setDragState(self):
-        for object in self.sym_objects:
-            self.sym_objects[object].setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
+        for object in self.sym_objects.values():
+            object.setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
 
     # draws each line in lines using the QPen q
     def drawLines(self, q):
-        if self.lines:
-            for line in self.lines:
-                q.drawLine(line[0].x(), line[0].y(), line[1].x(), line[1].y())
+        for object in self.sym_objects.values():
+            for connection in object.connections.values():
+                self.drawConnection(q, connection)
+        # if self.lines:
+        #     for line in self.lines:
+        #         q.drawLine(line[0].x(), line[0].y(), line[1].x(), line[1].y())
 
-
+    def drawConnection(self, q, connection):
+        q.drawLine(connection.parent_endpoint.x(), connection.parent_endpoint.y(), connection.child_endpoint.x(), connection.child_endpoint.y())
     # parses the sym_object dictionary to build the exported python file
     def getSymObjects(self):
         res = ""

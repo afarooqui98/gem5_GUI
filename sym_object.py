@@ -30,7 +30,6 @@ class SymObject(QGraphicsItemGroup):
         self.scene = scene
 
         self.initUIObject(self, 0, 0)
-
         # if we are loading from a file, we dont need to check for overlapping
         # and can set position
         if loadingFromFile:
@@ -139,6 +138,22 @@ class SymObject(QGraphicsItemGroup):
         self.state.current_sym_object = None
         del self.state.coord_map[(self.x, self.y)]
         del self.state.sym_objects[name]
+
+
+    def mouseMoveEvent(self, event):
+        for name, connection in self.connections.items():
+            if name[0] == "parent":
+                key = ("child", self.name)
+                connection.setEndpoints(event.scenePos(), None)
+                self.state.sym_objects[name[1]].connections[key].setEndpoints(event.scenePos(), None)
+            else:
+                key = ("parent", self.name)
+                connection.setEndpoints(None, event.scenePos())
+                self.state.sym_objects[name[1]].connections[key].setEndpoints(None, event.scenePos())
+
+            #self.state.drawConnection(connection)
+        self.state.line_drawer.update()
+        super(SymObject, self).mouseMoveEvent(event)
 
     # when mouse is release on object, update its position including the case
     # where it overlaps and deal with subobject being created
