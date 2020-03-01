@@ -26,10 +26,10 @@ def get_obj_lists():
         obj_list = ObjectList.ObjectList(getattr(m5.objects, base_obj, None))
 
         sub_objs = {}  # Go through each derived class in the Object List
-        for sub_obj, obbb in obj_list._sub_classes.items():
+        for sub_obj_name, sub_obj_val  in obj_list._sub_classes.items():
 
             param_dict = {}  # Go through each parameter item for derived class
-            for pname, param in obj_list._sub_classes[sub_obj]._params.items():
+            for pname, param in obj_list._sub_classes[sub_obj_name]._params.items():
                 param_attr = {}
                 param_attr["Description"] = param.desc
                 param_attr["Type"] = param.ptype_str
@@ -41,7 +41,7 @@ def get_obj_lists():
                     param_attr["Default"] = None
                     param_attr["Value"] = None
                 param_dict[pname] = param_attr
-            sub_objs[sub_obj] = param_dict
+            sub_objs[sub_obj_name] = param_dict
 
         obj_tree[base_obj] = sub_objs
     return obj_tree
