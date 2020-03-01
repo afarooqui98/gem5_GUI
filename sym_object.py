@@ -122,7 +122,6 @@ class SymObject(QGraphicsItemGroup):
             clicked.component_name, False)
 
     # remove visual and backend respresentations of object
-    # delete children as well?
     def delete(self):
         name = self.name
         self.state.scene.removeItem(self)

@@ -60,18 +60,25 @@ class LineDrawer(QWidget):
         parent_loc = self.pos1
         child_loc = self.pos2
         parent, child = None, None
-        for key, val in self.state.coord_map.items():
-            sym_object = self.state.sym_objects[val]
+        parent_z_score = -1
+        child_z_score = -1
+        key = [None, None]
+        for sym_object in self.state.sym_objects.values():
+            #sym_object = self.state.sym_objects[val]
+            key[0] = sym_object.x
+            key[1] = sym_object.y
             if key[0] < parent_loc.x() and \
                     parent_loc.x() < key[0] + sym_object.width:
                 if key[1] < parent_loc.y() and \
                         parent_loc.y() < key[1] + sym_object.height:
-                    parent = sym_object
+                    if sym_object.z > parent_z_score:
+                        parent = sym_object
             if key[0] < child_loc.x() and \
                     child_loc.x() < key[0] + sym_object.width:
                 if key[1] < child_loc.y() and \
                         child_loc.y() < key[1] + sym_object.height:
-                    child = sym_object
+                    if sym_object.z > child_z_score:
+                        child = sym_object
         #create connection, add to parent and child
         if not parent or not child:
             return -1
