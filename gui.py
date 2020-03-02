@@ -17,9 +17,9 @@ import json
 class MainWindow(QMainWindow):
     """this class creates the main window"""
 
-    def __init__(self, catalog):
+    def __init__(self, catalog, instances):
         super(MainWindow, self).__init__()
-        self.state = State()
+        self.state = State(instances)
         self.setWindowTitle("gem5 GUI")
         self.main = QWidget()
         self.catalog = catalog
@@ -105,7 +105,7 @@ class MainWindow(QMainWindow):
                 self.attributes = self.catalog[name]
 
         for attribute in self.attributes.keys():
-            self.addRow(attribute, self.attributes[attribute]["Value"],
+            self.addRow(attribute, str(self.attributes[attribute]["Value"]),
                                                     isTreeWidgetClick)
 
 
@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     gui_application = QApplication() #create new application
     catalog = json.load(open('result_new.json'))
-    main_window = MainWindow(catalog) #create new instance of main window
+    main_window = MainWindow(catalog, None) #create new instance of main window
     main_window.state.mainWindow = main_window
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack
@@ -146,15 +146,15 @@ if __name__ == "__main__":
 if __name__ == "__m5_main__":
     import sys
     import os
-    sys.path.append('configs')
+    sys.path.append('/home/parallels/Desktop/gem5/configs')
     import m5.objects
     from common import ObjectList
     from m5_calls import get_obj_lists
 
     # use gem5 to get list of objects
-    obj_tree = get_obj_lists()
+    obj_tree, instance_tree = get_obj_lists()
     gui_application = QApplication() #create new application
-    main_window = MainWindow(obj_tree) #create new instance of main window
+    main_window = MainWindow(obj_tree, instance_tree) #create new instance of main window
     main_window.state.mainWindow = main_window
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack

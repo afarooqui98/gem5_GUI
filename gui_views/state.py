@@ -7,7 +7,7 @@ from graphic_scene import *
 import sys, random
 
 class State():
-    def __init__(self):
+    def __init__(self, instances):
         self.drag_state = True
         self.draw_wire_state = False
         self.coord_map = {} # Map coordinates to (user-defined) name of symobject
@@ -19,6 +19,7 @@ class State():
         self.scene = None
         self.port_size = 10
         self.mainWindow = None
+        self.instances = instances
 
     # sets objects in scene as draggable or not draggable based on drag_state
     def setDragState(self):

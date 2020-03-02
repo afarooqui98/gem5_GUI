@@ -8,6 +8,8 @@ import copy
 from gui_views import state
 import json
 
+from m5_calls import *
+
 class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def __init__(self, layout, state):
         self.state = state
@@ -37,7 +39,10 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
         for object in self.state.sym_objects.values():
-            print(object.component_name)
+            if object.component_name == "Root":
+                print(object.connected_objects)
+                _ , root = traverse_hierarchy(self.state.sym_objects, object)
+                instamtiate(root)
 
     # loads .ui file into gui
     def openUI_button_pressed(self):
