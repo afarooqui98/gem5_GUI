@@ -30,7 +30,6 @@ class SymObject(QGraphicsItemGroup):
         self.scene = scene
 
         self.initUIObject(self, 0, 0)
-
         # if we are loading from a file, we dont need to check for overlapping
         # and can set position
         if loadingFromFile:
@@ -48,15 +47,15 @@ class SymObject(QGraphicsItemGroup):
         for key in self.state.sym_objects:
             item = self.state.sym_objects[key]
             if self.doesOverlap(item):
-                self.setPos(item.pos().x() + item.width + 10,
-                            item.pos().y() + item.height + 10)
+                self.setPos(item.scenePos().x() + item.width + 10,
+                            item.scenePos().y() + item.height + 10)
                 #del self.state.coord_map[(self.x, self.y)]
-                self.x = self.pos().x()
-                self.y = self.pos().y()
+                self.x = self.scenePos().x()
+                self.y = self.scenePos().y()
                 self.state.coord_map[(self.x, self.y)] = self.name
 
-        self.x = self.pos().x()
-        self.y = self.pos().y()
+        self.x = self.scenePos().x()
+        self.y = self.scenePos().y()
         self.state.coord_map[(self.x, self.y)] = self.name
         self.state.current_sym_object = self
 
@@ -122,7 +121,6 @@ class SymObject(QGraphicsItemGroup):
             clicked.component_name, False)
 
     # remove visual and backend respresentations of object
-    # delete children as well?
     def delete(self):
         name = self.name
         self.state.scene.removeItem(self)
@@ -141,6 +139,34 @@ class SymObject(QGraphicsItemGroup):
         del self.state.coord_map[(self.x, self.y)]
         del self.state.sym_objects[name]
 
+
+    def mouseMoveEvent(self, event):
+        self.modifyConnections(event, self)
+        self.updateConnections(event, self)
+        self.state.line_drawer.update()
+        super(SymObject, self).mouseMoveEvent(event)
+
+    def modifyConnections(self, event, sym_object):
+        new_coords = event.pos()
+        new_coords.setX(sym_object.scenePos().x() + sym_object.width / 2)
+        new_coords.setY(sym_object.scenePos().y() + sym_object.height / 2)
+
+        for name, connection in sym_object.connections.items():
+            if name[0] == "parent":
+                key = ("child", sym_object.name)
+                connection.setEndpoints(new_coords, None)
+                self.state.sym_objects[name[1]].connections[key].setEndpoints(new_coords, None)
+            else:
+                key = ("parent", sym_object.name)
+                connection.setEndpoints(None, new_coords)
+                self.state.sym_objects[name[1]].connections[key].setEndpoints(None, new_coords)
+
+
+    def updateConnections(self, event, sym_object):
+        for object_name in sym_object.connected_objects:
+            object = self.state.sym_objects[object_name]
+            self.modifyConnections(event, object)
+            self.updateConnections(event, object)
     # when mouse is release on object, update its position including the case
     # where it overlaps and deal with subobject being created
     def mouseReleaseEvent(self, event):
@@ -152,7 +178,6 @@ class SymObject(QGraphicsItemGroup):
 
         z_score = -1
         parent = None
-
         #iterate through all sym objects on the screen and check if the object's
         # current position overlaps with any of them
         parent = self.getFrontmostOverLappingObject()
@@ -168,8 +193,8 @@ class SymObject(QGraphicsItemGroup):
 
         # update the object's position parameters
         #del self.state.coord_map[(self.x, self.y)]
-        self.x = self.pos().x()
-        self.y = self.pos().y()
+        self.x = self.scenePos().x()
+        self.y = self.scenePos().y()
         self.state.coord_map[(self.x, self.y)] = self.name
         self.detachChildren()
 
@@ -205,12 +230,12 @@ class SymObject(QGraphicsItemGroup):
         return frontmost_object
 
     def isClicked(self, event):
-        click_x, click_y = event.pos().x(), event.pos().y()
+        click_x, click_y = event.scenePos().x(), event.scenePos().y()
         # if the click position is within the text item's bounding box, return
         # true
-        if (click_x > self.pos().x() and click_x < self.pos().x() + \
-            self.width and click_y > self.pos().y() and click_y < \
-            self.pos().y() + self.height):
+        if (click_x > self.scenePos().x() and click_x < self.scenePos().x() + \
+            self.width and click_y > self.scenePos().y() and click_y < \
+            self.scenePos().y() + self.height):
             return True
 
         return False
@@ -235,11 +260,11 @@ class SymObject(QGraphicsItemGroup):
     # checks if the delete button was pressed based on mouse click
     def deleteButtonPressed(self, event):
         # get x and y coordinate of mouse click
-        click_x, click_y = event.pos().x(), event.pos().y()
+        click_x, click_y = event.scenePos().x(), event.scenePos().y()
 
         # get coordinate and dimension info from deletebutton
-        delete_button_x = self.deleteButton.pos().x()
-        delete_button_y = self.deleteButton.pos().y()
+        delete_button_x = self.deleteButton.scenePos().x()
+        delete_button_y = self.deleteButton.scenePos().y()
         delete_button_width = self.deleteButton.boundingRect().size().width()
         delete_button_height = self.deleteButton.boundingRect().size().height()
 
@@ -254,14 +279,14 @@ class SymObject(QGraphicsItemGroup):
 
     # checks if two objects overlap
     def doesOverlap(self, item):
-        l1_x = self.pos().x()
-        l1_y = self.pos().y()
-        r1_x = self.pos().x() + self.width
-        r1_y = self.pos().y() + self.height
-        l2_x = item.pos().x()
-        l2_y = item.pos().y()
-        r2_x = item.pos().x() + item.width
-        r2_y = item.pos().y() + item.height
+        l1_x = self.scenePos().x()
+        l1_y = self.scenePos().y()
+        r1_x = self.scenePos().x() + self.width
+        r1_y = self.scenePos().y() + self.height
+        l2_x = item.scenePos().x()
+        l2_y = item.scenePos().y()
+        r2_x = item.scenePos().x() + item.width
+        r2_y = item.scenePos().y() + item.height
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap
 
@@ -275,27 +300,27 @@ class SymObject(QGraphicsItemGroup):
         self.state.scene.removeItem(item.text)
         item.removeFromGroup(item.deleteButton)
         self.state.scene.removeItem(item.deleteButton)
-        item.x = item.pos().x()
-        item.y = item.pos().y()
+        item.x = item.scenePos().x()
+        item.y = item.scenePos().y()
 
         # if item is a new parent
         if not item.connected_objects: # or force_resize:
             item.width += self.width
             item.height += self.width
 
-            self.setPos(item.pos().x(),
-                        item.pos().y() + item.height - self.height)
-            self.x = self.pos().x()
-            self.y = self.pos().y()
+            self.setPos(item.scenePos().x(),
+                        item.scenePos().y() + item.height - self.height)
+            self.x = self.scenePos().x()
+            self.y = self.scenePos().y()
 
         # get rightmost and lowest child for dynamic resizing in case a child
         # if not within bounds of parent
         rightmost_object = item.rightMostChild(self)
         lowest_object = item.lowestChild(self)
 
-        y_diff = lowest_object.pos().y() + lowest_object.height - \
-            item.pos().y() - item.height
-        x_diff = item.pos().x() + item.width - rightmost_object.pos().x() - \
+        y_diff = lowest_object.scenePos().y() + lowest_object.height - \
+            item.scenePos().y() - item.height
+        x_diff = item.scenePos().x() + item.width - rightmost_object.scenePos().x() - \
             rightmost_object.width
 
         if item.connected_objects:
@@ -305,22 +330,22 @@ class SymObject(QGraphicsItemGroup):
                 item.height += y_diff
 
             # place first child at x coordinate of parent
-            next_x = item.pos().x()
+            next_x = item.scenePos().x()
 
             # re-render all children to deal with any cases of nested children
             # being resized
             for child in item.connected_objects:
                 cur_child = self.state.sym_objects[child]
-                child_y = item.pos().y() + item.height - cur_child.height
+                child_y = item.scenePos().y() + item.height - cur_child.height
                 cur_child.setPos(next_x, child_y)
-                cur_child.x = cur_child.pos().x()
-                cur_child.y = cur_child.pos().y()
+                cur_child.x = cur_child.scenePos().x()
+                cur_child.y = cur_child.scenePos().y()
                 next_x += cur_child.width + 10
 
             if not force_resize:
                 self.setPos(next_x, child_y)
-                self.x = self.pos().x()
-                self.y = self.pos().y()
+                self.x = self.scenePos().x()
+                self.y = self.scenePos().y()
 
         # recursively traverse upwards and resize each parent
         if item.parent_name:
@@ -331,22 +356,22 @@ class SymObject(QGraphicsItemGroup):
 
     def lowestChild(self, item):
         lowest = item
-        y_coord = item.pos().y() + item.height
+        y_coord = item.scenePos().y() + item.height
         for child in self.connected_objects:
             cur_child = self.state.sym_objects[child]
-            if (cur_child.pos().y() + cur_child.height > y_coord):
-                y_coord = cur_child.pos().y() + cur_child.height
+            if (cur_child.scenePos().y() + cur_child.height > y_coord):
+                y_coord = cur_child.scenePos().y() + cur_child.height
                 lowest = cur_child
 
         return lowest
 
     def rightMostChild(self, item):
         rightmost = item
-        x_coord = item.pos().x() + item.width
+        x_coord = item.scenePos().x() + item.width
         for child in self.connected_objects:
             cur_child = self.state.sym_objects[child]
-            if (cur_child.pos().x() + cur_child.width > x_coord):
-                x_coord = cur_child.pos().x() + cur_child.width
+            if (cur_child.scenePos().x() + cur_child.width > x_coord):
+                x_coord = cur_child.scenePos().x() + cur_child.width
                 rightmost = cur_child
 
         return rightmost
