@@ -117,7 +117,7 @@ class MainWindow(QMainWindow):
         for item in sorted(self.catalog.keys()):
             tree_item = QTreeWidgetItem([item])
             # Go through every specialized sym-object
-            for sub_item in self.catalog[item].keys():
+            for sub_item in sorted(self.catalog[item].keys()):
                 tree_item.addChild(QTreeWidgetItem([sub_item]))
             self.catalogView.treeWidget.addTopLevelItem(tree_item)
 
@@ -153,7 +153,6 @@ if __name__ == "__m5_main__":
 
     # use gem5 to get list of objects
     obj_tree = get_obj_lists()
-
     gui_application = QApplication() #create new application
     main_window = MainWindow(obj_tree) #create new instance of main window
     main_window.state.mainWindow = main_window

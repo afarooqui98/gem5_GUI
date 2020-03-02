@@ -16,11 +16,3 @@ class Connection:
             self.parent_endpoint = parent_endpoint
         if child_endpoint is not None:
             self.child_endpoint = child_endpoint
-
-    def drawConnection(self):
-        self.update()
-
-    def paintEvent(self, event):
-        q = QPainter(self)
-        q.setPen(QPen(Qt.black, 3))
-        q.drawLine(self.parent_endpoint.x(), self.parent_endpoint.y(), self.child_endpoint.x(), self.child_endpoint.y())

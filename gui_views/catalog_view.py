@@ -87,6 +87,7 @@ class CatalogView(): #dropdown and search bar
                 for j in range(gchild_count):
                     grand_item = item.child(j)
                     not_found = not_found or (grand_item in set(match_items))
+                    grand_item.setHidden(grand_item not in set(match_items))
                 # hide and expand top-level item based on if sub-level item
                 #   is a match
                 item.setHidden(not not_found)

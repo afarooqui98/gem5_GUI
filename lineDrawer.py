@@ -62,8 +62,8 @@ class LineDrawer(QWidget):
         child_z_score = -1
         key = [None, None]
         for sym_object in self.state.sym_objects.values():
-            key[0] = sym_object.x
-            key[1] = sym_object.y
+            key[0] = sym_object.scenePos().x()
+            key[1] = sym_object.scenePos().y()
             if key[0] < parent_loc.x() and \
                     parent_loc.x() < key[0] + sym_object.width:
                 if key[1] < parent_loc.y() and \
@@ -79,33 +79,10 @@ class LineDrawer(QWidget):
         #create connection, add to parent and child
         if not parent or not child:
             return -1
-        self.pos1.setX(parent.x + parent.width / 2)
-        self.pos1.setY(parent.y + parent.height / 2)
-        self.pos2.setX(child.x + child.width / 2)
-        self.pos2.setY(child.y + child.height / 2)
+        self.pos1.setX(parent.scenePos().x() + parent.width / 2)
+        self.pos1.setY(parent.scenePos().y() + parent.height / 2)
+        self.pos2.setX(child.scenePos().x() + child.width / 2)
+        self.pos2.setY(child.scenePos().y() + child.height / 2)
         parent.connections[("parent", child.name)] = Connection(self.pos1, self.pos2)
         child.connections[("child", parent.name)] = Connection(self.pos1, self.pos2)
         return 0
-
-    # connects a parent and child object with a dotted line
-    def connectSubObject(self, parent_name, child_name):
-        parent = self.state.sym_objects[parent_name]
-        child = self.state.sym_objects[child_name]
-        #implement later
-        #x1, y1, x2, y2 = self.calculateShortestDistance(parent_name,
-        #                                                    child_name)
-        pos1 = QPoint()
-        pos2 = QPoint()
-        # draw line from middle of parent to middle of child
-        pos1.setX(parent.x + parent.width / 2)
-        pos1.setY(parent.y + parent.height / 2)
-        pos2.setX(child.x + child.width / 2)
-        pos2.setY(child.y + child.height / 2)
-        # add line to sub_object_lines list
-        self.state.sub_object_lines.append((pos1, pos2))
-        # triggers paint event to redraw scene
-        self.update()
-
-    # used to draw line between parent and child (unimplemented)
-    def calculateShortestDistance(self, parent_name, child_name):
-        pass

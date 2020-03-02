@@ -14,8 +14,6 @@ class State():
         self.coord_map = {} # Map coordinates to (user-defined) name of symobject
         self.sym_objects = {} # Map name to actual symobject (has coords)
         self.current_sym_object = None
-        self.lines = []
-        self.sub_object_lines = []
         self.line_drawer = None
         self.scene = None
         self.port_size = 10
@@ -31,9 +29,7 @@ class State():
         for object in self.sym_objects.values():
             for connection in object.connections.values():
                 self.drawConnection(q, connection)
-        # if self.lines:
-        #     for line in self.lines:
-        #         q.drawLine(line[0].x(), line[0].y(), line[1].x(), line[1].y())
+
 
     def drawConnection(self, q, connection):
         q.drawLine(connection.parent_endpoint.x(), connection.parent_endpoint.y(), connection.child_endpoint.x(), connection.child_endpoint.y())
