@@ -35,7 +35,7 @@ def get_obj_lists():
             for pname, param in obj_list._sub_classes[sub_obj_name]._params.items():
                 param_attr = {}
                 param_attr["Description"] = param.desc
-                param_attr["Type"] = param.ptype_str
+                param_attr["Type"] = param.ptype
                 if param.ptype_str not in set_type_conv:
                     set_type_conv[param.ptype_str] = []
                 if hasattr(param, 'default'):
@@ -49,25 +49,48 @@ def get_obj_lists():
                 param_dict[pname] = param_attr
             sub_objs[sub_obj_name] = param_dict
         obj_tree[base_obj] = sub_objs
-    # print(obj_tree['SimObject']["System"])
+    print(inspect.getmembers(m5))
     return obj_tree, instance_tree
 
-def traverse_hierarchy(sym_catalog, symobject):
-    m5_children = []
-    print(symobject.parameters)
-    print(symobject.connected_objects)
-    for child in symobject.connected_objects:
-        m5_children.append(traverse_hierarchy(sym_catalog, sym_catalog[child]))
-    print(symobject.name)
-    instantiated = symobject.SimObject()
-    if symobject.component_name == 'SrcClockDomain':
-        getattr(instantiated, 'voltage_domain', VoltageDomain())
-        setattr(instantiated, 'clock', '1GHz')
-    for m_child in m5_children:
-        print(m_child)
-        setattr(instantiated, m_child[0], m_child[1])
-    return (symobject.name, instantiated)
+def traverse_hierarchy_root(sym_catalog, symroot):
+    root = symroot.SimObject()
+    x, y =  traverse_hierarchy(sym_catalog, symroot, root)
+    print(y.eventq_index)
+    return x,y
 
-def instamtiate(root):
-    root.full_system = True
+
+def traverse_hierarchy(sym_catalog, symobject, simobject):
+    m5_children = []
+    print(symobject.name)
+    for child in symobject.connected_objects:
+        sym, sim = sym_catalog[child].name, sym_catalog[child].SimObject()
+        setattr(simobject, sym, sim)
+        m5_children.append((sym, sim))
+
+    for m_child in m5_children:
+        _, _ = traverse_hierarchy(sym_catalog,sym_catalog[m_child[0]], m_child[1])
+
+    for param, param_info in symobject.parameters.items():
+        if isinstance(param_info["Value"], unicode):
+            if issubclass(param_info["Type"], SimObject):
+                for obj in m5_children:
+                    sym, sim = obj
+                    if sym == param_info["Value"]:
+                        # setattr(simobject, sym, None)
+                        setattr(simobject, param, sim)
+                        break
+            else:
+                setattr(simobject, param, str(param_info["Value"]))
+        else:
+            if param_info["Value"] == param_info["Default"]:
+                if param != 'eventq_index':
+                    setattr(simobject, param, param_info["Value"])
+            else:
+                if str(param_info["Value"]) in symobject.connected_objects:
+                    print("object exists and can be parameterized")
+    return (symobject.name, simobject)
+
+def instantiate(root):
     m5.instantiate()
+
+get_obj_lists()
