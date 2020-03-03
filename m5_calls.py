@@ -49,7 +49,11 @@ def get_obj_lists():
                 param_dict[pname] = param_attr
             sub_objs[sub_obj_name] = param_dict
         obj_tree[base_obj] = sub_objs
-    print(inspect.getmembers(m5))
+    # Root has a default value for eventq_indexthat referecnes a Parent which
+    #   does not fit with our logic. So we set it to the default value if you
+    #   call the root constructor, which is 0.
+    obj_tree['SimObject']['Root']['eventq_index']['Default'] = 0
+    obj_tree['SimObject']['Root']['eventq_index']['Value'] = 0
     return obj_tree, instance_tree
 
 def traverse_hierarchy_root(sym_catalog, symroot):
@@ -83,8 +87,7 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
                 setattr(simobject, param, str(param_info["Value"]))
         else:
             if param_info["Value"] == param_info["Default"]:
-                if param != 'eventq_index':
-                    setattr(simobject, param, param_info["Value"])
+                setattr(simobject, param, param_info["Value"])
             else:
                 if str(param_info["Value"]) in symobject.connected_objects:
                     print("object exists and can be parameterized")
