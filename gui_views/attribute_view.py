@@ -58,7 +58,7 @@ class AttributeView(): #table view for parameters, as well as the description
         # if the value is name or connected objects, set the param instead of
         # the dict
         if currentAttribute == "Name":
-            self.state.current_sym_object.name = currentValue
+            self.state.current_sym_object.updateName(currentValue)
             current_x = self.state.current_sym_object.x
             current_y = self.state.current_sym_object.y
             current_name = self.state.current_sym_object.name

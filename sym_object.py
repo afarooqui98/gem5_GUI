@@ -155,11 +155,13 @@ class SymObject(QGraphicsItemGroup):
             if name[0] == "parent":
                 key = ("child", sym_object.name)
                 connection.setEndpoints(new_coords, None)
-                self.state.sym_objects[name[1]].connections[key].setEndpoints(new_coords, None)
+                self.state.sym_objects[name[1]].connections[key].setEndpoints(\
+                                                            new_coords, None)
             else:
                 key = ("parent", sym_object.name)
                 connection.setEndpoints(None, new_coords)
-                self.state.sym_objects[name[1]].connections[key].setEndpoints(None, new_coords)
+                self.state.sym_objects[name[1]].connections[key].setEndpoints(\
+                                                            None, new_coords)
 
 
     def updateConnections(self, event, sym_object):
@@ -167,6 +169,7 @@ class SymObject(QGraphicsItemGroup):
             object = self.state.sym_objects[object_name]
             self.modifyConnections(event, object)
             self.updateConnections(event, object)
+            
     # when mouse is release on object, update its position including the case
     # where it overlaps and deal with subobject being created
     def mouseReleaseEvent(self, event):
@@ -320,8 +323,8 @@ class SymObject(QGraphicsItemGroup):
 
         y_diff = lowest_object.scenePos().y() + lowest_object.height - \
             item.scenePos().y() - item.height
-        x_diff = item.scenePos().x() + item.width - rightmost_object.scenePos().x() - \
-            rightmost_object.width
+        x_diff = item.scenePos().x() + item.width - \
+                        rightmost_object.scenePos().x() - rightmost_object.width
 
         if item.connected_objects:
             if x_diff < size:
@@ -379,6 +382,7 @@ class SymObject(QGraphicsItemGroup):
     # attaches all children of the current sym_object to it so they move as one
     def attachChildren(self):
         for child_name in self.connected_objects:
+            print(child_name)
             self.addToGroup(self.state.sym_objects[child_name])
             #attach descendants
             self.state.sym_objects[child_name].attachChildren()
@@ -388,3 +392,25 @@ class SymObject(QGraphicsItemGroup):
         for child_name in self.connected_objects:
             #self.state.sym_objects[child_name].detachChildren()
             self.removeFromGroup(self.state.sym_objects[child_name])
+
+    # updates a symobjects name
+    def updateName(self, newName):
+        # changed name on visualization of symobject
+        self.name_text.setPlainText(newName)
+
+        # if sym object has a parent, change current sym object's name in
+        # parent's list of child objects
+        if self.parent_name:
+            self.state.sym_objects[self.parent_name].connected_objects.\
+                                                            remove(self.name)
+            self.state.sym_objects[self.parent_name].connected_objects.\
+                                                            append(newName)
+
+        # if sym object is a parent, change the parent name of all of its
+        # children
+        if self.connected_objects:
+            for child_name in self.connected_objects:
+                self.state.sym_objects[child_name].parent_name = newName
+
+        # update member variable
+        self.name = newName
