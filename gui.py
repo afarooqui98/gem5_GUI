@@ -64,6 +64,7 @@ class MainWindow(QMainWindow):
                                     QTableWidgetItem(value1))
         cell = table.item(table.rowCount() - 1, 0)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
+        cell.setToolTip(self.attributes[value1]["Description"]) #set tooltip
 
         # set column 1 value
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value2))
@@ -120,17 +121,6 @@ class MainWindow(QMainWindow):
             for sub_item in sorted(self.catalog[item].keys()):
                 tree_item.addChild(QTreeWidgetItem([sub_item]))
             self.catalogView.treeWidget.addTopLevelItem(tree_item)
-
-    # TODO still need this function to get description of parametrs
-    def populateDescription(self, item):
-        info = ""
-        info += self.attributes[item.text()]["Description"]
-        info += "\n"
-        info += "Type: " + self.attributes[item.text()]["Type"]
-        if self.attributes[item.text()]["Default"] is not None:
-            info += "\n" + "Default Value: " + \
-                    self.attributes[item.text()]["Default"]
-        self.label.setText(info)
 
 if __name__ == "__main__":
     gui_application = QApplication() #create new application
