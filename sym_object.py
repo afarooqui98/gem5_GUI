@@ -12,7 +12,6 @@ class SymObject(QGraphicsItemGroup):
                     loadingFromFile, state):
         super(SymObject, self).__init__()
         self.state = state
-        #TODO: at export, this string will become a list
         self.connected_objects = []
         self.parameters = {}
         self.ports = {}

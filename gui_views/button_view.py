@@ -40,6 +40,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def export_button_pressed(self):
         for object in self.state.sym_objects.values():
             if object.component_name == "Root":
+                print(object.name)
                 print(object.connected_objects)
                 root_name , root = traverse_hierarchy_root(self.state.sym_objects, object)
                 instantiate(root)
