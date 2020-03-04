@@ -19,7 +19,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self, catalog, instances):
         super(MainWindow, self).__init__()
-        self.state = State(instances)
+        self.switchBit = 0
+        self.state = State(instances, catalog)
         self.setWindowTitle("gem5 GUI")
         self.main = QWidget()
         self.catalog = catalog
@@ -46,12 +47,16 @@ class MainWindow(QMainWindow):
         self.layout.addLayout(self.gridLayout)
         self.layout.addWidget(self.graphics_view)
 
+        self.switch = QPushButton("switch")
+        self.layout.addWidget(self.switch)
+
         self.main.setLayout(self.layout)
         self.setCentralWidget(self.main)
 
         # populate treeview
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
+        self.switch.clicked.connect(self.populatePorts)
 
     def closeEvent(self, event):
         sys.exit()
@@ -78,6 +83,26 @@ class MainWindow(QMainWindow):
         self.state.current_sym_object = None
         self.populateAttributes(item, name, True)
 
+    def populatePorts(self, item):
+        if self.switchBit == 1:
+            self.populateAttributes(item, self.state.current_sym_object.component_name, True)
+        else:
+            table = self.attributeView.attributeTable
+            if self.state.current_sym_object == None:
+                #TODO: fix this!!!!!
+                current_object_name_index = table.selectedItems()[0]
+                current_object_name = table.item(current_object_name_index)
+            else:
+                current_object_name = self.state.current_sym_object.component_name
+
+            table.clear()
+            table.setRowCount(0)
+            ports = self.catalog["SimObject"][current_object_name]['ports']
+            for port in ports.keys():
+                self.addRow(port, str(ports[port]["Value"]), True)
+
+            self.switchBit = 1
+
     def populateAttributes(self, item, name, isTreeWidgetClick):
         table = self.attributeView.attributeTable
         table.clear()
@@ -94,12 +119,13 @@ class MainWindow(QMainWindow):
         if item:
             if item.parent() is None:
                 return
-            self.attributes = self.catalog[item.parent().text(0)][item.text(0)]
+            self.attributes = self.catalog[item.parent().text(0)][item.text(0)]['params']
         else:
             # only load from param list if there is a sym object in the context
             if self.state.current_sym_object != None or \
                 self.state.current_sym_object.component_name == name:
                 self.attributes = self.state.current_sym_object.parameters
+                print(self.attributes)
             else: # TODO: check when would this branch happen??
                 print("filling in name branch")
                 self.attributes = self.catalog[name]
@@ -107,6 +133,7 @@ class MainWindow(QMainWindow):
         for attribute in self.attributes.keys():
             self.addRow(attribute, str(self.attributes[attribute]["Value"]),
                                                     isTreeWidgetClick)
+        self.switchBit = 0
 
 
     def populate(self):

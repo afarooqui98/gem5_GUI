@@ -15,6 +15,7 @@ class SymObject(QGraphicsItemGroup):
         #TODO: at export, this string will become a list
         self.connected_objects = []
         self.parameters = {}
+        self.ports = {}
         self.connections = {}
         self.SimObject = None
 

@@ -3,6 +3,7 @@ import inspect
 sys.path.append('/home/parallels/Desktop/gem5/configs')
 import m5.objects
 from m5.objects import *
+from m5.params import *
 from common import ObjectList
 
 """
@@ -31,6 +32,16 @@ def get_obj_lists():
         for sub_obj_name, sub_obj_val  in obj_list._sub_classes.items():
             instance_tree[sub_obj_name] = sub_obj_val
 
+            port_dict = {}
+            for port_name, port in obj_list._sub_classes[sub_obj_name]._ports.items():
+                port_attr = {}
+                port_attr["Description"] = port.desc
+                port_attr["Name"] = port_name
+                port_attr["Value"] = port
+                port_attr["Type"] = Port
+                print(port_attr["Type"])
+                port_dict[port_name] = port_attr
+
             param_dict = {}  # Go through each parameter item for derived class
             for pname, param in obj_list._sub_classes[sub_obj_name]._params.items():
                 param_attr = {}
@@ -47,16 +58,18 @@ def get_obj_lists():
                     param_attr["Default"] = None
                     param_attr["Value"] = None
                 param_dict[pname] = param_attr
-            sub_objs[sub_obj_name] = param_dict
+            sub_objs[sub_obj_name] = {}
+            sub_objs[sub_obj_name]['params'] = param_dict
+            sub_objs[sub_obj_name]['ports'] = port_dict
         obj_tree[base_obj] = sub_objs
     print(inspect.getmembers(m5))
     return obj_tree, instance_tree
 
 def traverse_hierarchy_root(sym_catalog, symroot):
     root = symroot.SimObject()
-    x, y =  traverse_hierarchy(sym_catalog, symroot, root)
-    print(y.eventq_index)
-    return x,y
+    _, root =  traverse_hierarchy(sym_catalog, symroot, root)
+    name, simroot = set_params(sym_catalog, symroot, root)
+    return name, simroot
 
 
 def traverse_hierarchy(sym_catalog, symobject, simobject):
@@ -69,6 +82,11 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
 
     for m_child in m5_children:
         _, _ = traverse_hierarchy(sym_catalog,sym_catalog[m_child[0]], m_child[1])
+
+
+    return (symobject.name, simobject)
+
+def set_params(sym_catalog, symobject, simobject):
 
     for param, param_info in symobject.parameters.items():
         if isinstance(param_info["Value"], unicode):
@@ -88,7 +106,14 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
             else:
                 if str(param_info["Value"]) in symobject.connected_objects:
                     print("object exists and can be parameterized")
-    return (symobject.name, simobject)
+        print("\nparam connected is: ")
+        print(getattr(simobject, param), param)
+
+    for child in symobject.connected_objects:
+        set_params(sym_catalog, sym_catalog[child], getattr(simobject, child))
+
+    return symobject.name, simobject
+
 
 def instantiate(root):
     m5.instantiate()
