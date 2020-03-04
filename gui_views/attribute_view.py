@@ -23,7 +23,15 @@ class AttributeView(): #table view for parameters, as well as the description
         self.attributeLayout.addWidget(self.attributeTable)
 
         layout.addLayout(self.attributeLayout)
-        
+
+        #description label
+        self.label = QLabel()
+        self.label.setFrameStyle(QFrame.Panel | QFrame.Sunken)
+        self.label.setAlignment(Qt.AlignBottom | Qt.AlignLeft)
+        self.label.setWordWrap(True)
+        self.label.setScaledContents(True)
+        layout.addWidget(self.label)
+
         #handlers
         self.attributeTable.itemDoubleClicked.connect(self.makeEditable)
 

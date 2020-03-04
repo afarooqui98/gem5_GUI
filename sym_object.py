@@ -16,7 +16,6 @@ class SymObject(QGraphicsItemGroup):
         self.connected_objects = []
         self.parameters = {}
         self.connections = {}
-        self.SimObject = None
 
         # set initial attributes for new symobject
         self.x = scene.width() / 2 - width

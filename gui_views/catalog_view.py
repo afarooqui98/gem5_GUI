@@ -55,9 +55,6 @@ class CatalogView(): #dropdown and search bar
             self.state.scene.addObjectToScene("component", item.text(0), name)
         self.state.current_sym_object.parameters = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)])
-        self.state.current_sym_object.SimObject = \
-            copy.deepcopy(
-            self.state.instances[self.state.current_sym_object.component_name])
 
     # make tree view searchable
     def searchItem(self):
