@@ -78,7 +78,7 @@ class AttributeView(): #table view for parameters, as well as the description
                 if "Value" not in self.state.current_sym_object.parameters[currentAttribute]:
                     self.state.current_sym_object.parameters[currentAttribute]["Value"] = currentValue
                     self.state.current_sym_object.parameters[currentAttribute]["Type"] = \
-                        self.state.catalog["SimObject"][self.state.current_sym_object.component_name]['ports']['Type']
+                        self.state.catalog["SimObject"][self.state.current_sym_object.component_name]['ports'][currentAttribute]['Type']
             else:
                 self.state.current_sym_object.parameters[currentAttribute]["Value"] = \
                                                                     currentValue

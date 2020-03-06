@@ -69,6 +69,7 @@ class MainWindow(QMainWindow):
                                     QTableWidgetItem(value1))
         cell = table.item(table.rowCount() - 1, 0)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
+        #cell.setToolTip(self.attributes[value1]["Description"])
 
         # set column 1 value
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value2))
@@ -125,7 +126,7 @@ class MainWindow(QMainWindow):
             if self.state.current_sym_object != None or \
                 self.state.current_sym_object.component_name == name:
                 self.attributes = self.state.current_sym_object.parameters
-                print(self.attributes)
+                #print(self.attributes)
             else: # TODO: check when would this branch happen??
                 print("filling in name branch")
                 self.attributes = self.catalog[name]
