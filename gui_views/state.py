@@ -11,7 +11,7 @@ class State():
     def __init__(self):
         self.drag_state = True
         self.draw_wire_state = False
-        self.coord_map = {} # Map coordinates to (user-defined) name of symobject
+        self.coord_map = {} # Map coordinates to name of symobject
         self.sym_objects = {} # Map name to actual symobject (has coords)
         self.current_sym_object = None
         self.line_drawer = None
@@ -31,38 +31,9 @@ class State():
 
 
     def drawConnection(self, p, connection):
-        line = self.scene.addLine(connection.parent_endpoint.x(), connection.parent_endpoint.y(), connection.child_endpoint.x(), connection.child_endpoint.y(), p)
+        line = self.scene.addLine(connection.parent_endpoint.x(), \
+        connection.parent_endpoint.y(), connection.child_endpoint.x(), \
+        connection.child_endpoint.y(), p)
         if connection.line:
             self.scene.removeItem(connection.line)
         connection.line = line
-
-    # parses the sym_object dictionary to build the exported python file
-    def getSymObjects(self):
-        res = ""
-        for object in self.sym_objects.values():
-            if object.to_export:
-                res += object.name + " = " + object.component_name + "("
-                param = self.extractValue(object.parameters.items())
-                if param:
-                    res += param
-
-                for child in object.connected_objects:
-                    if not child:
-                        break
-
-                    res += object.name + "." + child + " = " + \
-                            self.sym_objects[child].component_name + "("
-                    param = extractValue(self.sym_objects[child].parameters.items())
-                    if param:
-                        res += param
-        return res
-
-    # extracts parameter values for a given sym_object
-    def extractValue(self, parameters):
-        param = ""
-        for key, val in parameters:
-            if val['Default'] != val['Value']:
-                param += key + " = " + val['Value'] + ","
-        param = param.rstrip(',')
-        param += ")\n"
-        return param

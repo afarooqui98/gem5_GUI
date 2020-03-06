@@ -57,7 +57,6 @@ class CatalogView(): #dropdown and search bar
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['params'])
         self.state.current_sym_object.ports = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
-        print(self.state.current_sym_object.ports)
 
     # make tree view searchable
     def searchItem(self):
