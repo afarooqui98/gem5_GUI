@@ -60,7 +60,26 @@ class SymObject(QGraphicsItemGroup):
         self.state.coord_map[(self.x, self.y)] = self.name
         self.state.current_sym_object = self
 
+    def initPorts(self):
+        self.sym_ports = []
+        prev_x = self.scenePos().x()
+        for sim_object_port in self.ports:
+            port = QGraphicsItemGroup()
+            # size of port is 25 x 10
+            # y + 19 is the y we want to add the port at
+            port_box = QGraphicsRectItem(prev_x, self.scenePos().y() + 19, 25, 10)
+            port.addToGroup(port_box)
+            port_name = QGraphicsTextItem(sim_object_port)
+            font = QFont()
+            font.setPointSize(7)
+            port_name.setFont(font)
+            port_name.setPos(port_box.boundingRect().center() - port_name.boundingRect().center())
+            port.addToGroup(port_name)
+            self.sym_ports.append(port)
+            prev_x += 25
 
+        for port in self.sym_ports:
+            self.addToGroup(port)
 
     def initUIObject(self, object, x, y):
         # initializing to (x, y) so that future positions are relative to (x, y)
@@ -76,23 +95,6 @@ class SymObject(QGraphicsItemGroup):
         object.name_text = QGraphicsTextItem(object.name)
         object.name_text.setPos(object.rect.boundingRect().topLeft())
 
-        object.sym_ports = []
-        prev_x = x
-        for sim_object_port in self.ports:
-            port = QGraphicsItemGroup()
-            # size of port is 25 x 10
-            # y + 19 is the y we want to add the port at
-            port_box = QGraphicsRectItem(prev_x, y + 19, 25, 10)
-            port.addToGroup(port_box)
-            port_name = QGraphicsTextItem(sim_object_port)
-            font = QFont()
-            font.setPointSize(7)
-            port_name.setFont(font)
-            port_name.setPos(port_box.boundingRect().center() - port_name.boundingRect().center())
-            port.addToGroup(port_name)
-            object.sym_ports.append(port)
-            prev_x += 25
-
         # create delete button
         object.deleteButton = QGraphicsTextItem('X')
         object.deleteButton.setPos(object.rect.boundingRect().topRight() -
@@ -104,8 +106,6 @@ class SymObject(QGraphicsItemGroup):
         object.addToGroup(object.name_text)
         object.addToGroup(object.text)
         object.addToGroup(object.deleteButton)
-        for port in object.sym_ports:
-            object.addToGroup(port)
 
         # set flags
         object.setAcceptDrops(True)
