@@ -64,6 +64,7 @@ class MainWindow(QMainWindow):
                                     QTableWidgetItem(value1))
         cell = table.item(table.rowCount() - 1, 0)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
+        #cell.setToolTip(self.attributes[value1]["Description"])
 
         # set column 1 value
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value2))
@@ -84,7 +85,7 @@ class MainWindow(QMainWindow):
         table.setRowCount(0)
 
         if self.state.current_sym_object != None:
-            print(self.state.current_sym_object.component_name)
+            #print(self.state.current_sym_object.component_name)
             self.addRow("Name", self.state.current_sym_object.name,
                         isTreeWidgetClick)
             self.addRow("Child Objects",
@@ -94,7 +95,7 @@ class MainWindow(QMainWindow):
         if item:
             if item.parent() is None:
                 return
-            self.attributes = self.catalog[item.parent().text(0)][item.text(0)]
+            self.attributes = self.catalog[item.parent().text(0)][item.text(0)]["params"]
         else:
             # only load from param list if there is a sym object in the context
             if self.state.current_sym_object != None or \
@@ -146,7 +147,7 @@ if __name__ == "__main__":
 if __name__ == "__m5_main__":
     import sys
     import os
-    sys.path.append('configs')
+    sys.path.append('/home/parallels/Documents/gem5/configs')
     import m5.objects
     from common import ObjectList
     from m5_calls import get_obj_lists

@@ -18,7 +18,10 @@ class LineDrawer(QWidget):
     def initUI(self):
         self.pos1 = None
         self.pos2 = None
+        self.draw_lines = 0
         self.line_done = 0
+        self.line = None
+        self.pen = QPen(Qt.black, 3)
 
     def mousePressEvent(self, event):
         if self.state.draw_wire_state:
@@ -26,10 +29,16 @@ class LineDrawer(QWidget):
             self.line_done = 0
 
     def mouseMoveEvent(self, event):
-        if self.state.draw_wire_state:
+        if self.state.draw_wire_state and self.pos1:
             self.pos2 = event.pos()
+            line = self.state.scene.addLine(self.pos1.x(), self.pos1.y(), self.pos2.x(),
+                                 self.pos2.y(), self.pen)
+            if self.line:
+                self.state.scene.removeItem(self.line)
+            self.line = line
             if not self.line_done:
-                self.update()
+                #self.update()
+                pass
 
     def mouseReleaseEvent(self, event):
         if self.state.draw_wire_state:
@@ -40,19 +49,31 @@ class LineDrawer(QWidget):
                 #     pass
             self.pos1 = None
             self.pos2 = None
-
-
-    def paintEvent(self, event):
-        q = QPainter(self)
-        if self.state.draw_wire_state:
+            self.draw_lines = 1
+            self.state.scene.removeItem(self.line)
+            self.line = None
             self.update()
-        #draw port lines
-        q.setPen(QPen(Qt.black, 3))
-        #currently drawing line
-        if self.pos1 and self.pos2 and self.state.draw_wire_state:
-            q.drawLine(self.pos1.x(), self.pos1.y(), self.pos2.x(),
-                        self.pos2.y())
-        self.state.drawLines(q)
+
+    def update(self):
+        self.state.drawLines(self.pen)
+
+
+    # def paintEvent(self, event):
+    #     #q = QPainter(self)
+    #     if self.state.draw_wire_state:
+    #         self.update()
+    #     #draw port lines
+    #     #q.setPen(QPen(Qt.black, 3))
+    #     #currently drawing line
+    #     if self.pos1 and self.pos2 and self.state.draw_wire_state:
+    #         line = self.state.scene.addLine(self.pos1.x(), self.pos1.y(), self.pos2.x(),
+    #                     self.pos2.y(), q.pen())
+    #         if self.line:
+    #             self.state.scene.removeItem(self.line)
+    #         self.line = line
+    #     #if self.draw_lines:
+    #     self.state.drawLines(q)
+            #self.draw_lines = 0
 
     def setObjectConnection(self):
         parent_loc = self.pos1

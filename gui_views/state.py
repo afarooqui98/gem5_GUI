@@ -16,7 +16,6 @@ class State():
         self.current_sym_object = None
         self.line_drawer = None
         self.scene = None
-        self.port_size = 10
         self.mainWindow = None
 
     # sets objects in scene as draggable or not draggable based on drag_state
@@ -24,15 +23,19 @@ class State():
         for object in self.sym_objects.values():
             object.setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
 
-    # draws each line in lines using the QPen q
-    def drawLines(self, q):
+    # draws each line in lines using the QPen p
+    def drawLines(self, p):
         for object in self.sym_objects.values():
-            for connection in object.connections.values():
-                self.drawConnection(q, connection)
+            for name, connection in object.connections.items():
+                self.drawConnection(p, connection)
 
 
-    def drawConnection(self, q, connection):
-        q.drawLine(connection.parent_endpoint.x(), connection.parent_endpoint.y(), connection.child_endpoint.x(), connection.child_endpoint.y())
+    def drawConnection(self, p, connection):
+        line = self.scene.addLine(connection.parent_endpoint.x(), connection.parent_endpoint.y(), connection.child_endpoint.x(), connection.child_endpoint.y(), p)
+        if connection.line:
+            self.scene.removeItem(connection.line)
+        connection.line = line
+
     # parses the sym_object dictionary to build the exported python file
     def getSymObjects(self):
         res = ""

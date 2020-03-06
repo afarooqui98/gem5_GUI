@@ -15,6 +15,7 @@ class SymObject(QGraphicsItemGroup):
         #TODO: at export, this string will become a list
         self.connected_objects = []
         self.parameters = {}
+        self.ports = {}
         self.connections = {}
 
         # set initial attributes for new symobject
@@ -119,6 +120,7 @@ class SymObject(QGraphicsItemGroup):
         self.state.current_sym_object = clicked
         self.state.mainWindow.populateAttributes(None,
             clicked.component_name, False)
+        self.state.line_drawer.draw_lines = 1
 
     # remove visual and backend respresentations of object
     def delete(self):
@@ -169,10 +171,11 @@ class SymObject(QGraphicsItemGroup):
             object = self.state.sym_objects[object_name]
             self.modifyConnections(event, object)
             self.updateConnections(event, object)
-            
+
     # when mouse is release on object, update its position including the case
     # where it overlaps and deal with subobject being created
     def mouseReleaseEvent(self, event):
+        self.state.line_drawer.draw_lines = 0
         super(SymObject, self).mouseReleaseEvent(event)
 
         # if object has not moved
