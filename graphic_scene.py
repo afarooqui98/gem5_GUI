@@ -79,8 +79,3 @@ class GraphicsScene(QGraphicsScene):
             event.accept()
         else:
             return
-
-    # paint event to draw lines
-    def paintEvent(self, event):
-        q = QPainter(self)
-        self.state.drawLines(q, self.state.lines)

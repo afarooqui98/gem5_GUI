@@ -9,6 +9,7 @@ class Connection:
     def __init__(self, parent_endpoint, child_endpoint):
         self.parent_endpoint = parent_endpoint
         self.child_endpoint = child_endpoint
+        self.line = None
 
     # sets new endpoints for the line (None passed in if unmodified)
     def setEndpoints(self, parent_endpoint, child_endpoint):

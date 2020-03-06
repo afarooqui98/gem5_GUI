@@ -15,6 +15,7 @@ class SymObject(QGraphicsItemGroup):
         #TODO: at export, this string will become a list
         self.connected_objects = []
         self.parameters = {}
+        self.ports = {}
         self.connections = {}
 
         # set initial attributes for new symobject
@@ -119,6 +120,7 @@ class SymObject(QGraphicsItemGroup):
         self.state.current_sym_object = clicked
         self.state.mainWindow.populateAttributes(None,
             clicked.component_name, False)
+        self.state.line_drawer.draw_lines = 1
 
     # remove visual and backend respresentations of object
     def delete(self):
@@ -142,7 +144,7 @@ class SymObject(QGraphicsItemGroup):
 
     def mouseMoveEvent(self, event):
         self.modifyConnections(event, self)
-        self.updateConnections(event, self)
+        self.updateChildrenConnections(event, self)
         self.state.line_drawer.update()
         super(SymObject, self).mouseMoveEvent(event)
 
@@ -164,15 +166,16 @@ class SymObject(QGraphicsItemGroup):
                                                             None, new_coords)
 
 
-    def updateConnections(self, event, sym_object):
+    def updateChildrenConnections(self, event, sym_object):
         for object_name in sym_object.connected_objects:
             object = self.state.sym_objects[object_name]
             self.modifyConnections(event, object)
-            self.updateConnections(event, object)
-            
+            self.updateChildrenConnections(event, object)
+
     # when mouse is release on object, update its position including the case
     # where it overlaps and deal with subobject being created
     def mouseReleaseEvent(self, event):
+        self.state.line_drawer.draw_lines = 0
         super(SymObject, self).mouseReleaseEvent(event)
 
         # if object has not moved
@@ -356,6 +359,10 @@ class SymObject(QGraphicsItemGroup):
             1, size)
 
         self.initUIObject(item, item.x, item.y)
+        self.modifyConnections(item, item)
+        self.updateChildrenConnections(item, item)
+        self.state.line_drawer.update()
+
 
     def lowestChild(self, item):
         lowest = item
