@@ -76,6 +76,23 @@ class SymObject(QGraphicsItemGroup):
         object.name_text = QGraphicsTextItem(object.name)
         object.name_text.setPos(object.rect.boundingRect().topLeft())
 
+        object.sym_ports = []
+        prev_x = x
+        for sim_object_port in self.ports:
+            port = QGraphicsItemGroup()
+            # size of port is 25 x 10
+            # y + 19 is the y we want to add the port at
+            port_box = QGraphicsRectItem(prev_x, y + 19, 25, 10)
+            port.addToGroup(port_box)
+            port_name = QGraphicsTextItem(sim_object_port)
+            font = QFont()
+            font.setPointSize(7)
+            port_name.setFont(font)
+            port_name.setPos(port_box.boundingRect().center() - port_name.boundingRect().center())
+            port.addToGroup(port_name)
+            object.sym_ports.append(port)
+            prev_x += 25
+
         # create delete button
         object.deleteButton = QGraphicsTextItem('X')
         object.deleteButton.setPos(object.rect.boundingRect().topRight() -
@@ -87,6 +104,8 @@ class SymObject(QGraphicsItemGroup):
         object.addToGroup(object.name_text)
         object.addToGroup(object.text)
         object.addToGroup(object.deleteButton)
+        for port in object.sym_ports:
+            object.addToGroup(port)
 
         # set flags
         object.setAcceptDrops(True)
@@ -144,7 +163,7 @@ class SymObject(QGraphicsItemGroup):
 
     def mouseMoveEvent(self, event):
         self.modifyConnections(event, self)
-        self.updateChildrenConnections(event, self)
+        self.updateConnections(event, self)
         self.state.line_drawer.update()
         super(SymObject, self).mouseMoveEvent(event)
 
@@ -166,11 +185,11 @@ class SymObject(QGraphicsItemGroup):
                                                             None, new_coords)
 
 
-    def updateChildrenConnections(self, event, sym_object):
+    def updateConnections(self, event, sym_object):
         for object_name in sym_object.connected_objects:
             object = self.state.sym_objects[object_name]
             self.modifyConnections(event, object)
-            self.updateChildrenConnections(event, object)
+            self.updateConnections(event, object)
 
     # when mouse is release on object, update its position including the case
     # where it overlaps and deal with subobject being created
@@ -306,6 +325,10 @@ class SymObject(QGraphicsItemGroup):
         self.state.scene.removeItem(item.text)
         item.removeFromGroup(item.deleteButton)
         self.state.scene.removeItem(item.deleteButton)
+        for port in item.sym_ports:
+            item.removeFromGroup(port)
+            self.state.scene.removeItem(port)
+
         item.x = item.scenePos().x()
         item.y = item.scenePos().y()
 
@@ -359,10 +382,6 @@ class SymObject(QGraphicsItemGroup):
             1, size)
 
         self.initUIObject(item, item.x, item.y)
-        self.modifyConnections(item, item)
-        self.updateChildrenConnections(item, item)
-        self.state.line_drawer.update()
-
 
     def lowestChild(self, item):
         lowest = item
