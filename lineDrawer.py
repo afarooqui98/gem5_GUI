@@ -59,34 +59,50 @@ class LineDrawer(QWidget):
         parent, child = None, None
         parent_z_score = -1
         child_z_score = -1
+        parent_port_num = 0
+        child_port_num = 0
         key = [None, None]
         for sym_object in self.state.sym_objects.values():
-            key[0] = sym_object.scenePos().x()
-            key[1] = sym_object.scenePos().y()
-            if key[0] < parent_loc.x() and \
-                    parent_loc.x() < key[0] + sym_object.width:
-                if key[1] < parent_loc.y() and \
-                        parent_loc.y() < key[1] + sym_object.height:
-                    if sym_object.z > parent_z_score:
-                        parent_z_score = sym_object.z
-                        parent = sym_object
-            if key[0] < child_loc.x() and \
-                    child_loc.x() < key[0] + sym_object.width:
-                if key[1] < child_loc.y() and \
-                        child_loc.y() < key[1] + sym_object.height:
-                    if sym_object.z > child_z_score:
-                        child_z_score = sym_object.z
-                        child = sym_object
+            count = 0
+            delete_button_height = sym_object.deleteButton.boundingRect().height()
+            next_y = delete_button_height
+            for port in sym_object.sym_ports:
+                # change keys depending on where ports end up
+                num_ports = len(sym_object.sym_ports)
+                key[0] = sym_object.scenePos().x() + sym_object.width * 3 / 4
+                key[1] = sym_object.scenePos().y() + next_y
+                # print(key[0], parent_loc.x(), key[0] + 25)
+                # print(key[1], parent_loc.y(), key[1] + 10)
+                # print(key[0], child_loc.x(), key[0] + 25)
+                # print(key[1], child_loc.y(), key[1] + 10)
+                if key[0] < parent_loc.x() and \
+                        parent_loc.x() < key[0] + port.rect().width():
+                    if key[1] < parent_loc.y() and \
+                            parent_loc.y() < key[1] + port.rect().height():
+                        if sym_object.z > parent_z_score:
+                            parent_z_score = sym_object.z
+                            parent = sym_object
+                            parent_port_num = count
+                if key[0] < child_loc.x() and \
+                        child_loc.x() < key[0] + port.rect().width():
+                    if key[1] < child_loc.y() and \
+                            child_loc.y() < key[1] + port.rect().height():
+                        if sym_object.z > child_z_score:
+                            child_z_score = sym_object.z
+                            child = sym_object
+                            child_port_num = count
+                next_y += (sym_object.height - delete_button_height) / num_ports
+                count = count + 1
 
         #create connection, add to parent and child
         if not parent or not child:
             return -1
-        self.pos1.setX(parent.scenePos().x() + parent.width / 2)
-        self.pos1.setY(parent.scenePos().y() + parent.height / 2)
-        self.pos2.setX(child.scenePos().x() + child.width / 2)
-        self.pos2.setY(child.scenePos().y() + child.height / 2)
+        # self.pos1.setX(parent.scenePos().x() + parent.width / 2)
+        # self.pos1.setY(parent.scenePos().y() + parent.height / 2)
+        # self.pos2.setX(child.scenePos().x() + child.width / 2)
+        # self.pos2.setY(child.scenePos().y() + child.height / 2)
         key1 = ("parent", child.name)
         key2 = ("child", parent.name)
-        parent.connections[key1] = Connection(self.pos1, self.pos2)
-        child.connections[key2] = Connection(self.pos1, self.pos2)
+        parent.connections[key1] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
+        child.connections[key2] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
         return 0
