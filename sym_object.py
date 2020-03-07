@@ -176,6 +176,8 @@ class SymObject(QGraphicsItemGroup):
         #new_coords.setY(sym_object.scenePos().y() + sym_object.height / 2)
         #middle of port
         num_ports = len(sym_object.ports)
+        if not num_ports:
+            return
         delete_button_height = sym_object.deleteButton.boundingRect().height()
         y_offset = (sym_object.height - delete_button_height) / num_ports
         new_x = sym_object.scenePos().x() + sym_object.width * 7 / 8
