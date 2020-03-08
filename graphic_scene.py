@@ -55,7 +55,7 @@ class GraphicsScene(QGraphicsScene):
 
         # add object rectangle to scene
 
-        new_object = SymObject(0, 0, 120, 60, self, component_name, name,
+        new_object = SymObject(0, 0, 150, 75, self, component_name, name,
                                 False, self.state)
 
         self.state.sym_objects[name] = new_object

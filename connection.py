@@ -6,9 +6,11 @@ from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QMessageBox)
 # endpoints for redrawing purposes. More functionality to be added later
 class Connection:
 
-    def __init__(self, parent_endpoint, child_endpoint):
+    def __init__(self, parent_endpoint, child_endpoint, parent_port_num, child_port_num):
         self.parent_endpoint = parent_endpoint
         self.child_endpoint = child_endpoint
+        self.parent_port_num = parent_port_num
+        self.child_port_num = child_port_num
         self.line = None
 
     # sets new endpoints for the line (None passed in if unmodified)
