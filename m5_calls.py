@@ -1,6 +1,6 @@
 import sys
 import inspect
-sys.path.append('/home/parallels/Desktop/gem5/configs')
+sys.path.append('/home/parallels/gem5/configs')
 import m5.objects
 from m5.objects import *
 from m5.params import *
@@ -71,14 +71,16 @@ def get_obj_lists():
 def traverse_hierarchy_root(sym_catalog, symroot):
     root = symroot.SimObject()
     name , m5_children, simroot = traverse_hierarchy(sym_catalog, symroot, root)
-    name, simroot = set_ports(sym_catalog, symroot, simroot, m5_children)
+    # name, simroot = set_ports(sym_catalog, symroot, simroot, m5_children)
     return symroot.name, simroot
 
 
 def traverse_hierarchy(sym_catalog, symobject, simobject):
     m5_children = []
+
     for child in symobject.connected_objects:
-        sym, sim = sym_catalog[child].name, sym_catalog[child].SimObject()
+        sym_catalog[child].SimObject = sym_catalog[child].SimObject()
+        sym, sim = sym_catalog[child].name, sym_catalog[child].SimObject
         setattr(simobject, sym, sim)
         m5_children.append((sym, sim))
 
@@ -135,4 +137,4 @@ def set_ports(sym_catalog, symobject, simobject, m5_children):
 
 def instantiate(root):
     m5.instantiate()
-    m5.simulate()
+    # m5.simulate()
