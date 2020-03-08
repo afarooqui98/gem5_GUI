@@ -61,6 +61,8 @@ class CatalogView(): #dropdown and search bar
         self.state.current_sym_object.SimObject = \
             copy.deepcopy(
             self.state.instances[self.state.current_sym_object.component_name])
+        self.state.current_sym_object.initPorts()
+
 
     # make tree view searchable
     def searchItem(self):

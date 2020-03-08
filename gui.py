@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
         table.setRowCount(0)
 
         if self.state.current_sym_object != None:
-            print(self.state.current_sym_object.component_name)
+            #print(self.state.current_sym_object.component_name)
             self.addRow("Name", self.state.current_sym_object.name,
                         isTreeWidgetClick)
             self.addRow("Child Objects",

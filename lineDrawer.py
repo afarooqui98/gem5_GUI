@@ -18,7 +18,10 @@ class LineDrawer(QWidget):
     def initUI(self):
         self.pos1 = None
         self.pos2 = None
+        self.draw_lines = 0
         self.line_done = 0
+        self.line = None
+        self.pen = QPen(Qt.black, 3)
 
     def mousePressEvent(self, event):
         if self.state.draw_wire_state:
@@ -26,82 +29,87 @@ class LineDrawer(QWidget):
             self.line_done = 0
 
     def mouseMoveEvent(self, event):
-        if self.state.draw_wire_state:
+        if self.state.draw_wire_state and self.pos1:
             self.pos2 = event.pos()
-            if not self.line_done:
-                self.update()
+            line = self.state.scene.addLine(self.pos1.x(), self.pos1.y(), \
+                        self.pos2.x(), self.pos2.y(), self.pen)
+            if self.line:
+                self.state.scene.removeItem(self.line)
+            self.line = line
 
     def mouseReleaseEvent(self, event):
-        if self.state.draw_wire_state:
+        if self.state.draw_wire_state and self.pos1 and self.pos2:
             self.line_done = 1
-            if self.setObjectConnection() >= 0:
-                self.state.lines.append((self.pos1, self.pos2))
-                print(self.state.current_sym_object.connections)
-            else:
+            if self.setObjectConnection() < 0:
                 ok = QMessageBox.about(self, "Alert", "Invalid line")
-                if not ok:
-                    pass
+
             self.pos1 = None
             self.pos2 = None
-
-
-    def paintEvent(self, event):
-        q = QPainter(self)
-        if self.state.draw_wire_state:
+            self.draw_lines = 1
+            self.state.scene.removeItem(self.line)
+            self.line = None
             self.update()
-        #draw port lines
-        q.setPen(QPen(Qt.black, 3))
-        if self.pos1 and self.pos2:
-            q.drawLine(self.pos1.x(), self.pos1.y(), self.pos2.x(),
-                        self.pos2.y())
-        self.state.drawLines(q)
+
+    def update(self):
+        self.state.drawLines(self.pen)
 
     def setObjectConnection(self):
         parent_loc = self.pos1
         child_loc = self.pos2
         parent, child = None, None
-        for key, val in self.state.coord_map.items():
-            sym_object = self.state.sym_objects[val]
-            if key[0] < parent_loc.x() and \
-                    parent_loc.x() < key[0] + sym_object.width:
-                if key[1] < parent_loc.y() and \
-                        parent_loc.y() < key[1] + sym_object.height:
-                    parent = sym_object
-            if key[0] < child_loc.x() and \
-                    child_loc.x() < key[0] + sym_object.width:
-                if key[1] < child_loc.y() and \
-                        child_loc.y() < key[1] + sym_object.height:
-                    child = sym_object
+        parent_z_score = -1
+        child_z_score = -1
+        parent_port_num = 0
+        parent_port_name = None
+        child_port_num = 0
+        child_port_name = None
+        key = [None, None]
+        for sym_object in self.state.sym_objects.values():
+            count = 0
+            delete_button_height = sym_object.deleteButton.boundingRect().height()
+            next_y = delete_button_height
+            for name, port in sym_object.sym_ports:
+                # change keys depending on where ports end up
+                num_ports = len(sym_object.sym_ports)
+                key[0] = sym_object.scenePos().x() + sym_object.width * 3 / 4
+                key[1] = sym_object.scenePos().y() + next_y
+                # print(key[0], parent_loc.x(), key[0] + 25)
+                # print(key[1], parent_loc.y(), key[1] + 10)
+                # print(key[0], child_loc.x(), key[0] + 25)
+                # print(key[1], child_loc.y(), key[1] + 10)
+                if key[0] < parent_loc.x() and \
+                        parent_loc.x() < key[0] + port.rect().width():
+                    if key[1] < parent_loc.y() and \
+                            parent_loc.y() < key[1] + port.rect().height():
+                        if sym_object.z > parent_z_score:
+                            parent_z_score = sym_object.z
+                            parent = sym_object
+                            parent_port_num = count
+                            parent_port_name = name
+                if key[0] < child_loc.x() and \
+                        child_loc.x() < key[0] + port.rect().width():
+                    if key[1] < child_loc.y() and \
+                            child_loc.y() < key[1] + port.rect().height():
+                        if sym_object.z > child_z_score:
+                            child_z_score = sym_object.z
+                            child = sym_object
+                            child_port_num = count
+                            child_port_name = name
+                next_y += (sym_object.height - delete_button_height) / num_ports
+                count = count + 1
+
         #create connection, add to parent and child
         if not parent or not child:
             return -1
-        self.pos1.setX(parent.x + parent.width / 2)
-        self.pos1.setY(parent.y + parent.height / 2)
-        self.pos2.setX(child.x + child.width / 2)
-        self.pos2.setY(child.y + child.height / 2)
-        parent.connections[child.name] = Connection(self.pos1, self.pos2)
-        child.connections[parent.name] = Connection(self.pos1, self.pos2)
+        # self.pos1.setX(parent.scenePos().x() + parent.width / 2)
+        # self.pos1.setY(parent.scenePos().y() + parent.height / 2)
+        # self.pos2.setX(child.scenePos().x() + child.width / 2)
+        # self.pos2.setY(child.scenePos().y() + child.height / 2)
+        key1 = ("parent", child.name)
+        key2 = ("child", parent.name)
+        parent.connections[key1] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
+        child.connections[key2] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
+        print(parent.ports)
+        parent.ports[parent_port_name]['Value'] = str(child.name) + "." + str(child_port_name)
+        print(parent.ports)
         return 0
-
-    # connects a parent and child object with a dotted line
-    def connectSubObject(self, parent_name, child_name):
-        parent = self.state.sym_objects[parent_name]
-        child = self.state.sym_objects[child_name]
-        #implement later
-        #x1, y1, x2, y2 = self.calculateShortestDistance(parent_name,
-        #                                                    child_name)
-        pos1 = QPoint()
-        pos2 = QPoint()
-        # draw line from middle of parent to middle of child
-        pos1.setX(parent.x + parent.width / 2)
-        pos1.setY(parent.y + parent.height / 2)
-        pos2.setX(child.x + child.width / 2)
-        pos2.setY(child.y + child.height / 2)
-        # add line to sub_object_lines list
-        self.state.sub_object_lines.append((pos1, pos2))
-        # triggers paint event to redraw scene
-        self.update()
-
-    # used to draw line between parent and child (unimplemented)
-    def calculateShortestDistance(self, parent_name, child_name):
-        pass
