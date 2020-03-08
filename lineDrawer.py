@@ -60,13 +60,15 @@ class LineDrawer(QWidget):
         parent_z_score = -1
         child_z_score = -1
         parent_port_num = 0
+        parent_port_name = None
         child_port_num = 0
+        child_port_name = None
         key = [None, None]
         for sym_object in self.state.sym_objects.values():
             count = 0
             delete_button_height = sym_object.deleteButton.boundingRect().height()
             next_y = delete_button_height
-            for port in sym_object.sym_ports:
+            for name, port in sym_object.sym_ports:
                 # change keys depending on where ports end up
                 num_ports = len(sym_object.sym_ports)
                 key[0] = sym_object.scenePos().x() + sym_object.width * 3 / 4
@@ -83,6 +85,7 @@ class LineDrawer(QWidget):
                             parent_z_score = sym_object.z
                             parent = sym_object
                             parent_port_num = count
+                            parent_port_name = name
                 if key[0] < child_loc.x() and \
                         child_loc.x() < key[0] + port.rect().width():
                     if key[1] < child_loc.y() and \
@@ -91,6 +94,7 @@ class LineDrawer(QWidget):
                             child_z_score = sym_object.z
                             child = sym_object
                             child_port_num = count
+                            child_port_name = name
                 next_y += (sym_object.height - delete_button_height) / num_ports
                 count = count + 1
 
@@ -105,4 +109,7 @@ class LineDrawer(QWidget):
         key2 = ("child", parent.name)
         parent.connections[key1] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
         child.connections[key2] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
+        print(parent.ports)
+        parent.ports[parent_port_name]['Value'] = str(child.name) + "." + str(child_port_name)
+        print(parent.ports)
         return 0

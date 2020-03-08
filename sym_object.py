@@ -79,7 +79,7 @@ class SymObject(QGraphicsItemGroup):
             port_name.setFont(font)
             port_name.setPos(port_box.boundingRect().center() - port_name.boundingRect().center())
             self.addToGroup(port_name)
-            self.sym_ports.append(port_box)
+            self.sym_ports.append((sim_object_port, port_box))
             next_y += (self.height - delete_button_height) / num_ports
 
             #self.addToGroup(port)
@@ -332,6 +332,10 @@ class SymObject(QGraphicsItemGroup):
 
     # resizes a sym_object when another object is placed in it
     def resizeUIObject(self, item, force_resize, size):
+        # recursively traverse upwards and resize each parent
+        if item.parent_name:
+            item.resizeUIObject(self.state.sym_objects[item.parent_name], \
+            1, size)
         item.removeFromGroup(item.rect)
         self.state.scene.removeItem(item.rect)
         item.removeFromGroup(item.name_text)
@@ -378,6 +382,7 @@ class SymObject(QGraphicsItemGroup):
 
             # re-render all children to deal with any cases of nested children
             # being resized
+            print(item.name, item.scenePos().x(), item.scenePos().y())
             for child in item.connected_objects:
                 cur_child = self.state.sym_objects[child]
                 child_y = item.scenePos().y() + item.height - cur_child.height
@@ -385,16 +390,13 @@ class SymObject(QGraphicsItemGroup):
                 cur_child.x = cur_child.scenePos().x()
                 cur_child.y = cur_child.scenePos().y()
                 next_x += cur_child.width + 10
+                print(cur_child.name, cur_child.scenePos().x(), cur_child.scenePos().y())
 
-            if not force_resize:
-                self.setPos(next_x, child_y)
-                self.x = self.scenePos().x()
-                self.y = self.scenePos().y()
 
-        # recursively traverse upwards and resize each parent
-        if item.parent_name:
-            item.resizeUIObject(self.state.sym_objects[item.parent_name], \
-            1, size)
+            # if not force_resize:
+            #     self.setPos(next_x, child_y)
+            #     self.x = self.scenePos().x()
+            #     self.y = self.scenePos().y()
 
         self.initUIObject(item, item.x, item.y)
         item.initPorts()
