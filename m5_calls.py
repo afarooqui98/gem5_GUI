@@ -1,6 +1,6 @@
 import sys
 import inspect
-sys.path.append('/home/parallels/gem5/configs')
+sys.path.append('configs')
 import m5.objects
 from m5.objects import *
 from m5.params import *
@@ -110,31 +110,51 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
 def set_ports(sym_catalog, symobject, simobject, m5_children):
 
     for ports, port_info in symobject.ports.items():
-
-        if isinstance(port_info["Value"], str):
-            print(simobject)
-            print(ports)
-            print(getattr(simobject, ports))
-            print(port_info)
-            values = port_info["Value"].split(".")
-            print(values)
-            print(sym_catalog[values[0]].SimObject)
-            print(getattr(sym_catalog[values[0]].SimObject, values[1]))
-            setattr(simobject, ports, getattr(sym_catalog[values[0]].SimObject, values[1]))
-            print(getattr(simobject, ports))
-            # value_to_get = getattr(simobject._parent, values[0]) #get the parent object to get the object to connect
-            # port_to_get = getattr(value_to_get, values[1]) #get the actual port to connect
-            # setattr(simobject, port, port_to_get)
-
-        # else:
-        #         setattr(simobject, port, str(port_info["Value"]))
+        if isinstance(simobject, list): #for vector param value
+            print("we have a vector!")
+            for i in range(len(simobject)):
+                if isinstance(port_info["Value"], str):
+                    values = port_info["Value"].split(".")
+                    print(sym_catalog[values[0]].SimObject)
+                    print(getattr(sym_catalog[values[0]].SimObject, values[1]))
+                    setattr(simobject[i], ports, getattr(sym_catalog[values[0]].SimObject, values[1]))
+                    print("simobject is: " + str(simobject[i]) + " ports are: " + str(ports))
+                    print(getattr(simobject[i], ports))
+                    print(port_info)
+                    print(values)
+                    print(getattr(simobject[i], ports).ini_str())
+                # else:
+                #         setattr(simobject, port, str(port_info["Value"]))
+                else:
+                    print("GOING BAD")
+                    # if param_info["Value"] == port_info["Default"]:
+                    #     setattr(simobject, port, port_info["Value"])
+                    # else:
+                    #     if str(port_info["Value"]) in symobject.connected_objects:
+                    #         print("object exists and can be parameterized")
         else:
-            print("GOING BAD")
-            # if param_info["Value"] == port_info["Default"]:
-            #     setattr(simobject, port, port_info["Value"])
+            if isinstance(port_info["Value"], str):
+                values = port_info["Value"].split(".")
+                print(sym_catalog[values[0]].SimObject)
+                print(getattr(sym_catalog[values[0]].SimObject, values[1]))
+                setattr(simobject, ports, getattr(sym_catalog[values[0]].SimObject, values[1]))
+                print("simobject is: " + str(simobject) + " ports are: " + str(ports))
+                print(getattr(simobject, ports))
+                print(port_info)
+                print(values)
+                print(getattr(simobject, ports).ini_str())
+                # value_to_get = getattr(simobject._parent, values[0]) #get the parent object to get the object to connect
+                # port_to_get = getattr(value_to_get, values[1]) #get the actual port to connect
+                # setattr(simobject, port, port_to_get)
             # else:
-            #     if str(port_info["Value"]) in symobject.connected_objects:
-            #         print("object exists and can be parameterized")
+            #         setattr(simobject, port, str(port_info["Value"]))
+            else:
+                print("GOING BAD")
+                # if param_info["Value"] == port_info["Default"]:
+                #     setattr(simobject, port, port_info["Value"])
+                # else:
+                #     if str(port_info["Value"]) in symobject.connected_objects:
+                #         print("object exists and can be parameterized")
     for child in symobject.connected_objects:
         set_ports(sym_catalog, sym_catalog[child], getattr(simobject, child), m5_children)
 
