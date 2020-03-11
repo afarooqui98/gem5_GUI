@@ -1,6 +1,6 @@
 import sys
 import inspect
-sys.path.append('../configs/')
+sys.path.append('/home/parallels/Documents/gem5/configs')
 import m5.objects
 from m5.objects import *
 from common import ObjectList
