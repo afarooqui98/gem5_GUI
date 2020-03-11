@@ -47,9 +47,6 @@ class MainWindow(QMainWindow):
         self.layout.addLayout(self.gridLayout)
         self.layout.addWidget(self.graphics_view)
 
-        self.switch = QPushButton("switch")
-        self.layout.addWidget(self.switch)
-
         self.main.setLayout(self.layout)
         self.setCentralWidget(self.main)
 
@@ -84,26 +81,6 @@ class MainWindow(QMainWindow):
         self.state.current_sym_object = None
         self.populateAttributes(item, name, True)
 
-    def populatePorts(self, item):
-        if self.switchBit == 1:
-            self.populateAttributes(item, self.state.current_sym_object.component_name, True)
-        else:
-            table = self.attributeView.attributeTable
-            if self.state.current_sym_object == None:
-                #TODO: fix this!!!!!
-                current_object_name_index = table.selectedItems()[0]
-                current_object_name = table.item(current_object_name_index)
-            else:
-                current_object_name = self.state.current_sym_object.component_name
-
-            table.clear()
-            table.setRowCount(0)
-            ports = self.catalog["SimObject"][current_object_name]['ports']
-            for port in ports.keys():
-                self.addRow(port, str(ports[port]["Value"]), True)
-
-            self.switchBit = 1
-
     def populateAttributes(self, item, name, isTreeWidgetClick):
         table = self.attributeView.attributeTable
         table.clear()
@@ -134,8 +111,6 @@ class MainWindow(QMainWindow):
         for attribute in self.attributes.keys():
             self.addRow(attribute, str(self.attributes[attribute]["Value"]),
                                                     isTreeWidgetClick)
-        self.switchBit = 0
-
 
     def populate(self):
         """
