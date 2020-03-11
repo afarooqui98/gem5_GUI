@@ -345,8 +345,9 @@ class SymObject(QGraphicsItemGroup):
         item.removeFromGroup(item.deleteButton)
         self.state.scene.removeItem(item.deleteButton)
         for port in item.sym_ports:
-            item.removeFromGroup(port)
-            self.state.scene.removeItem(port)
+            port_box = port[1]
+            item.removeFromGroup(port_box)
+            self.state.scene.removeItem(port_box)
 
         item.x = item.scenePos().x()
         item.y = item.scenePos().y()
