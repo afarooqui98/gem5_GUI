@@ -53,7 +53,6 @@ class MainWindow(QMainWindow):
         # populate treeview
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
-        self.switch.clicked.connect(self.populatePorts)
 
     def closeEvent(self, event):
         sys.exit()
@@ -149,7 +148,7 @@ if __name__ == "__main__":
 if __name__ == "__m5_main__":
     import sys
     import os
-    sys.path.append('configs')
+    sys.path.append('/home/parallels/Desktop/gem5/configs')
     import m5.objects
     from common import ObjectList
     from m5_calls import get_obj_lists
