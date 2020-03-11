@@ -17,9 +17,10 @@ import json
 class MainWindow(QMainWindow):
     """this class creates the main window"""
 
-    def __init__(self, catalog):
+    def __init__(self, catalog, instances):
         super(MainWindow, self).__init__()
-        self.state = State()
+        self.switchBit = 0
+        self.state = State(instances, catalog)
         self.setWindowTitle("gem5 GUI")
         self.main = QWidget()
         self.catalog = catalog
@@ -52,6 +53,7 @@ class MainWindow(QMainWindow):
         # populate treeview
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
+        self.switch.clicked.connect(self.populatePorts)
 
     def closeEvent(self, event):
         sys.exit()
@@ -95,20 +97,20 @@ class MainWindow(QMainWindow):
         if item:
             if item.parent() is None:
                 return
-            self.attributes = self.catalog[item.parent().text(0)][item.text(0)]["params"]
+            self.attributes = self.catalog[item.parent().text(0)][item.text(0)]['params']
         else:
             # only load from param list if there is a sym object in the context
             if self.state.current_sym_object != None or \
                 self.state.current_sym_object.component_name == name:
                 self.attributes = self.state.current_sym_object.parameters
+                #print(self.attributes)
             else: # TODO: check when would this branch happen??
                 print("filling in name branch")
                 self.attributes = self.catalog[name]
 
         for attribute in self.attributes.keys():
-            self.addRow(attribute, self.attributes[attribute]["Value"],
+            self.addRow(attribute, str(self.attributes[attribute]["Value"]),
                                                     isTreeWidgetClick)
-
 
     def populate(self):
         """
@@ -136,7 +138,7 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     gui_application = QApplication() #create new application
     catalog = json.load(open('result_new.json'))
-    main_window = MainWindow(catalog) #create new instance of main window
+    main_window = MainWindow(catalog, None) #create new instance of main window
     main_window.state.mainWindow = main_window
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack
@@ -147,15 +149,15 @@ if __name__ == "__main__":
 if __name__ == "__m5_main__":
     import sys
     import os
-    sys.path.append('/home/parallels/Documents/gem5/configs')
+    sys.path.append('configs')
     import m5.objects
     from common import ObjectList
     from m5_calls import get_obj_lists
 
     # use gem5 to get list of objects
-    obj_tree = get_obj_lists()
+    obj_tree, instance_tree = get_obj_lists()
     gui_application = QApplication() #create new application
-    main_window = MainWindow(obj_tree) #create new instance of main window
+    main_window = MainWindow(obj_tree, instance_tree) #create new instance of main window
     main_window.state.mainWindow = main_window
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack

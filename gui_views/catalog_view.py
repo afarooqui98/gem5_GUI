@@ -28,6 +28,7 @@ class CatalogView(): #dropdown and search bar
         self.treeWidget = QTreeWidget()
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Name")
+        self.treeWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         layout.addWidget(self.treeWidget)
 
         #handlers
@@ -57,6 +58,9 @@ class CatalogView(): #dropdown and search bar
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['params'])
         self.state.current_sym_object.ports = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
+        self.state.current_sym_object.SimObject = \
+            copy.deepcopy(
+            self.state.instances[self.state.current_sym_object.component_name])
         self.state.current_sym_object.initPorts()
 
 

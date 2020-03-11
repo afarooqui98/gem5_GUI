@@ -73,7 +73,14 @@ class AttributeView(): #table view for parameters, as well as the description
             self.state.line_drawer.connectSubObject(self.state.current_sym_object.name,
                                                 currentValue)
         else:
-            self.state.current_sym_object.parameters[currentAttribute]["Value"] = \
+            if currentAttribute not in self.state.current_sym_object.parameters:
+                self.state.current_sym_object.parameters[currentAttribute] = {}
+                if "Value" not in self.state.current_sym_object.parameters[currentAttribute]:
+                    self.state.current_sym_object.parameters[currentAttribute]["Value"] = currentValue
+                    self.state.current_sym_object.parameters[currentAttribute]["Type"] = \
+                        self.state.catalog["SimObject"][self.state.current_sym_object.component_name]['ports'][currentAttribute]['Type']
+            else:
+                self.state.current_sym_object.parameters[currentAttribute]["Value"] = \
                                                                     currentValue
 
         # item no longer editable, disconnect
