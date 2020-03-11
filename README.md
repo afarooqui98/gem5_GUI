@@ -28,7 +28,9 @@ Download dependencies using:
 
     pip install -r requirements.txt
 
+before running gem5, navigate to the bottom of gui.py and the top of m5calls.py, and change the configs path to wherever the configs directory for your instance of gem5 is.
+
 ## Proof of Concept
 In order to run the gui:
 
-    python gui.py
+    <gem5.opt path> gui.py
