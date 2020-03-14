@@ -1,6 +1,6 @@
 import sys
 import inspect
-sys.path.append('configs')
+sys.path.append('../configs')
 import m5.objects
 from m5.objects import *
 from m5.params import *

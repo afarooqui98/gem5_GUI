@@ -34,7 +34,6 @@ class GraphicsScene(QGraphicsScene):
         parent = newObject["parent_name"]
 
         new_object = SymObject(x, y, width, height, self, component_name, name, True, self.state)
-
         new_object.parameters = parameters
         new_object.connected_objects = connected_objects
         new_object.parent_name = parent

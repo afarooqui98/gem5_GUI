@@ -87,7 +87,15 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             newObject["name"] = object.name
             newObject["parent_name"] = object.parent_name
 
-            newObject["parameters"] = object.parameters
+            params = {}
+            print(object.parameters)
+            for param in object.parameters:
+                params[str(param)] = {}
+                if (object.parameters[param]["Value"] != object.parameters[param]["Default"]):
+                    params[str(param)]["Value"] = object.parameters[param]["Value"]
+            
+            print(params)
+            newObject["parameters"] = params
             newObject["connected_objects"] = object.connected_objects
             newObject["connections"] = object.connections
             savedObjects[object.name] = newObject
