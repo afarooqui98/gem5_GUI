@@ -78,23 +78,24 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # object for each one
         for object in self.state.sym_objects.values():
             newObject = {}
-            newObject["x"] = object.x
-            newObject["y"] = object.y
+            newObject["x"] = object.scenePos().x()
+            newObject["y"] = object.scenePos().y()
             newObject["z"] = object.z
             newObject["width"] = object.width
             newObject["height"] = object.height
             newObject["component_name"] = object.component_name
             newObject["name"] = object.name
             newObject["parent_name"] = object.parent_name
-
-            params = {}
             print(object.parameters)
+            params = {}
             for param in object.parameters:
                 params[str(param)] = {}
-                if (object.parameters[param]["Value"] != object.parameters[param]["Default"]):
+                param_type = type(object.parameters[param]["Value"])
+                if (param_type == str or param_type == int or param_type == bool):
                     params[str(param)]["Value"] = object.parameters[param]["Value"]
-            
-            print(params)
+                else:
+                    params[str(param)]["Value"] = None
+
             newObject["parameters"] = params
             newObject["connected_objects"] = object.connected_objects
             newObject["connections"] = object.connections
