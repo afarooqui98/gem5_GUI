@@ -65,7 +65,11 @@ class MainWindow(QMainWindow):
                                     QTableWidgetItem(value1))
         cell = table.item(table.rowCount() - 1, 0)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
-        #cell.setToolTip(self.attributes[value1]["Description"])
+
+        if value1 == "Name" or value1 == "Child Objects":
+            pass
+        else:
+            cell.setToolTip(self.attributes[value1]["Description"])
 
         # set column 1 value
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value2))

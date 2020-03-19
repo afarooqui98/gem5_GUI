@@ -68,8 +68,24 @@ def get_obj_lists():
     obj_tree['SimObject']['Root']['params']['eventq_index']['Value'] = 0
     return obj_tree, instance_tree
 
+def instantiate_object(object):
+    object.SimObject = object.SimObject()
+    param_dict = object.SimObject.enumerateParams()
+
+    print(param_dict)
+
+    for param, value in object.parameters.items():
+        if param_dict.get(param) == None:
+            continue
+        else:
+            if param_dict[param].default_val != "":
+                object.parameters[param]["Default"] = str(param_dict[param].default_val)
+                object.parameters[param]["Value"] = str(param_dict[param].default_val)
+            else:
+                continue
+
 def traverse_hierarchy_root(sym_catalog, symroot):
-    root = symroot.SimObject()
+    root = symroot.SimObject
     name , m5_children, simroot = traverse_hierarchy(sym_catalog, symroot, root)
     name, simroot = set_ports(sym_catalog, symroot, simroot, m5_children)
     return symroot.name, simroot
@@ -79,7 +95,6 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
     m5_children = []
 
     for child in symobject.connected_objects:
-        sym_catalog[child].SimObject = sym_catalog[child].SimObject()
         sym, sim = sym_catalog[child].name, sym_catalog[child].SimObject
         setattr(simobject, sym, sim)
         m5_children.append((sym, sim))
@@ -88,7 +103,7 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
         _ , _ , _ = traverse_hierarchy(sym_catalog, sym_catalog[m_child[0]], m_child[1])
 
     for param, param_info in symobject.parameters.items():
-        if isinstance(param_info["Value"], unicode):
+        if isinstance(param_info["Value"], unicode) or isinstance(param_info["Value"], str):
             if issubclass(param_info["Type"], SimObject):
                 for obj in m5_children:
                     sym, sim = obj
@@ -161,6 +176,8 @@ def set_ports(sym_catalog, symobject, simobject, m5_children):
     return symobject.name, simobject
 
 
-def instantiate(root):
+def instantiate():
     m5.instantiate()
-    # m5.simulate()
+
+def simulate():
+    m5.simulate()

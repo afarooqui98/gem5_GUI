@@ -43,7 +43,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 print(object.name)
                 print(object.connected_objects)
                 root_name , root = traverse_hierarchy_root(self.state.sym_objects, object)
-                instantiate(root)
+                instantiate()
 
     # loads .ui file into gui
     def openUI_button_pressed(self):

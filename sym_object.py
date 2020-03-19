@@ -4,6 +4,7 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from gui_views import state
+from m5_calls import *
 
 
 class SymObject(QGraphicsItemGroup):
@@ -58,6 +59,9 @@ class SymObject(QGraphicsItemGroup):
         self.y = self.scenePos().y()
         self.state.coord_map[(self.x, self.y)] = self.name
         self.state.current_sym_object = self
+
+    def instantiateSimObject(self):
+        instantiate_object(self) #actual simobject
 
     def initPorts(self):
         self.sym_ports = []
