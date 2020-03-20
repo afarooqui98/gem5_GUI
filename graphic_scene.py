@@ -8,6 +8,7 @@ from gui_views import state
 from sym_object import *
 import string
 import random
+import copy
 
 class GraphicsScene(QGraphicsScene):
     """this class provides a scene to manage objects"""
@@ -38,10 +39,19 @@ class GraphicsScene(QGraphicsScene):
         new_object.connected_objects = connected_objects
         new_object.parent_name = parent
         new_object.z = z
+        new_object.ports = newObject["ports"]
 
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object
         self.state.current_sym_object = new_object
+        #self.state.current_sym_object.ports = \
+        #    copy.deepcopy(self.state.catalog[name]['ports'])
+        self.state.current_sym_object.SimObject = \
+            copy.deepcopy(
+        self.state.instances[self.state.current_sym_object.component_name])
+        self.state.current_sym_object.initPorts()
+    
+
         self.addItem(new_object)
         return new_object
 

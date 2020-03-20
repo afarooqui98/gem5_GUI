@@ -90,8 +90,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             newObject["component_name"] = object.component_name
             newObject["name"] = object.name
             newObject["parent_name"] = object.parent_name
-            print(object.parameters)
+        
             params = {}
+
             for param in object.parameters:
                 params[str(param)] = {}
                 param_type = type(object.parameters[param]["Value"])
@@ -101,6 +102,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     params[str(param)]["Value"] = None
 
             newObject["parameters"] = params
+        
+            ports = []
+            for port in object.ports:
+                ports.append(port)
+        
+            newObject["ports"] = ports
+        
             newObject["connected_objects"] = object.connected_objects
             newObject["connections"] = object.connections
             if object.z not in savedObjects:
@@ -108,7 +116,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             savedObjects[object.z].append(newObject)
 
-        print(savedObjects)
         # show dialog box to let user create output file
         filename = QFileDialog.getSaveFileName(None, "",
                                            "",
