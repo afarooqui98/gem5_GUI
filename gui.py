@@ -19,7 +19,6 @@ class MainWindow(QMainWindow):
 
     def __init__(self, catalog, instances):
         super(MainWindow, self).__init__()
-        self.switchBit = 0
         self.state = State(instances, catalog)
         self.setWindowTitle("gem5 GUI")
         self.main = QWidget()

@@ -52,6 +52,7 @@ class CatalogView(): #dropdown and search bar
                 pass
             return
 
+        #modify state to accomodate the new object
         self.state.current_sym_object = \
             self.state.scene.addObjectToScene("component", item.text(0), name)
         self.state.current_sym_object.parameters = \
@@ -62,8 +63,13 @@ class CatalogView(): #dropdown and search bar
             copy.deepcopy(
             self.state.instances[self.state.current_sym_object.component_name])
         self.state.current_sym_object.initPorts()
+
+        #eager instantiation
         self.state.current_sym_object.instantiateSimObject()
 
+        #allow instantiation ONLY when root is on the canvas
+        if self.state.current_sym_object.component_name == "Root":
+            self.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
     # make tree view searchable
     def searchItem(self):

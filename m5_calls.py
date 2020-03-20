@@ -68,6 +68,7 @@ def get_obj_lists():
     obj_tree['SimObject']['Root']['params']['eventq_index']['Value'] = 0
     return obj_tree, instance_tree
 
+#eager instantiation occurs here, pass through object from state via current_sym_object
 def instantiate_object(object):
     object.SimObject = object.SimObject()
     param_dict = object.SimObject.enumerateParams()
@@ -78,12 +79,15 @@ def instantiate_object(object):
         if param_dict.get(param) == None:
             continue
         else:
+            #the objects param_dictionary is replaced from the preloaded
+            #"catalog" values to the instantiated value
             if param_dict[param].default_val != "":
                 object.parameters[param]["Default"] = param_dict[param].default_val
                 object.parameters[param]["Value"] = param_dict[param].default_val
             else:
                 continue
 
+#recursively set parameters (ONLY if changed?) and then recursively set ports
 def traverse_hierarchy_root(sym_catalog, symroot):
     root = symroot.SimObject
     name , m5_children, simroot = traverse_hierarchy(sym_catalog, symroot, root)
@@ -102,6 +106,8 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
     for m_child in m5_children:
         _ , _ , _ = traverse_hierarchy(sym_catalog, sym_catalog[m_child[0]], m_child[1])
 
+    #TODO: possible error with the eager instantiation happening here?
+    #set user-defined attributes here, do some type checking to do different things
     for param, param_info in symobject.parameters.items():
         if isinstance(param_info["Value"], unicode):
             if issubclass(param_info["Type"], SimObject):
@@ -122,6 +128,7 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
 
     return (symobject.name, m5_children, simobject)
 
+#port setting for objects
 def set_ports(sym_catalog, symobject, simobject, m5_children):
 
     for ports, port_info in symobject.ports.items():
@@ -148,7 +155,7 @@ def set_ports(sym_catalog, symobject, simobject, m5_children):
                     #     if str(port_info["Value"]) in symobject.connected_objects:
                     #         print("object exists and can be parameterized")
         else:
-            if isinstance(port_info["Value"], str):
+            if isinstance(port_info["Value"], str): #nonvector param value
                 values = port_info["Value"].split(".")
                 print(sym_catalog[values[0]].SimObject)
                 print(getattr(sym_catalog[values[0]].SimObject, values[1]))
@@ -180,4 +187,5 @@ def instantiate():
     m5.instantiate()
 
 def simulate():
-    m5.simulate()
+    exit_event = m5.simulate()
+    print('Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause()))

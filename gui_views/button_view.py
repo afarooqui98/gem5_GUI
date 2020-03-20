@@ -32,6 +32,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.saveUIButton.clicked.connect(self.saveUI_button_pressed)
         self.openUIButton.clicked.connect(self.openUI_button_pressed)
         self.simulateButton.setEnabled(False)
+        self.exportButton.setEnabled(False)
 
     # changes gui state to allow for wire drawing and disable object dragging
     def wire_button_pressed(self):
