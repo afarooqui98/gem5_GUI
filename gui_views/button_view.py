@@ -73,10 +73,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     self.state.scene.loadSavedObject("component", object["name"], object)
                 
                 z_score += 1
-                
+            
+            self.state.line_drawer.drawSavedLines(data["lines"])
+
     # saves gui state to a .ui file
     def saveUI_button_pressed(self):
         savedObjects = {}
+        lines = []
 
         # iterate through the current objects on the scene and create a new JSON
         # object for each one
@@ -108,14 +111,32 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 ports.append(port)
         
             newObject["ports"] = ports
-        
+            #print(object.connections) 
+            for c in object.connections:
+                #print("new connection")
+                newLine = {}
+                parent = {}
+                child = {}
+                parent["x"] = object.connections[c].parent_endpoint.x()
+                parent["y"] = object.connections[c].parent_endpoint.y()
+                child["x"] = object.connections[c].child_endpoint.x()
+                child["y"] = object.connections[c].child_endpoint.y()
+                newLine["parent"] = parent
+                newLine["child"] = child
+                lines.append(newLine)
+                
+                #print(object.connections[c].parent_endpoint)
+                #print(c["Value"].child_endpoint)
+
             newObject["connected_objects"] = object.connected_objects
-            newObject["connections"] = object.connections
+            #newObject["connections"] = object.connections
             if object.z not in savedObjects:
                 savedObjects[object.z] = []
 
             savedObjects[object.z].append(newObject)
 
+        savedObjects["lines"] = lines
+        #print(len(lines))
         # show dialog box to let user create output file
         filename = QFileDialog.getSaveFileName(None, "",
                                            "",

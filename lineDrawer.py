@@ -53,6 +53,11 @@ class LineDrawer(QWidget):
     def update(self):
         self.state.drawLines(self.pen)
 
+    def drawSavedLines(self, lines):
+        for line in lines:
+            self.state.scene.addLine(line["parent"]["x"], line["parent"]["y"], line["child"]["x"], line["child"]["y"], self.pen)
+
+
     def setObjectConnection(self):
         parent_loc = self.pos1
         child_loc = self.pos2
