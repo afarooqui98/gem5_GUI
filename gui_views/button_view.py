@@ -66,10 +66,14 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # read data in from the file and load each object
         with open(filename) as json_file:
             data = json.load(json_file)
-            for key in data:
-                object = data[key]
-                self.state.scene.loadSavedObject("component", key, object)
-
+            z_score = 0
+            while str(z_score) in data:
+                cur_z_array = data[str(z_score)]
+                for object in cur_z_array:
+                    self.state.scene.loadSavedObject("component", object["name"], object)
+                
+                z_score += 1
+                
     # saves gui state to a .ui file
     def saveUI_button_pressed(self):
         savedObjects = {}
@@ -99,8 +103,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             newObject["parameters"] = params
             newObject["connected_objects"] = object.connected_objects
             newObject["connections"] = object.connections
-            savedObjects[object.name] = newObject
+            if object.z not in savedObjects:
+                savedObjects[object.z] = []
 
+            savedObjects[object.z].append(newObject)
+
+        print(savedObjects)
         # show dialog box to let user create output file
         filename = QFileDialog.getSaveFileName(None, "",
                                            "",
