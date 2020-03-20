@@ -79,8 +79,8 @@ def instantiate_object(object):
             continue
         else:
             if param_dict[param].default_val != "":
-                object.parameters[param]["Default"] = str(param_dict[param].default_val)
-                object.parameters[param]["Value"] = str(param_dict[param].default_val)
+                object.parameters[param]["Default"] = param_dict[param].default_val
+                object.parameters[param]["Value"] = param_dict[param].default_val
             else:
                 continue
 
@@ -103,7 +103,7 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
         _ , _ , _ = traverse_hierarchy(sym_catalog, sym_catalog[m_child[0]], m_child[1])
 
     for param, param_info in symobject.parameters.items():
-        if isinstance(param_info["Value"], unicode) or isinstance(param_info["Value"], str):
+        if isinstance(param_info["Value"], unicode):
             if issubclass(param_info["Type"], SimObject):
                 for obj in m5_children:
                     sym, sim = obj
