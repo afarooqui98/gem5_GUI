@@ -42,12 +42,9 @@ class State():
 
 
 def get_path():
-    cur_dir = os.getcwd()
-    os.chdir("/home") #make just / if not assuming gem5 in home directory
-
-    for root, dirs, files in os.walk(os.getcwd(), topdown=False):
+    gem5_parent_dir = sys.executable.split("gem5")[0]
+    for root, dirs, files in os.walk(gem5_parent_dir, topdown=False):
         for name in dirs:
             abs_path = os.path.join(root, name)
             if abs_path.endswith("gem5/configs"):
-                os.chdir(cur_dir)
                 os.environ['gem5_path'] = abs_path
