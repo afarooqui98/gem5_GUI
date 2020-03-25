@@ -18,15 +18,12 @@ class LineDrawer(QWidget):
     def initUI(self):
         self.pos1 = None
         self.pos2 = None
-        self.draw_lines = 0
-        self.line_done = 0
         self.line = None
         self.pen = QPen(Qt.black, 3)
 
     def mousePressEvent(self, event):
         if self.state.draw_wire_state:
             self.pos1 = event.pos()
-            self.line_done = 0
 
     def mouseMoveEvent(self, event):
         if self.state.draw_wire_state and self.pos1:
@@ -36,16 +33,16 @@ class LineDrawer(QWidget):
             if self.line:
                 self.state.scene.removeItem(self.line)
             self.line = line
+            self.line.setZValue(1000)
 
     def mouseReleaseEvent(self, event):
         if self.state.draw_wire_state and self.pos1 and self.pos2:
-            self.line_done = 1
-            if self.setObjectConnection() < 0:
-                ok = QMessageBox.about(self, "Alert", "Invalid line")
-
+            ret = self.setObjectConnection()
             self.pos1 = None
             self.pos2 = None
-            self.draw_lines = 1
+            if ret < 0:
+                ok = QMessageBox.about(self, "Alert", "Invalid line")
+
             self.state.scene.removeItem(self.line)
             self.line = None
             self.update()

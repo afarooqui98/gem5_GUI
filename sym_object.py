@@ -118,6 +118,7 @@ class SymObject(QGraphicsItemGroup):
         # get object that was clicked on (since multiple objects can be stacked
         # on top of each other)
         clicked = self.getClickedObject(event)
+        clicked.setZValue(100)
         if not clicked:
             clicked = self
 
@@ -229,13 +230,15 @@ class SymObject(QGraphicsItemGroup):
             self.z = parent.z + 1 # update z index
             if not self.name in parent.connected_objects:
                 parent.connected_objects.append(self.name) # add new child
-
+        for object in self.state.sym_objects.values():
+            object.setZValue(object.z)
         # update the object's position parameters
         #del self.state.coord_map[(self.x, self.y)]
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
         self.state.coord_map[(self.x, self.y)] = self.name
         self.detachChildren()
+        self.state.line_drawer.update()
 
     # based on mouse click position, return object with highest zscore
     def getClickedObject(self, event):
@@ -293,7 +296,7 @@ class SymObject(QGraphicsItemGroup):
         if item.name in self.connected_objects:
             return True
         for child_name in self.connected_objects:
-            return self.state.sym_objects[child_name].isDescendant(item)
+            return self.isDescendant(self.state.sym_objects[child_name])
         return False
 
     # checks if the delete button was pressed based on mouse click

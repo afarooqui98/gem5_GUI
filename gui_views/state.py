@@ -39,6 +39,7 @@ class State():
         if connection.line:
             self.scene.removeItem(connection.line)
         connection.line = line
+        connection.line.setZValue(1000)
 
 
 def get_path():
