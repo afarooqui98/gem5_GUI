@@ -1,5 +1,5 @@
 from lineDrawer import *
-from PySide2 import QtCore
+from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
@@ -172,42 +172,35 @@ class SymObject(QGraphicsItemGroup):
 
     def modifyConnections(self, event, sym_object):
         new_coords = event.pos()
+        
         #middle of port
         num_ports = len(sym_object.ports)
         if not num_ports:
             return
+        
         delete_button_height = sym_object.deleteButton.boundingRect().height()
         y_offset = (sym_object.height - delete_button_height) / num_ports
         new_x = sym_object.scenePos().x() + sym_object.width * 7 / 8
-        new_coords.setX(new_x)
+        #new_coords.setX(new_x)
+        
         for name, connection in sym_object.connections.items():
-            print(name)
+            new_coords = event.pos()
             new_y = delete_button_height
             if name[0] == "parent":
-                print(connection.parent_port_num)
                 new_y += sym_object.scenePos().y() + connection.parent_port_num * y_offset + y_offset / 4
-                print("PARENT")
-                new_coords.setY(new_y)
-                print("set", sym_object.name, connection.parent_port_num, "at", new_coords)
+                new_coords = QPointF(new_x, new_y)
                 key = ("child", sym_object.name, name[3], name[2])
                 connection.setEndpoints(new_coords, None)
                 self.state.sym_objects[name[1]].connections[key].setEndpoints(\
                                                             new_coords, None)
             else:
-                print(connection.child_port_num)
                 new_y += sym_object.scenePos().y() + connection.child_port_num * y_offset + y_offset / 4
-                new_coords.setY(new_y)
+                new_coords = QPointF(new_x, new_y)
                 key = ("parent", sym_object.name, name[3], name[2])
-                print("set", sym_object.name, connection.child_port_num, "at", new_coords)
-
                 connection.setEndpoints(None, new_coords)
                 self.state.sym_objects[name[1]].connections[key].setEndpoints(\
                                                             None, new_coords)
 
-                print("connect instance", connection)
-                print("connection", connection.child_endpoint.y())
-                print("dict instance", self.state.sym_objects[name[1]].connections[key])
-                print("dict", self.state.sym_objects[name[1]].connections[key].child_endpoint.y())
 
     def updateChildrenConnections(self, event, sym_object):
         for object_name in sym_object.connected_objects:
