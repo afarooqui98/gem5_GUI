@@ -28,6 +28,7 @@ class State():
     # draws each line in lines using the QPen p
     def drawLines(self, p):
         for object in self.sym_objects.values():
+            print(object.name)
             for name, connection in object.connections.items():
                 if name[0] == "parent":
                     self.drawConnection(p, connection)

@@ -186,6 +186,7 @@ class SymObject(QGraphicsItemGroup):
             if name[0] == "parent":
                 print(connection.parent_port_num)
                 new_y += sym_object.scenePos().y() + connection.parent_port_num * y_offset + y_offset / 4
+                print("PARENT")
                 new_coords.setY(new_y)
                 print("set", sym_object.name, connection.parent_port_num, "at", new_coords)
                 key = ("child", sym_object.name, name[3], name[2])
@@ -197,11 +198,16 @@ class SymObject(QGraphicsItemGroup):
                 new_y += sym_object.scenePos().y() + connection.child_port_num * y_offset + y_offset / 4
                 new_coords.setY(new_y)
                 key = ("parent", sym_object.name, name[3], name[2])
-               # print("set", sym_object.name, connection.child_port_num, "at", new_coords)
+                print("set", sym_object.name, connection.child_port_num, "at", new_coords)
 
                 connection.setEndpoints(None, new_coords)
                 self.state.sym_objects[name[1]].connections[key].setEndpoints(\
                                                             None, new_coords)
+
+                print("connect instance", connection)
+                print("connection", connection.child_endpoint.y())
+                print("dict instance", self.state.sym_objects[name[1]].connections[key])
+                print("dict", self.state.sym_objects[name[1]].connections[key].child_endpoint.y())
 
     def updateChildrenConnections(self, event, sym_object):
         for object_name in sym_object.connected_objects:
