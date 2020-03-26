@@ -29,16 +29,18 @@ class State():
     def drawLines(self, p):
         for object in self.sym_objects.values():
             for name, connection in object.connections.items():
-                self.drawConnection(p, connection)
+                if name[0] == "parent": #don't need to draw line twice
+                    self.drawConnection(p, connection)
 
 
     def drawConnection(self, p, connection):
-        line = self.scene.addLine(connection.parent_endpoint.x(), \
-        connection.parent_endpoint.y(), connection.child_endpoint.x(), \
-        connection.child_endpoint.y(), p)
         if connection.line:
             self.scene.removeItem(connection.line)
-        connection.line = line
+        connection.line = self.scene.addLine(connection.parent_endpoint.x(), \
+        connection.parent_endpoint.y(), connection.child_endpoint.x(), \
+        connection.child_endpoint.y(), p)
+
+        connection.line.setZValue(1000)
 
 
 def get_path():

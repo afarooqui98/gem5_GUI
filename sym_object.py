@@ -1,5 +1,5 @@
 from lineDrawer import *
-from PySide2 import QtCore
+from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
@@ -49,7 +49,6 @@ class SymObject(QGraphicsItemGroup):
             if self.doesOverlap(item):
                 self.setPos(item.scenePos().x() + item.width + 10,
                             item.scenePos().y() + item.height + 10)
-                #del self.state.coord_map[(self.x, self.y)]
                 self.x = self.scenePos().x()
                 self.y = self.scenePos().y()
                 self.state.coord_map[(self.x, self.y)] = self.name
@@ -70,13 +69,15 @@ class SymObject(QGraphicsItemGroup):
             # size of port is 25 x 10
             # y + 25 is the y we want to add the port at
             y = self.scenePos().y() + next_y
-            port_box = QGraphicsRectItem(x, y, self.width / 4, (self.height - delete_button_height) / num_ports)
+            port_box = QGraphicsRectItem(x, y, self.width / 4, (self.height - \
+                delete_button_height) / num_ports)
             self.addToGroup(port_box)
             port_name = QGraphicsTextItem(sim_object_port)
             font = QFont()
             font.setPointSize(5)
             port_name.setFont(font)
-            port_name.setPos(port_box.boundingRect().center() - port_name.boundingRect().center())
+            port_name.setPos(port_box.boundingRect().center() - \
+                port_name.boundingRect().center())
             self.addToGroup(port_name)
             self.sym_ports.append((sim_object_port, port_box))
             next_y += (self.height - delete_button_height) / num_ports
@@ -118,6 +119,7 @@ class SymObject(QGraphicsItemGroup):
         # get object that was clicked on (since multiple objects can be stacked
         # on top of each other)
         clicked = self.getClickedObject(event)
+        clicked.setZValue(100)
         if not clicked:
             clicked = self
 
@@ -170,30 +172,30 @@ class SymObject(QGraphicsItemGroup):
         super(SymObject, self).mouseMoveEvent(event)
 
     def modifyConnections(self, event, sym_object):
-        new_coords = event.pos()
-        #new_coords.setX(sym_object.scenePos().x() + sym_object.width / 2)
-        #new_coords.setY(sym_object.scenePos().y() + sym_object.height / 2)
         #middle of port
         num_ports = len(sym_object.ports)
         if not num_ports:
             return
+
         delete_button_height = sym_object.deleteButton.boundingRect().height()
         y_offset = (sym_object.height - delete_button_height) / num_ports
         new_x = sym_object.scenePos().x() + sym_object.width * 7 / 8
-        new_coords.setX(new_x)
+
         for name, connection in sym_object.connections.items():
             new_y = delete_button_height
             if name[0] == "parent":
-                new_y += sym_object.scenePos().y() + connection.parent_port_num * y_offset + y_offset / 4
-                new_coords.setY(new_y)
-                key = ("child", sym_object.name)
+                new_y += sym_object.scenePos().y() + connection.parent_port_num\
+                    * y_offset + y_offset / 4
+                new_coords = QPointF(new_x, new_y)
+                key = ("child", sym_object.name, name[3], name[2])
                 connection.setEndpoints(new_coords, None)
                 self.state.sym_objects[name[1]].connections[key].setEndpoints(\
                                                             new_coords, None)
             else:
-                new_y += sym_object.scenePos().y() + connection.child_port_num * y_offset + y_offset / 4
-                new_coords.setY(new_y)
-                key = ("parent", sym_object.name)
+                new_y += sym_object.scenePos().y() + connection.child_port_num \
+                    * y_offset + y_offset / 4
+                new_coords = QPointF(new_x, new_y)
+                key = ("parent", sym_object.name, name[3], name[2])
                 connection.setEndpoints(None, new_coords)
                 self.state.sym_objects[name[1]].connections[key].setEndpoints(\
                                                             None, new_coords)
@@ -208,7 +210,6 @@ class SymObject(QGraphicsItemGroup):
     # when mouse is release on object, update its position including the case
     # where it overlaps and deal with subobject being created
     def mouseReleaseEvent(self, event):
-        self.state.line_drawer.draw_lines = 0
         super(SymObject, self).mouseReleaseEvent(event)
 
         # if object has not moved
@@ -229,13 +230,14 @@ class SymObject(QGraphicsItemGroup):
             self.z = parent.z + 1 # update z index
             if not self.name in parent.connected_objects:
                 parent.connected_objects.append(self.name) # add new child
-
+        for object in self.state.sym_objects.values():
+            object.setZValue(object.z)
         # update the object's position parameters
         #del self.state.coord_map[(self.x, self.y)]
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
-        self.state.coord_map[(self.x, self.y)] = self.name
         self.detachChildren()
+        self.state.line_drawer.update()
 
     # based on mouse click position, return object with highest zscore
     def getClickedObject(self, event):
@@ -293,7 +295,7 @@ class SymObject(QGraphicsItemGroup):
         if item.name in self.connected_objects:
             return True
         for child_name in self.connected_objects:
-            return self.state.sym_objects[child_name].isDescendant(item)
+            return self.isDescendant(self.state.sym_objects[child_name])
         return False
 
     # checks if the delete button was pressed based on mouse click
