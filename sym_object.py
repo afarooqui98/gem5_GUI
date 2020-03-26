@@ -172,8 +172,6 @@ class SymObject(QGraphicsItemGroup):
 
     def modifyConnections(self, event, sym_object):
         new_coords = event.pos()
-        #new_coords.setX(sym_object.scenePos().x() + sym_object.width / 2)
-        #new_coords.setY(sym_object.scenePos().y() + sym_object.height / 2)
         #middle of port
         num_ports = len(sym_object.ports)
         if not num_ports:
@@ -185,16 +183,18 @@ class SymObject(QGraphicsItemGroup):
         for name, connection in sym_object.connections.items():
             new_y = delete_button_height
             if name[0] == "parent":
+                print(connection.parent_port_num)
                 new_y += sym_object.scenePos().y() + connection.parent_port_num * y_offset + y_offset / 4
                 new_coords.setY(new_y)
-                key = ("child", sym_object.name)
+                key = ("child", sym_object.name, name[3], name[2])
                 connection.setEndpoints(new_coords, None)
                 self.state.sym_objects[name[1]].connections[key].setEndpoints(\
                                                             new_coords, None)
             else:
+                print(connection.child_port_num)
                 new_y += sym_object.scenePos().y() + connection.child_port_num * y_offset + y_offset / 4
                 new_coords.setY(new_y)
-                key = ("parent", sym_object.name)
+                key = ("parent", sym_object.name, name[3], name[2])
                 connection.setEndpoints(None, new_coords)
                 self.state.sym_objects[name[1]].connections[key].setEndpoints(\
                                                             None, new_coords)

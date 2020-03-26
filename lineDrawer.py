@@ -1,4 +1,4 @@
-import sys
+import sys, string, random
 from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QMessageBox)
 from PySide2.QtGui import QPainter, QColor, QPen
 from PySide2.QtCore import Qt, QPoint
@@ -103,15 +103,10 @@ class LineDrawer(QWidget):
         #create connection, add to parent and child
         if not parent or not child:
             return -1
-        # self.pos1.setX(parent.scenePos().x() + parent.width / 2)
-        # self.pos1.setY(parent.scenePos().y() + parent.height / 2)
-        # self.pos2.setX(child.scenePos().x() + child.width / 2)
-        # self.pos2.setY(child.scenePos().y() + child.height / 2)
-        key1 = ("parent", child.name)
-        key2 = ("child", parent.name)
+
+        key1 = ("parent", child.name, parent_port_name, child_port_name)
+        key2 = ("child", parent.name, child_port_name, parent_port_name)
         parent.connections[key1] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
         child.connections[key2] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
-        print(parent.ports)
         parent.ports[parent_port_name]['Value'] = str(child.name) + "." + str(child_port_name)
-        print(parent.ports)
         return 0

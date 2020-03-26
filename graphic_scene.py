@@ -45,18 +45,18 @@ class GraphicsScene(QGraphicsScene):
         new_object_connections = {}
 
         for connection in connections:
-            parent_endpoint = QPointF(connection["parent_endpoint_x"], 
+            parent_endpoint = QPointF(connection["parent_endpoint_x"],
                                         connection["parent_endpoint_y"])
-            child_endpoint = QPointF(connection["child_endpoint_x"], 
+            child_endpoint = QPointF(connection["child_endpoint_x"],
                                         connection["child_endpoint_y"])
-            new_connection = Connection(parent_endpoint, child_endpoint, 
-                                            connection["parent_port_num"], 
+            new_connection = Connection(parent_endpoint, child_endpoint,
+                                            connection["parent_port_num"],
                                             connection["child_port_num"])
-            key = (connection["key"][0], connection["key"][1])
+            key = (connection["key"][0], connection["key"][1], connection["key"][2])
             new_object_connections[key] = new_connection
-            
+
         new_object.connections = new_object_connections
-        
+
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object
         self.state.current_sym_object = new_object
@@ -64,7 +64,7 @@ class GraphicsScene(QGraphicsScene):
             copy.deepcopy(
         self.state.instances[self.state.current_sym_object.component_name])
         self.state.current_sym_object.initPorts()
-    
+
 
         self.addItem(new_object)
         return new_object
