@@ -50,11 +50,6 @@ class LineDrawer(QWidget):
     def update(self):
         self.state.drawLines(self.pen)
 
-    def drawSavedLines(self, lines):
-        for line in lines:
-            self.state.scene.addLine(line["parent"]["x"], line["parent"]["y"], line["child"]["x"], line["child"]["y"], self.pen)
-
-
     def setObjectConnection(self):
         parent_loc = self.pos1
         child_loc = self.pos2
@@ -106,7 +101,10 @@ class LineDrawer(QWidget):
 
         key1 = ("parent", child.name, parent_port_name, child_port_name)
         key2 = ("child", parent.name, child_port_name, parent_port_name)
-        parent.connections[key1] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
-        child.connections[key2] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
-        parent.ports[parent_port_name]['Value'] = str(child.name) + "." + str(child_port_name)
+        parent.connections[key1] = Connection(self.pos1, self.pos2,
+            parent_port_num, child_port_num)
+        child.connections[key2] = Connection(self.pos1, self.pos2,
+            parent_port_num, child_port_num)
+        parent.ports[parent_port_name]['Value'] = str(child.name) + "." + \
+            str(child_port_name)
         return 0

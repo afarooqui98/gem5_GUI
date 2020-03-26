@@ -29,7 +29,7 @@ class State():
     def drawLines(self, p):
         for object in self.sym_objects.values():
             for name, connection in object.connections.items():
-                if name[0] == "parent":
+                if name[0] == "parent": #don't need to draw line twice
                     self.drawConnection(p, connection)
 
 
@@ -40,7 +40,6 @@ class State():
         connection.parent_endpoint.y(), connection.child_endpoint.x(), \
         connection.child_endpoint.y(), p)
 
-        #connection.line = line
         connection.line.setZValue(1000)
 
 

@@ -35,7 +35,8 @@ class GraphicsScene(QGraphicsScene):
         parent = newObject["parent_name"]
         connections = newObject["connections"]
 
-        new_object = SymObject(x, y, width, height, self, component_name, name, True, self.state)
+        new_object = SymObject(x, y, width, height, self, component_name, name,
+            True, self.state)
         new_object.parameters = parameters
         new_object.connected_objects = connected_objects
         new_object.parent_name = parent
@@ -52,7 +53,8 @@ class GraphicsScene(QGraphicsScene):
             new_connection = Connection(parent_endpoint, child_endpoint,
                                             connection["parent_port_num"],
                                             connection["child_port_num"])
-            key = (connection["key"][0], connection["key"][1], connection["key"][2], connection["key"][3])
+            key = (connection["key"][0], connection["key"][1],
+                connection["key"][2], connection["key"][3])
             new_object_connections[key] = new_connection
 
         new_object.connections = new_object_connections
