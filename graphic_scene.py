@@ -84,7 +84,8 @@ class GraphicsScene(QGraphicsScene):
                                 False, self.state)
 
         self.state.sym_objects[name] = new_object
-        self.state.current_sym_object = new_object
+
+        #self.state.current_sym_object = new_object
         self.addItem(new_object)
         return new_object
 
