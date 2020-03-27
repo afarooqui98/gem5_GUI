@@ -5,7 +5,7 @@ from PySide2.QtWidgets import *
 
 from graphic_scene import *
 from connection import *
-import sys, random
+import sys, random, os
 
 class State():
     def __init__(self, instances, catalog):
@@ -29,13 +29,24 @@ class State():
     def drawLines(self, p):
         for object in self.sym_objects.values():
             for name, connection in object.connections.items():
-                self.drawConnection(p, connection)
+                if name[0] == "parent": #don't need to draw line twice
+                    self.drawConnection(p, connection)
 
 
     def drawConnection(self, p, connection):
-        line = self.scene.addLine(connection.parent_endpoint.x(), \
-        connection.parent_endpoint.y(), connection.child_endpoint.x(), \
-        connection.child_endpoint.y(), p)
         if connection.line:
             self.scene.removeItem(connection.line)
-        connection.line = line
+        connection.line = self.scene.addLine(connection.parent_endpoint.x(), \
+        connection.parent_endpoint.y(), connection.child_endpoint.x(), \
+        connection.child_endpoint.y(), p)
+
+        connection.line.setZValue(1000)
+
+
+def get_path():
+    gem5_parent_dir = sys.executable.split("gem5")[0]
+    for root, dirs, files in os.walk(gem5_parent_dir, topdown=False):
+        for name in dirs:
+            abs_path = os.path.join(root, name)
+            if abs_path.endswith("gem5/configs"):
+                os.environ['gem5_path'] = abs_path

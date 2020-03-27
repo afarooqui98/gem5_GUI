@@ -3,11 +3,12 @@ from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 
 from lineDrawer import *
-from PySide2 import QtCore
+from PySide2.QtCore import *
 from gui_views import state
 from sym_object import *
 import string
 import random
+import copy
 
 class GraphicsScene(QGraphicsScene):
     """this class provides a scene to manage objects"""
@@ -32,17 +33,41 @@ class GraphicsScene(QGraphicsScene):
         parameters = newObject["parameters"]
         connected_objects = newObject["connected_objects"]
         parent = newObject["parent_name"]
+        connections = newObject["connections"]
 
-        new_object = SymObject(x, y, width, height, self, component_name, name, True, self.state)
-
+        new_object = SymObject(x, y, width, height, self, component_name, name,
+            True, self.state)
         new_object.parameters = parameters
         new_object.connected_objects = connected_objects
         new_object.parent_name = parent
         new_object.z = z
+        new_object.ports = newObject["ports"]
+
+        new_object_connections = {}
+
+        for connection in connections:
+            parent_endpoint = QPointF(connection["parent_endpoint_x"],
+                                        connection["parent_endpoint_y"])
+            child_endpoint = QPointF(connection["child_endpoint_x"],
+                                        connection["child_endpoint_y"])
+            new_connection = Connection(parent_endpoint, child_endpoint,
+                                            connection["parent_port_num"],
+                                            connection["child_port_num"])
+            key = (connection["key"][0], connection["key"][1],
+                connection["key"][2], connection["key"][3])
+            new_object_connections[key] = new_connection
+
+        new_object.connections = new_object_connections
 
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object
         self.state.current_sym_object = new_object
+        self.state.current_sym_object.SimObject = \
+            copy.deepcopy(
+        self.state.instances[self.state.current_sym_object.component_name])
+        self.state.current_sym_object.initPorts()
+
+
         self.addItem(new_object)
         return new_object
 

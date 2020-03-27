@@ -1,6 +1,9 @@
 import sys
+import os
 import inspect
-sys.path.append('configs')
+from gui_views.state import *
+get_path()
+sys.path.append(os.getenv('gem5_path'))
 import m5.objects
 from m5.objects import *
 from m5.params import *
