@@ -77,9 +77,17 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # read data in from the file and load each object
         with open(filename) as json_file:
             data = json.load(json_file)
-            for key in data:
-                object = data[key]
-                self.state.scene.loadSavedObject("component", key, object)
+            z_score = 0
+            while str(z_score) in data:
+                cur_z_array = data[str(z_score)]
+                for object in cur_z_array:
+                    self.state.scene.loadSavedObject("component", 
+                                                    object["name"], object)
+                
+                z_score += 1
+            
+            self.state.line_drawer.update() 
+        
 
     # saves gui state to a .ui file
     def saveUI_button_pressed(self):
@@ -89,19 +97,61 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # object for each one
         for object in self.state.sym_objects.values():
             newObject = {}
-            newObject["x"] = object.x
-            newObject["y"] = object.y
+            newObject["x"] = object.scenePos().x()
+            newObject["y"] = object.scenePos().y()
             newObject["z"] = object.z
             newObject["width"] = object.width
             newObject["height"] = object.height
             newObject["component_name"] = object.component_name
             newObject["name"] = object.name
             newObject["parent_name"] = object.parent_name
+        
+            params = {}
 
-            newObject["parameters"] = object.parameters
+            for param in object.parameters:
+                params[str(param)] = {}
+                param_type = type(object.parameters[param]["Value"])
+                if (param_type == str or param_type == int or \
+                        param_type == bool):
+                    params[str(param)]["Value"] = \
+                            object.parameters[param]["Value"]
+                else:
+                    params[str(param)]["Value"] = None
+
+            newObject["parameters"] = params
+        
+            ports = []
+            for port in object.ports:
+                ports.append(port)
+        
+            newObject["ports"] = ports
             newObject["connected_objects"] = object.connected_objects
-            newObject["connections"] = object.connections
-            savedObjects[object.name] = newObject
+            
+            connections = []
+
+            for c in object.connections:
+                newConnection = {}
+                newConnection["key"] = c
+                newConnection["parent_endpoint_x"] = \
+                        object.connections[c].parent_endpoint.x()
+                newConnection["parent_endpoint_y"] = \
+                        object.connections[c].parent_endpoint.y()
+                newConnection["child_endpoint_x"] = \
+                        object.connections[c].child_endpoint.x()
+                newConnection["child_endpoint_y"] = \
+                        object.connections[c].child_endpoint.y()
+                newConnection["parent_port_num"] = \
+                        object.connections[c].parent_port_num
+                newConnection["child_port_num"] = \
+                        object.connections[c].child_port_num
+                connections.append(newConnection)
+
+            newObject["connections"] = connections
+            
+            if object.z not in savedObjects:
+                savedObjects[object.z] = []
+
+            savedObjects[object.z].append(newObject)
 
         # show dialog box to let user create output file
         filename = QFileDialog.getSaveFileName(None, "",

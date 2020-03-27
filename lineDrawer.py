@@ -1,4 +1,4 @@
-import sys
+import sys, string, random
 from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QMessageBox)
 from PySide2.QtGui import QPainter, QColor, QPen
 from PySide2.QtCore import Qt, QPoint
@@ -18,15 +18,12 @@ class LineDrawer(QWidget):
     def initUI(self):
         self.pos1 = None
         self.pos2 = None
-        self.draw_lines = 0
-        self.line_done = 0
         self.line = None
         self.pen = QPen(Qt.black, 3)
 
     def mousePressEvent(self, event):
         if self.state.draw_wire_state:
             self.pos1 = event.pos()
-            self.line_done = 0
 
     def mouseMoveEvent(self, event):
         if self.state.draw_wire_state and self.pos1:
@@ -36,16 +33,16 @@ class LineDrawer(QWidget):
             if self.line:
                 self.state.scene.removeItem(self.line)
             self.line = line
+            self.line.setZValue(1000)
 
     def mouseReleaseEvent(self, event):
         if self.state.draw_wire_state and self.pos1 and self.pos2:
-            self.line_done = 1
-            if self.setObjectConnection() < 0:
-                ok = QMessageBox.about(self, "Alert", "Invalid line")
-
+            ret = self.setObjectConnection()
             self.pos1 = None
             self.pos2 = None
-            self.draw_lines = 1
+            if ret < 0:
+                ok = QMessageBox.about(self, "Alert", "Invalid line")
+
             self.state.scene.removeItem(self.line)
             self.line = None
             self.update()
@@ -101,15 +98,13 @@ class LineDrawer(QWidget):
         #create connection, add to parent and child
         if not parent or not child:
             return -1
-        # self.pos1.setX(parent.scenePos().x() + parent.width / 2)
-        # self.pos1.setY(parent.scenePos().y() + parent.height / 2)
-        # self.pos2.setX(child.scenePos().x() + child.width / 2)
-        # self.pos2.setY(child.scenePos().y() + child.height / 2)
-        key1 = ("parent", child.name)
-        key2 = ("child", parent.name)
-        parent.connections[key1] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
-        child.connections[key2] = Connection(self.pos1, self.pos2, parent_port_num, child_port_num)
-        print(parent.ports)
-        parent.ports[parent_port_name]['Value'] = str(child.name) + "." + str(child_port_name)
-        print(parent.ports)
+
+        key1 = ("parent", child.name, parent_port_name, child_port_name)
+        key2 = ("child", parent.name, child_port_name, parent_port_name)
+        parent.connections[key1] = Connection(self.pos1, self.pos2,
+            parent_port_num, child_port_num)
+        child.connections[key2] = Connection(self.pos1, self.pos2,
+            parent_port_num, child_port_num)
+        parent.ports[parent_port_name]['Value'] = str(child.name) + "." + \
+            str(child_port_name)
         return 0
