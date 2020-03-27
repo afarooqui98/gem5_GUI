@@ -15,23 +15,27 @@ def get_obj_lists():
         with mappings of base classes to derived classes to parameters"""
     obj_tree = {}
     instance_tree = {}
-    set_type_conv = {}
+    set_subtypes = set()
     #TODO this list is predetermined, must compile final list of all objects
-    #test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher',
-    #   'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject',
-    #  'HelloObject', 'GoodbyeObject', 'System', 'SimpleMemory', 'SimObject']
-    test_objects = ['SimObject']
+    categories = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher',
+       'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'BaseInterrupts',
+         'SimObject']
     sim_obj_type = getattr(m5.objects, 'SimObject', None)
 
-    for base_obj in test_objects:
+    for base_obj in categories:
         # Create ObjectLists for each base element
 
         obj_list = ObjectList.ObjectList(getattr(m5.objects, base_obj, None))
-
+        set_subtypes.add(base_obj)
         sub_objs = {}  # Go through each derived class in the Object List
         for sub_obj_name, sub_obj_val  in obj_list._sub_classes.items():
-            instance_tree[sub_obj_name] = sub_obj_val
+            if base_obj == 'SimObject':
+                if sub_obj_name in set_subtypes:
+                    continue
+            else:
+                set_subtypes.add(sub_obj_name)
 
+            instance_tree[sub_obj_name] = sub_obj_val
             port_dict = {}
             for port_name, port in obj_list._sub_classes[sub_obj_name]._ports.items():
                 port_attr = {}
@@ -46,11 +50,7 @@ def get_obj_lists():
                 param_attr = {}
                 param_attr["Description"] = param.desc
                 param_attr["Type"] = param.ptype
-                if param.ptype_str not in set_type_conv:
-                    set_type_conv[param.ptype_str] = []
                 if hasattr(param, 'default'):
-                    if type(param.default) not in set_type_conv[param.ptype_str]:
-                        set_type_conv[param.ptype_str].append(type(param.default))
                     param_attr["Default"] = param.default
                     param_attr["Value"] = param.default
                 else:
@@ -60,12 +60,14 @@ def get_obj_lists():
             sub_objs[sub_obj_name] = {}
             sub_objs[sub_obj_name]['params'] = param_dict
             sub_objs[sub_obj_name]['ports'] = port_dict
+        if base_obj == 'SimObject':
+            base_obj = 'Other'
         obj_tree[base_obj] = sub_objs
     # Root has a default value for eventq_indexthat referecnes a Parent which
     #   does not fit with our logic. So we set it to the default value if you
     #   call the root constructor, which is 0.
-    obj_tree['SimObject']['Root']['params']['eventq_index']['Default'] = 0
-    obj_tree['SimObject']['Root']['params']['eventq_index']['Value'] = 0
+    obj_tree['Root']['Root']['params']['eventq_index']['Default'] = 0
+    obj_tree['Root']['Root']['params']['eventq_index']['Value'] = 0
     return obj_tree, instance_tree
 
 #eager instantiation occurs here, pass through object from state via current_sym_object
