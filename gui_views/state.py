@@ -19,6 +19,7 @@ class State():
         self.mainWindow = None
         self.instances = instances
         self.catalog = catalog
+        self.buttonView = None
 
     # sets objects in scene as draggable or not draggable based on drag_state
     def setDragState(self):

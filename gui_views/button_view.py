@@ -16,8 +16,10 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # create buttons and add to layout
         self.wireButton = QPushButton("draw wire")
         layout.addWidget(self.wireButton)
-        self.exportButton = QPushButton("export")
+        self.exportButton = QPushButton("Instantiate")
         layout.addWidget(self.exportButton)
+        self.simulateButton = QPushButton("Simulate")
+        layout.addWidget(self.simulateButton)
         self.saveUIButton = QPushButton("Save Configuration")
         layout.addWidget(self.saveUIButton)
         self.openUIButton = QPushButton("Open Configuration")
@@ -26,8 +28,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # connect each button to its event handler
         self.wireButton.clicked.connect(self.wire_button_pressed)
         self.exportButton.clicked.connect(self.export_button_pressed)
+        self.simulateButton.clicked.connect(self.simulate_button_pressed)
         self.saveUIButton.clicked.connect(self.saveUI_button_pressed)
         self.openUIButton.clicked.connect(self.openUI_button_pressed)
+        self.simulateButton.setEnabled(False)
+        self.exportButton.setEnabled(False)
 
     # changes gui state to allow for wire drawing and disable object dragging
     def wire_button_pressed(self):
@@ -44,6 +49,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 print(object.connected_objects)
                 root_name , root = traverse_hierarchy_root(self.state.sym_objects, object)
                 instantiate()
+                self.simulateButton.setEnabled(True)
+                self.exportButton.setEnabled(False)
+
+    # creates a python file that can be run with gem5
+    def simulate_button_pressed(self):
+        simulate()
 
     # loads .ui file into gui
     def openUI_button_pressed(self):
