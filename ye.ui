@@ -1,0 +1,1 @@
+{"0": [{"parent_name": null, "name": "clk", "parameters": {"init_perf_level": {}, "voltage_domain": {"Value": null}, "eventq_index": {}, "domain_id": {}, "clock": {"Value": null}}, "height": 75, "connections": [], "width": 150, "connected_objects": [], "y": 550.0, "x": 725.0, "z": 0, "ports": {}, "component_name": "SrcClockDomain"}]}

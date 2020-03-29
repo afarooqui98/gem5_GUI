@@ -44,6 +44,9 @@ class GraphicsScene(QGraphicsScene):
         new_object.z = z
         new_object.ports = newObject["ports"]
 
+        print("\nports are:")
+        print(newObject["ports"])
+
         new_object_connections = {}
 
         for connection in connections:
@@ -70,7 +73,7 @@ class GraphicsScene(QGraphicsScene):
 
         # instantiate the simobject and set its parameters
         load_instantiate(self.state.current_sym_object)
-        
+
         self.addItem(new_object)
         return new_object
 

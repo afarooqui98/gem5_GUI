@@ -75,8 +75,7 @@ def get_obj_lists():
 
 #eager instantiation occurs here, pass through object from state via current_sym_object
 def instantiate_object(object):
-    object.SimObject = object.SimObject()
-    param_dict = object.SimObject._params
+    param_dict = object.SimObject.enumerateParams()
 
     print(object.name)
     print(object.parameters)
@@ -91,13 +90,13 @@ def instantiate_object(object):
         else:
             #the objects param_dictionary is replaced from the preloaded
             #"catalog" values to the instantiated value
-            if hasattr(param_dict[param], 'default'):
-                object.parameters[param]["Default"] = param_dict[param].default
-                object.parameters[param]["Value"] = param_dict[param].default
+            # if hasattr(param_dict[param], 'default'):
+            #     object.parameters[param]["Default"] = param_dict[param].default
+            #     object.parameters[param]["Value"] = param_dict[param].default
 
-            # if param_dict[param].default_val != "":
-            #     object.parameters[param]["Default"] = param_dict[param].default_val
-            #     object.parameters[param]["Value"] = param_dict[param].default_val
+            if param_dict[param].default_val != "":
+                object.parameters[param]["Default"] = param_dict[param].default_val
+                object.parameters[param]["Value"] = param_dict[param].default_val
             else:
                 continue
 
@@ -142,11 +141,11 @@ def load_instantiate(object):
     for i in range(len(weird_params)):
         del object.parameters[weird_params[i]]
 
+    instantiate_object(object) #enumerate over params to assign default values
+
     if object.component_name == "Root":
         print(object.parameters)
         object.state.mainWindow.buttonView.exportButton.setEnabled(True)
-
-
 
 #recursively set parameters (ONLY if changed?) and then recursively set ports
 def traverse_hierarchy_root(sym_catalog, symroot):
@@ -244,6 +243,9 @@ def set_ports(sym_catalog, symobject, simobject, m5_children):
 
     return symobject.name, simobject
 
+def object_instantiate(object):
+    object.SimObject = object.SimObject()
+    instantiate_object(object)
 
 def instantiate():
     m5.instantiate()

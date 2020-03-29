@@ -88,8 +88,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             self.state.line_drawer.update()
 
-
-
     # saves gui state to a .ui file
     def saveUI_button_pressed(self):
         savedObjects = {}
@@ -134,9 +132,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             newObject["parameters"] = params
 
-            ports = []
-            for port in object.ports:
-                ports.append(port)
+            ports = {}
+            for port in object.ports.keys():
+                ports[port] = {}
+                print(type(object.ports[port]["Value"]))
+                ports[port]["Value"] = str(object.ports[port]["Value"])
 
             newObject["ports"] = ports
             newObject["connected_objects"] = object.connected_objects
