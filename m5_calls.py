@@ -76,11 +76,11 @@ def get_obj_lists():
 #eager instantiation occurs here, pass through object from state via current_sym_object
 def instantiate_object(object):
     object.SimObject = object.SimObject()
-    param_dict = object.SimObject.enumerateParams()
+    param_dict = object.SimObject._params
 
     print(object.name)
-    print(len(object.parameters))
-    print(len(param_dict))
+    print(object.parameters)
+    print(param_dict)
     print()
 
     for param, value in object.parameters.items():
@@ -91,16 +91,20 @@ def instantiate_object(object):
         else:
             #the objects param_dictionary is replaced from the preloaded
             #"catalog" values to the instantiated value
-            if param_dict[param].default_val != "":
-                object.parameters[param]["Default"] = param_dict[param].default_val
-                object.parameters[param]["Value"] = param_dict[param].default_val
+            if hasattr(param_dict[param], 'default'):
+                object.parameters[param]["Default"] = param_dict[param].default
+                object.parameters[param]["Value"] = param_dict[param].default
+
+            # if param_dict[param].default_val != "":
+            #     object.parameters[param]["Default"] = param_dict[param].default_val
+            #     object.parameters[param]["Value"] = param_dict[param].default_val
             else:
                 continue
 
 #instantiation occurs here when an object is loaded from a model file
 def load_instantiate(object):
     object.SimObject = object.SimObject()
-    param_dict = object.SimObject.enumerateParams()
+    param_dict = object.SimObject._params
 
     print(object.name)
     print(object.parameters)
@@ -116,11 +120,16 @@ def load_instantiate(object):
             weird_params.append(param)
             continue
 
-        object.parameters[param]["Type"] = param_dict[param].type
+        #Check is set since some of the types for parametrs are VectorParam objs
+        if inspect.isclass(param_dict[param].ptype):
+            object.parameters[param]["Type"] = param_dict[param].ptype
+        else:
+            object.parameters[param]["Type"] = type(param_dict[param].ptype)
+
         object.parameters[param]["Description"] = param_dict[param].desc
 
-        if param_dict[param].default_val != "":
-            object.parameters[param]["Default"] = param_dict[param].default_val
+        if hasattr(param_dict[param], 'default'):
+            object.parameters[param]["Default"] = param_dict[param].default
         else:
             object.parameters[param]["Default"] = None
 
@@ -132,6 +141,10 @@ def load_instantiate(object):
 
     for i in range(len(weird_params)):
         del object.parameters[weird_params[i]]
+
+    if object.component_name == "Root":
+        print(object.parameters)
+        object.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
 
 
@@ -158,6 +171,7 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
     #set user-defined attributes here, do some type checking to do different things
     for param, param_info in symobject.parameters.items():
         if isinstance(param_info["Value"], unicode):
+            print(param_info["Type"])
             if issubclass(param_info["Type"], SimObject):
                 for obj in m5_children:
                     sym, sim = obj
