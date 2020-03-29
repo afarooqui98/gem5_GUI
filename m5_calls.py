@@ -78,10 +78,15 @@ def instantiate_object(object):
     object.SimObject = object.SimObject()
     param_dict = object.SimObject.enumerateParams()
 
-    print(param_dict)
+    print(object.name)
+    print(len(object.parameters))
+    print(len(param_dict))
+    print()
 
     for param, value in object.parameters.items():
         if param_dict.get(param) == None:
+            # Some parameters are included in the class but not in the actual
+            #   parameters given in enumerateParams TODO: look into this
             continue
         else:
             #the objects param_dictionary is replaced from the preloaded
@@ -91,6 +96,44 @@ def instantiate_object(object):
                 object.parameters[param]["Value"] = param_dict[param].default_val
             else:
                 continue
+
+#instantiation occurs here when an object is loaded from a model file
+def load_instantiate(object):
+    object.SimObject = object.SimObject()
+    param_dict = object.SimObject.enumerateParams()
+
+    print(object.name)
+    print(object.parameters)
+    print(param_dict)
+
+    # Some parameters are included in the class but not in the actual parameters
+    #   given in enumerateParams TODO: look into this
+    weird_params = []
+
+
+    for param, param_info in object.parameters.items():
+        if param_dict.get(param) == None:
+            weird_params.append(param)
+            continue
+
+        object.parameters[param]["Type"] = param_dict[param].type
+        object.parameters[param]["Description"] = param_dict[param].desc
+
+        if param_dict[param].default_val != "":
+            object.parameters[param]["Default"] = param_dict[param].default_val
+        else:
+            object.parameters[param]["Default"] = None
+
+        #If the value was changed in the model file then no need to load in
+        #   the default, otherwise the value is set to the default
+        if "Value" not in object.parameters[param]:
+            object.parameters[param]["Value"] = \
+                object.parameters[param]["Default"]
+
+    for i in range(len(weird_params)):
+        del object.parameters[weird_params[i]]
+
+
 
 #recursively set parameters (ONLY if changed?) and then recursively set ports
 def traverse_hierarchy_root(sym_catalog, symroot):
