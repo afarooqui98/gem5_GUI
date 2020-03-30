@@ -19,7 +19,7 @@ class LineDrawer(QWidget):
         self.pos1 = None
         self.pos2 = None
         self.line = None
-        self.pen = QPen(Qt.black, 3)
+        self.pen = QPen(Qt.black, 2)
 
     def mousePressEvent(self, event):
         if self.state.draw_wire_state:

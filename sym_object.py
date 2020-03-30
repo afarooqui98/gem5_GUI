@@ -94,12 +94,12 @@ class SymObject(QGraphicsItemGroup):
         object.rect.setBrush(QColor("White"))
 
         # textbox to display component name
-        object.text = QGraphicsTextItem(object.component_name)
-        object.text.setPos(object.rect.boundingRect().center()
-                            - object.text.boundingRect().center())
+        # object.text = QGraphicsTextItem(object.component_name)
+        # object.text.setPos(object.rect.boundingRect().center()
+        #                    - object.text.boundingRect().center())
 
         # textbox to display symObject name
-        object.name_text = QGraphicsTextItem(object.name)
+        object.name_text = QGraphicsTextItem(object.name + "::" + object.component_name)
         object.name_text.setPos(object.rect.boundingRect().topLeft())
 
         # create delete button
@@ -108,10 +108,13 @@ class SymObject(QGraphicsItemGroup):
                                 object.deleteButton.boundingRect().topRight())
         object.deleteButton.hide()
 
+        # set max width of name, 20 is the width of the delete button
+        object.name_text.setTextWidth(object.width - 20)
+
         # add objects created above to group
         object.addToGroup(object.rect)
         object.addToGroup(object.name_text)
-        object.addToGroup(object.text)
+        # object.addToGroup(object.text)
         object.addToGroup(object.deleteButton)
 
         # set flags
@@ -344,8 +347,8 @@ class SymObject(QGraphicsItemGroup):
         self.state.scene.removeItem(item.rect)
         item.removeFromGroup(item.name_text)
         self.state.scene.removeItem(item.name_text)
-        item.removeFromGroup(item.text)
-        self.state.scene.removeItem(item.text)
+        #item.removeFromGroup(item.text)
+        #self.state.scene.removeItem(item.text)
         item.removeFromGroup(item.deleteButton)
         self.state.scene.removeItem(item.deleteButton)
         for port in item.sym_ports:
