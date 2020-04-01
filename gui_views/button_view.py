@@ -47,15 +47,15 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         dlg = instantiateDialog()
         if dlg.exec_():
             print("Success!")
+            self.saveUI_button_pressed() #want to save before instantiation
+            for object in self.state.sym_objects.values():
+                if object.component_name == "Root":
+                    root_name , root = traverse_hierarchy_root(self.state.sym_objects, object)
+                    instantiate() #actual m5 instatiation
+                    self.simulateButton.setEnabled(True)
+                    self.exportButton.setEnabled(False)
         else:
             print("Cancel!")
-
-        for object in self.state.sym_objects.values():
-            if object.component_name == "Root":
-                root_name , root = traverse_hierarchy_root(self.state.sym_objects, object)
-                instantiate() #actual m5 instatiation
-                self.simulateButton.setEnabled(True)
-                self.exportButton.setEnabled(False)
 
     # creates a python file that can be run with gem5
     def simulate_button_pressed(self):
