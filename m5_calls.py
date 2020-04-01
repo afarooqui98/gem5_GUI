@@ -94,6 +94,7 @@ def instantiate_object(object):
             #     object.parameters[param]["Default"] = param_dict[param].default
             #     object.parameters[param]["Value"] = param_dict[param].default
 
+
             if param_dict[param].default_val != "":
                 object.parameters[param]["Default"] = param_dict[param].default_val
                 object.parameters[param]["Value"] = param_dict[param].default_val

@@ -62,6 +62,7 @@ class SymObject(QGraphicsItemGroup):
     def instantiateSimObject(self):
         object_instantiate(self) #actual simobject
 
+
     def initPorts(self):
         self.sym_ports = []
         x = self.scenePos().x() + self.width * 3 / 4
@@ -124,6 +125,7 @@ class SymObject(QGraphicsItemGroup):
         # on top of each other)
         clicked = self.getClickedObject(event)
         clicked.setZValue(100)
+
         if not clicked:
             clicked = self
 
@@ -133,9 +135,11 @@ class SymObject(QGraphicsItemGroup):
         # hide button on previously selected object
         if self.state.current_sym_object:
             self.state.current_sym_object.deleteButton.hide()
+            self.state.current_sym_object.rect.setBrush(QColor("White"))
 
         # show button for current object
         clicked.deleteButton.show()
+        clicked.rect.setBrush(QColor("Green"))
 
         # check if mouse press is on delete button
         deletePressed = clicked.deleteButtonPressed(event)
