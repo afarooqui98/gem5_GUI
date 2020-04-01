@@ -60,7 +60,8 @@ class SymObject(QGraphicsItemGroup):
         self.state.current_sym_object = self
 
     def instantiateSimObject(self):
-        instantiate_object(self) #actual simobject
+        object_instantiate(self) #actual simobject
+
 
     def initPorts(self):
         self.sym_ports = []

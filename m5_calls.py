@@ -18,23 +18,27 @@ def get_obj_lists():
         with mappings of base classes to derived classes to parameters"""
     obj_tree = {}
     instance_tree = {}
-    set_type_conv = {}
+    set_subtypes = set()
     #TODO this list is predetermined, must compile final list of all objects
-    #test_objects = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher',
-    #   'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'SimpleObject',
-    #  'HelloObject', 'GoodbyeObject', 'System', 'SimpleMemory', 'SimObject']
-    test_objects = ['SimObject']
+    categories = ['BaseXBar', 'BranchPredictor', 'BaseCPU', 'BasePrefetcher',
+       'IndirectPredictor', 'BaseCache', 'DRAMCtrl', 'Root', 'BaseInterrupts',
+         'SimObject']
     sim_obj_type = getattr(m5.objects, 'SimObject', None)
 
-    for base_obj in test_objects:
+    for base_obj in categories:
         # Create ObjectLists for each base element
 
         obj_list = ObjectList.ObjectList(getattr(m5.objects, base_obj, None))
-
+        set_subtypes.add(base_obj)
         sub_objs = {}  # Go through each derived class in the Object List
         for sub_obj_name, sub_obj_val  in obj_list._sub_classes.items():
-            instance_tree[sub_obj_name] = sub_obj_val
+            if base_obj == 'SimObject':
+                if sub_obj_name in set_subtypes:
+                    continue
+            else:
+                set_subtypes.add(sub_obj_name)
 
+            instance_tree[sub_obj_name] = sub_obj_val
             port_dict = {}
             for port_name, port in obj_list._sub_classes[sub_obj_name]._ports.items():
                 port_attr = {}
@@ -49,11 +53,7 @@ def get_obj_lists():
                 param_attr = {}
                 param_attr["Description"] = param.desc
                 param_attr["Type"] = param.ptype
-                if param.ptype_str not in set_type_conv:
-                    set_type_conv[param.ptype_str] = []
                 if hasattr(param, 'default'):
-                    if type(param.default) not in set_type_conv[param.ptype_str]:
-                        set_type_conv[param.ptype_str].append(type(param.default))
                     param_attr["Default"] = param.default
                     param_attr["Value"] = param.default
                 else:
@@ -63,32 +63,90 @@ def get_obj_lists():
             sub_objs[sub_obj_name] = {}
             sub_objs[sub_obj_name]['params'] = param_dict
             sub_objs[sub_obj_name]['ports'] = port_dict
+        if base_obj == 'SimObject':
+            base_obj = 'Other'
         obj_tree[base_obj] = sub_objs
     # Root has a default value for eventq_indexthat referecnes a Parent which
     #   does not fit with our logic. So we set it to the default value if you
     #   call the root constructor, which is 0.
-    obj_tree['SimObject']['Root']['params']['eventq_index']['Default'] = 0
-    obj_tree['SimObject']['Root']['params']['eventq_index']['Value'] = 0
+    obj_tree['Root']['Root']['params']['eventq_index']['Default'] = 0
+    obj_tree['Root']['Root']['params']['eventq_index']['Value'] = 0
     return obj_tree, instance_tree
 
 #eager instantiation occurs here, pass through object from state via current_sym_object
 def instantiate_object(object):
-    object.SimObject = object.SimObject()
     param_dict = object.SimObject.enumerateParams()
 
+    print(object.name)
+    print(object.parameters)
     print(param_dict)
+    print()
 
     for param, value in object.parameters.items():
         if param_dict.get(param) == None:
+            # Some parameters are included in the class but not in the actual
+            #   parameters given in enumerateParams TODO: look into this
             continue
         else:
             #the objects param_dictionary is replaced from the preloaded
             #"catalog" values to the instantiated value
+            # if hasattr(param_dict[param], 'default'):
+            #     object.parameters[param]["Default"] = param_dict[param].default
+            #     object.parameters[param]["Value"] = param_dict[param].default
+
+
             if param_dict[param].default_val != "":
                 object.parameters[param]["Default"] = param_dict[param].default_val
                 object.parameters[param]["Value"] = param_dict[param].default_val
             else:
                 continue
+
+#instantiation occurs here when an object is loaded from a model file
+def load_instantiate(object):
+    object.SimObject = object.SimObject()
+    param_dict = object.SimObject._params
+
+    print(object.name)
+    print(object.parameters)
+    print(param_dict)
+
+    # Some parameters are included in the class but not in the actual parameters
+    #   given in enumerateParams TODO: look into this
+    weird_params = []
+
+
+    for param, param_info in object.parameters.items():
+        if param_dict.get(param) == None:
+            weird_params.append(param)
+            continue
+
+        #Check is set since some of the types for parametrs are VectorParam objs
+        if inspect.isclass(param_dict[param].ptype):
+            object.parameters[param]["Type"] = param_dict[param].ptype
+        else:
+            object.parameters[param]["Type"] = type(param_dict[param].ptype)
+
+        object.parameters[param]["Description"] = param_dict[param].desc
+
+        if hasattr(param_dict[param], 'default'):
+            object.parameters[param]["Default"] = param_dict[param].default
+        else:
+            object.parameters[param]["Default"] = None
+
+        #If the value was changed in the model file then no need to load in
+        #   the default, otherwise the value is set to the default
+        if "Value" not in object.parameters[param]:
+            object.parameters[param]["Value"] = \
+                object.parameters[param]["Default"]
+
+    for i in range(len(weird_params)):
+        del object.parameters[weird_params[i]]
+
+    instantiate_object(object) #enumerate over params to assign default values
+
+    if object.component_name == "Root":
+        print(object.parameters)
+        object.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
 #recursively set parameters (ONLY if changed?) and then recursively set ports
 def traverse_hierarchy_root(sym_catalog, symroot):
@@ -113,6 +171,7 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
     #set user-defined attributes here, do some type checking to do different things
     for param, param_info in symobject.parameters.items():
         if isinstance(param_info["Value"], unicode):
+            print(param_info["Type"])
             if issubclass(param_info["Type"], SimObject):
                 for obj in m5_children:
                     sym, sim = obj
@@ -185,6 +244,9 @@ def set_ports(sym_catalog, symobject, simobject, m5_children):
 
     return symobject.name, simobject
 
+def object_instantiate(object):
+    object.SimObject = object.SimObject()
+    instantiate_object(object)
 
 def instantiate():
     m5.instantiate()

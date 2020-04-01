@@ -81,13 +81,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             while str(z_score) in data:
                 cur_z_array = data[str(z_score)]
                 for object in cur_z_array:
-                    self.state.scene.loadSavedObject("component", 
+                    self.state.scene.loadSavedObject("component",
                                                     object["name"], object)
-                
+
                 z_score += 1
-            
-            self.state.line_drawer.update() 
-        
+
+            self.state.line_drawer.update()
 
     # saves gui state to a .ui file
     def saveUI_button_pressed(self):
@@ -105,28 +104,43 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             newObject["component_name"] = object.component_name
             newObject["name"] = object.name
             newObject["parent_name"] = object.parent_name
-        
-            params = {}
 
+            params = {}
+            #Storing the parameters
             for param in object.parameters:
                 params[str(param)] = {}
-                param_type = type(object.parameters[param]["Value"])
-                if (param_type == str or param_type == int or \
-                        param_type == bool):
-                    params[str(param)]["Value"] = \
-                            object.parameters[param]["Value"]
-                else:
+
+                # TODO: Insert err message here if a parameter has not been set
+                if object.parameters[param]["Value"] is None:
+                    print("Error must set required parameter")
                     params[str(param)]["Value"] = None
 
+                #Only need to store the values of parameters changed for now
+                if object.parameters[param]["Default"] != \
+                    object.parameters[param]["Value"]:
+                    param_type = type(object.parameters[param]["Value"])
+                    if (param_type == str or param_type == int or \
+                            param_type == bool or param_type == unicode or \
+                            param_type == list):
+                        params[str(param)]["Value"] = \
+                            object.parameters[param]["Value"]
+                    else:
+                        # weird case if a value is a class but shouldn't really
+                        #   hit this case since all user inputs are strings
+                        params[str(param)]["Value"] = \
+                            object.parameters[param]["Value"].__dict__
+
             newObject["parameters"] = params
-        
-            ports = []
-            for port in object.ports:
-                ports.append(port)
-        
+
+            ports = {}
+            for port in object.ports.keys():
+                ports[port] = {}
+                print(type(object.ports[port]["Value"]))
+                ports[port]["Value"] = str(object.ports[port]["Value"])
+
             newObject["ports"] = ports
             newObject["connected_objects"] = object.connected_objects
-            
+
             connections = []
 
             for c in object.connections:
@@ -147,7 +161,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 connections.append(newConnection)
 
             newObject["connections"] = connections
-            
+
             if object.z not in savedObjects:
                 savedObjects[object.z] = []
 
