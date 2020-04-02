@@ -20,6 +20,11 @@ class GraphicsScene(QGraphicsScene):
         self.state = state
         self.state.line_drawer = LineDrawer(state)
         self.state.line_drawer.resize(self.width(), self.height())
+        pal = QPalette()
+        pal.setColor(QPalette.Background, Qt.lightGray)
+        self.state.line_drawer.setAutoFillBackground(True)
+        self.state.line_drawer.setPalette(pal)
+
         self.addWidget(self.state.line_drawer)
 
     # load object from saved UI file
