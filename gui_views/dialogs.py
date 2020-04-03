@@ -12,7 +12,7 @@ class instantiateDialog(QDialog):
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
 
         self.text = QLabel(self)
-        self.text.setText("Warning: Once you instantitate, you cannot modify any values. As such, we will save before continuing.")
+        self.text.setText("Warning: Once you instantiate, you cannot modify any values. As such, we will save before continuing.")
 
         self.buttonBox = QDialogButtonBox(QBtn)
         self.buttonBox.accepted.connect(self.accept)
