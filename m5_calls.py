@@ -7,6 +7,7 @@ sys.path.append(os.getenv('gem5_path'))
 import m5.objects
 from m5.objects import *
 from m5.params import *
+from m5.proxy import AttrProxy
 from common import ObjectList
 
 """
@@ -83,6 +84,10 @@ def instantiate_object(object):
     print()
 
     for param, value in object.parameters.items():
+        if(isinstance(object.parameters[param]["Default"], AttrProxy)):
+            print("encountered proxy parameters")
+            continue #want to skip proxy parameters, want to do this lazily
+
         if param_dict.get(param) == None:
             # Some parameters are included in the class but not in the actual
             #   parameters given in enumerateParams TODO: look into this
@@ -114,7 +119,7 @@ def load_instantiate(object):
     #   given in enumerateParams TODO: look into this
     weird_params = []
 
-
+    #TODO: handle proxy params here!!!!
     for param, param_info in object.parameters.items():
         if param_dict.get(param) == None:
             weird_params.append(param)
@@ -164,9 +169,6 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
         setattr(simobject, sym, sim)
         m5_children.append((sym, sim))
 
-    for m_child in m5_children:
-        _ , _ , _ = traverse_hierarchy(sym_catalog, sym_catalog[m_child[0]], m_child[1])
-
     #TODO: possible error with the eager instantiation happening here?
     #set user-defined attributes here, do some type checking to do different things
     for param, param_info in symobject.parameters.items():
@@ -182,11 +184,22 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
             else:
                 setattr(simobject, param, str(param_info["Value"]))
         else:
-            if param_info["Value"] == param_info["Default"]:
+            if param_info["Value"] == param_info["Default"]: #
+                if isinstance(param_info["Default"], AttrProxy):
+                    result, found = param_info["Default"].find(simobject)
+                    if not found:
+                        print("PROXY GOING BAD")
+                    else:
+                        print("simobject is " + str(simobject))
+                        print("param is " + str(param_info["Default"]))
+                        param_info["Value"] = result
                 setattr(simobject, param, param_info["Value"])
             else:
                 if str(param_info["Value"]) in symobject.connected_objects:
                     print("object exists and can be parameterized")
+
+    for m_child in m5_children:
+        _ , _ , _ = traverse_hierarchy(sym_catalog, sym_catalog[m_child[0]], m_child[1])
 
     return (symobject.name, m5_children, simobject)
 
