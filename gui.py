@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
     def __init__(self, catalog, instances):
         super(MainWindow, self).__init__()
         self.state = State(instances, catalog)
-        self.setWindowTitle("gem5 GUI")
+        self.setWindowTitle("gem5 GUI | Untitled")
         self.main = QWidget()
         self.catalog = catalog
         self.setLayoutDirection(Qt.LeftToRight)
@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         self.gridLayout = QVBoxLayout()
         self.gridLayout.setObjectName("gridLayout")
 
-        self.buttonView = ButtonView(self.gridLayout, self.state) #add button view
+        self.buttonView = ButtonView(self.gridLayout, self.state, self) #add button view
         #add catalog view
         self.catalogView = CatalogView(self.gridLayout, catalog, self.state)
         self.attributeView = AttributeView(self.gridLayout, self.state) #add attributes
@@ -136,6 +136,14 @@ class MainWindow(QMainWindow):
             info += "\n" + "Default Value: " + \
                     self.attributes[item.text()]["Default"]
         self.label.setText(info)
+
+    def closeEvent(self, event):
+        if self.state.sym_objects:
+            dialog = saveChangesDialog("closing")
+            if dialog.exec_():
+                self.buttonView.save_button_pressed()
+            else:
+                print("dont save changes")
 
 if __name__ == "__main__":
     gui_application = QApplication() #create new application

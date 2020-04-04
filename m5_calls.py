@@ -151,7 +151,7 @@ def load_instantiate(object):
 
     if object.component_name == "Root":
         print(object.parameters)
-        object.state.mainWindow.buttonView.exportButton.setEnabled(True)
+        #object.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
 #recursively set parameters (ONLY if changed?) and then recursively set ports
 def traverse_hierarchy_root(sym_catalog, symroot):
