@@ -29,13 +29,25 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         fileMenu.addAction(saveAsAction)
         fileMenu.addAction(openAction)
 
-        InstantiateAction = QAction("Instantiate", window)
-        InstantiateAction.triggered.connect(self.export_button_pressed)
+        copyAction = QAction("Copy", window)
+        copyAction.triggered.connect(self.copy_button_pressed)
+        pasteAction = QAction("Paste", window)
+        pasteAction.triggered.connect(self.paste_button_pressed)
+        undoAction = QAction("Undo", window)
+        undoAction.triggered.connect(self.undo_button_pressed)
+
+        editMenu = mainMenu.addMenu('Edit')
+        editMenu.addAction(copyAction)
+        editMenu.addAction(pasteAction)
+        editMenu.addAction(undoAction)
+
+        instantiateAction = QAction("Instantiate", window)
+        instantiateAction.triggered.connect(self.export_button_pressed)
         simulateAction = QAction("Simulate", window)
         simulateAction.triggered.connect(self.simulate_button_pressed)
 
         runMenu = mainMenu.addMenu('Run')
-        runMenu.addAction(InstantiateAction)
+        runMenu.addAction(instantiateAction)
         runMenu.addAction(simulateAction)
 
         wireAction = QAction("Enable Wire", window)
@@ -50,6 +62,20 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.draw_wire_state = not self.state.draw_wire_state
         self.state.setDragState()
 
+    #TODO
+    def copy_button_pressed(self):
+        print("copy button pressed")
+        return
+
+    #TODO
+    def paste_button_pressed(self):
+        print ("paste button pressed")
+        return
+
+    #TODO
+    def undo_button_pressed(self):
+        print ("undo button pressed")
+        return
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
