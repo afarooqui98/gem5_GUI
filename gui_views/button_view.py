@@ -12,28 +12,66 @@ import json
 from m5_calls import *
 
 class ButtonView(): #export, draw line, save and load self.stateuration buttons
-    def __init__(self, layout, state):
+    def __init__(self, layout, state, window):
         self.state = state
-        # create buttons and add to layout
-        self.wireButton = QPushButton("draw wire")
-        layout.addWidget(self.wireButton)
-        self.exportButton = QPushButton("Instantiate")
-        layout.addWidget(self.exportButton)
-        self.simulateButton = QPushButton("Simulate")
-        layout.addWidget(self.simulateButton)
-        self.saveUIButton = QPushButton("Save Configuration")
-        layout.addWidget(self.saveUIButton)
-        self.openUIButton = QPushButton("Open Configuration")
-        layout.addWidget(self.openUIButton)
 
-        # connect each button to its event handler
-        self.wireButton.clicked.connect(self.wire_button_pressed)
-        self.exportButton.clicked.connect(self.export_button_pressed)
-        self.simulateButton.clicked.connect(self.simulate_button_pressed)
-        self.saveUIButton.clicked.connect(self.saveUI_button_pressed)
-        self.openUIButton.clicked.connect(self.openUI_button_pressed)
-        self.simulateButton.setEnabled(False)
-        self.exportButton.setEnabled(False)
+        # set up main menu - add tabs and connect each button to handler
+        mainMenu = window.menuBar()
+        self.buildMenuBar(mainMenu, window)
+
+    # build the main menu bar
+    def buildMenuBar(self, mainMenu, window):
+        self.buildFileTab(mainMenu, window)
+        self.buildEditTab(mainMenu, window)
+        self.buildRunTab(mainMenu, window)
+        self.buildToolsTab(mainMenu, window)
+
+    # build the file tab
+    def buildFileTab(self, mainMenu, window):
+        saveAction = QAction("Save", window)
+        saveAction.triggered.connect(self.save_button_pressed)
+        saveAsAction = QAction("Save As", window)
+        saveAsAction.triggered.connect(self.save_as_UI_button_pressed)
+        openAction = QAction("Open", window)
+        openAction.triggered.connect(self.openUI_button_pressed)
+
+        fileMenu = mainMenu.addMenu('File')
+        fileMenu.addAction(saveAction)
+        fileMenu.addAction(saveAsAction)
+        fileMenu.addAction(openAction)
+
+    # build the edit tab
+    def buildEditTab(self, mainMenu, window):
+        copyAction = QAction("Copy", window)
+        copyAction.triggered.connect(self.copy_button_pressed)
+        pasteAction = QAction("Paste", window)
+        pasteAction.triggered.connect(self.paste_button_pressed)
+        undoAction = QAction("Undo", window)
+        undoAction.triggered.connect(self.undo_button_pressed)
+
+        editMenu = mainMenu.addMenu('Edit')
+        editMenu.addAction(copyAction)
+        editMenu.addAction(pasteAction)
+        editMenu.addAction(undoAction)
+
+    # build the run tab
+    def buildRunTab(self, mainMenu, window):
+        instantiateAction = QAction("Instantiate", window)
+        instantiateAction.triggered.connect(self.export_button_pressed)
+        simulateAction = QAction("Simulate", window)
+        simulateAction.triggered.connect(self.simulate_button_pressed)
+
+        runMenu = mainMenu.addMenu('Run')
+        runMenu.addAction(instantiateAction)
+        runMenu.addAction(simulateAction)
+
+    # build the tools tab
+    def buildToolsTab(self, mainMenu, window):
+        wireAction = QAction("Enable Wire", window)
+        wireAction.triggered.connect(self.wire_button_pressed)
+
+        toolsMenu = mainMenu.addMenu('Tools')
+        toolsMenu.addAction(wireAction)
 
     # changes gui state to allow for wire drawing and disable object dragging
     def wire_button_pressed(self):
@@ -41,16 +79,31 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.draw_wire_state = not self.state.draw_wire_state
         self.state.setDragState()
 
+    #TODO
+    def copy_button_pressed(self):
+        print("copy button pressed")
+        return
+
+    #TODO
+    def paste_button_pressed(self):
+        print ("paste button pressed")
+        return
+
+    #TODO
+    def undo_button_pressed(self):
+        print ("undo button pressed")
+        return
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
         dlg = instantiateDialog()
         if dlg.exec_():
             print("Success!")
-            self.saveUI_button_pressed() #want to save before instantiation
+            self.save_button_pressed() #want to save before instantiation
             for object in self.state.sym_objects.values():
                 if object.component_name == "Root":
-                    root_name , root = traverse_hierarchy_root(self.state.sym_objects, object)
+                    root_name , root = traverse_hierarchy_root(\
+                                                self.state.sym_objects, object)
                     instantiate() #actual m5 instatiation
                     self.simulateButton.setEnabled(True)
                     self.exportButton.setEnabled(False)
@@ -63,6 +116,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     # loads .ui file into gui
     def openUI_button_pressed(self):
+        # check if any changes have been made - to save before closing
+        if self.state.sym_objects:
+            dialog = saveChangesDialog("opening a new file")
+            if dialog.exec_():
+                self.save_button_pressed()
+            else:
+                print("dont save changes")
 
         # show dialog box for user to select a file to open
         filename = QFileDialog.getOpenFileName(None, 'Open file',
@@ -72,9 +132,21 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not filename:
             return
 
-        #clear out existing objects before loading from file
+        # set state filename to file that was loaded
+        self.state.fileName = filename
+
+        # get file name from path and add to window title
+        tokens = filename.split('/')
+        self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
+
+        # clear out existing objects and wires before loading from file
         for object in self.state.sym_objects.values():
+            for name, connection in object.connections.items():
+                if connection.line:
+                    self.state.scene.removeItem(connection.line)
+
             self.state.scene.removeItem(object)
+            object.connections.clear()
 
         self.state.sym_objects.clear()
         self.state.coord_map.clear()
@@ -93,8 +165,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             self.state.line_drawer.update()
 
-    # saves gui state to a .ui file
-    def saveUI_button_pressed(self):
+    # build dictionary to export
+    def getOutputData(self):
         savedObjects = {}
 
         # iterate through the current objects on the scene and create a new JSON
@@ -172,6 +244,37 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             savedObjects[object.z].append(newObject)
 
+        return savedObjects
+
+    # saves current state to open file if it exists, otherwise use dialog
+    # to select new file to save to
+    def save_button_pressed(self):
+        # check if file is already open
+        if self.state.fileName:
+            filename = self.state.fileName
+        else:
+            # show dialog box to let user create output file
+            filename = QFileDialog.getSaveFileName(None, "",
+                                           "",
+                                           "gem5 UI Files (*.ui)")[0]
+        # stop if cancel is pressed
+        if not filename:
+            return
+
+        savedObjects = self.getOutputData()
+
+        # with the selected file write our JSON object
+        with open(filename, 'w') as outfile:
+            json.dump(savedObjects, outfile)
+
+        # get file name from path
+        tokens = filename.split('/')
+        self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
+
+    # saves gui state to a .ui file, shows dialog to select output file
+    # regardless of whether file exists in the state
+    def save_as_UI_button_pressed(self):
+
         # show dialog box to let user create output file
         filename = QFileDialog.getSaveFileName(None, "",
                                            "",
@@ -180,6 +283,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not filename:
             return
 
+        savedObjects = self.getOutputData()
+
         # with the selected file write our JSON object
         with open(filename, 'w') as outfile:
             json.dump(savedObjects, outfile)
+
+        # get file name from path
+        tokens = filename.split('/')
+        self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
