@@ -63,7 +63,8 @@ class LineDrawer(QWidget):
         key = [None, None]
         for sym_object in self.state.sym_objects.values():
             count = 0
-            delete_button_height = sym_object.deleteButton.boundingRect().height()
+            delete_button_height = sym_object.deleteButton.boundingRect().\
+                                                                    height()
             next_y = delete_button_height
             for name, port in sym_object.sym_ports:
                 # change keys depending on where ports end up

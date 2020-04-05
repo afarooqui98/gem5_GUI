@@ -15,8 +15,19 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def __init__(self, layout, state, window):
         self.state = state
 
+        # set up main menu - add tabs and connect each button to handler
         mainMenu = window.menuBar()
+        self.buildMenuBar(mainMenu, window)
 
+    # build the main menu bar
+    def buildMenuBar(self, mainMenu, window):
+        self.buildFileTab(mainMenu, window)
+        self.buildEditTab(mainMenu, window)
+        self.buildRunTab(mainMenu, window)
+        self.buildToolsTab(mainMenu, window)
+
+    # build the file tab
+    def buildFileTab(self, mainMenu, window):
         saveAction = QAction("Save", window)
         saveAction.triggered.connect(self.save_button_pressed)
         saveAsAction = QAction("Save As", window)
@@ -29,6 +40,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         fileMenu.addAction(saveAsAction)
         fileMenu.addAction(openAction)
 
+    # build the edit tab
+    def buildEditTab(self, mainMenu, window):
         copyAction = QAction("Copy", window)
         copyAction.triggered.connect(self.copy_button_pressed)
         pasteAction = QAction("Paste", window)
@@ -41,6 +54,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         editMenu.addAction(pasteAction)
         editMenu.addAction(undoAction)
 
+    # build the run tab
+    def buildRunTab(self, mainMenu, window):
         instantiateAction = QAction("Instantiate", window)
         instantiateAction.triggered.connect(self.export_button_pressed)
         simulateAction = QAction("Simulate", window)
@@ -50,6 +65,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         runMenu.addAction(instantiateAction)
         runMenu.addAction(simulateAction)
 
+    # build the tools tab
+    def buildToolsTab(self, mainMenu, window):
         wireAction = QAction("Enable Wire", window)
         wireAction.triggered.connect(self.wire_button_pressed)
 
@@ -85,7 +102,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             self.save_button_pressed() #want to save before instantiation
             for object in self.state.sym_objects.values():
                 if object.component_name == "Root":
-                    root_name , root = traverse_hierarchy_root(self.state.sym_objects, object)
+                    root_name , root = traverse_hierarchy_root(\
+                                                self.state.sym_objects, object)
                     instantiate() #actual m5 instatiation
                     self.simulateButton.setEnabled(True)
                     self.exportButton.setEnabled(False)
@@ -98,6 +116,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     # loads .ui file into gui
     def openUI_button_pressed(self):
+        # check if any changes have been made - to save before closing
         if self.state.sym_objects:
             dialog = saveChangesDialog("opening a new file")
             if dialog.exec_():
@@ -113,13 +132,14 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not filename:
             return
 
+        # set state filename to file that was loaded
         self.state.fileName = filename
 
-        # get file name from path
+        # get file name from path and add to window title
         tokens = filename.split('/')
         self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
 
-        #clear out existing objects before loading from file
+        # clear out existing objects and wires before loading from file
         for object in self.state.sym_objects.values():
             for name, connection in object.connections.items():
                 if connection.line:
@@ -145,6 +165,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             self.state.line_drawer.update()
 
+    # build dictionary to export
     def getOutputData(self):
         savedObjects = {}
 
@@ -225,8 +246,10 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         return savedObjects
 
-
+    # saves current state to open file if it exists, otherwise use dialog
+    # to select new file to save to
     def save_button_pressed(self):
+        # check if file is already open
         if self.state.fileName:
             filename = self.state.fileName
         else:
@@ -248,7 +271,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         tokens = filename.split('/')
         self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
 
-    # saves gui state to a .ui file
+    # saves gui state to a .ui file, shows dialog to select output file
+    # regardless of whether file exists in the state
     def save_as_UI_button_pressed(self):
 
         # show dialog box to let user create output file

@@ -137,6 +137,7 @@ class MainWindow(QMainWindow):
                     self.attributes[item.text()]["Default"]
         self.label.setText(info)
 
+    # when user tries to exit, check if changes need to be saved before closing
     def closeEvent(self, event):
         if self.state.sym_objects:
             dialog = saveChangesDialog("closing")

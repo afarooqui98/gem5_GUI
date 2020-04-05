@@ -94,13 +94,9 @@ class SymObject(QGraphicsItemGroup):
         object.rect = QGraphicsRectItem(x, y, object.width, object.height)
         object.rect.setBrush(QColor("White"))
 
-        # textbox to display component name
-        # object.text = QGraphicsTextItem(object.component_name)
-        # object.text.setPos(object.rect.boundingRect().center()
-        #                    - object.text.boundingRect().center())
-
         # textbox to display symObject name
-        object.name_text = QGraphicsTextItem(object.name + "::" + object.component_name)
+        object.name_text = QGraphicsTextItem(object.name + "::" +
+                                                        object.component_name)
         object.name_text.setPos(object.rect.boundingRect().topLeft())
 
         # create delete button
@@ -241,10 +237,12 @@ class SymObject(QGraphicsItemGroup):
             self.z = parent.z + 1 # update z index
             if not self.name in parent.connected_objects:
                 parent.connected_objects.append(self.name) # add new child
+
         for object in self.state.sym_objects.values():
             object.setZValue(object.z)
+
         # update the object's position parameters
-        #del self.state.coord_map[(self.x, self.y)]
+        # del self.state.coord_map[(self.x, self.y)]
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
         self.detachChildren()

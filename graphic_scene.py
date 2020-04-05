@@ -20,6 +20,8 @@ class GraphicsScene(QGraphicsScene):
         self.state = state
         self.state.line_drawer = LineDrawer(state)
         self.state.line_drawer.resize(self.width(), self.height())
+
+        # change background of canvas to light gray
         pal = QPalette()
         pal.setColor(QPalette.Background, Qt.lightGray)
         self.state.line_drawer.setAutoFillBackground(True)
@@ -54,6 +56,7 @@ class GraphicsScene(QGraphicsScene):
 
         new_object_connections = {}
 
+        # rebuild the connection dictionary for the object
         for connection in connections:
             parent_endpoint = QPointF(connection["parent_endpoint_x"],
                                         connection["parent_endpoint_y"])
