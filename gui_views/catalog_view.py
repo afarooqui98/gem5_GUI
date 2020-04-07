@@ -74,8 +74,8 @@ class CatalogView(): #dropdown and search bar
         self.state.current_sym_object.instantiateSimObject()
 
         #allow instantiation ONLY when root is on the canvas
-        if self.state.current_sym_object.component_name == "Root":
-            self.state.mainWindow.buttonView.exportButton.setEnabled(True)
+        #if self.state.current_sym_object.component_name == "Root":
+        #    self.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
     # make tree view searchable
     def searchItem(self):

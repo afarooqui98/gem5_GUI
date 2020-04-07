@@ -62,10 +62,7 @@ class AttributeView(): #table view for parameters, as well as the description
             current_x = self.state.current_sym_object.x
             current_y = self.state.current_sym_object.y
             current_name = self.state.current_sym_object.name
-            if (current_x, current_y) in self.state.coord_map:
-                del self.state.sym_objects[self.state.coord_map[(current_x, current_y)]]
-
-            self.state.coord_map[(current_x, current_y)] = current_name
+            
             self.state.sym_objects[current_name] = self.state.current_sym_object
         elif currentAttribute == "Child Objects":
             self.state.current_sym_object.connected_objects = currentValue

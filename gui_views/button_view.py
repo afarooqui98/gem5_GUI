@@ -78,6 +78,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.drag_state = not self.state.drag_state
         self.state.draw_wire_state = not self.state.draw_wire_state
         self.state.setDragState()
+        self.state.line_drawer.update()
 
     #TODO
     def copy_button_pressed(self):
@@ -107,8 +108,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     instantiate() #actual m5 instatiation
                     self.simulateButton.setEnabled(True)
                     self.exportButton.setEnabled(False)
-        else:
-            print("Cancel!")
 
     # creates a python file that can be run with gem5
     def simulate_button_pressed(self):
@@ -121,8 +120,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             dialog = saveChangesDialog("opening a new file")
             if dialog.exec_():
                 self.save_button_pressed()
-            else:
-                print("dont save changes")
 
         # show dialog box for user to select a file to open
         filename = QFileDialog.getOpenFileName(None, 'Open file',
@@ -149,7 +146,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             object.connections.clear()
 
         self.state.sym_objects.clear()
-        self.state.coord_map.clear()
 
         # read data in from the file and load each object
         with open(filename) as json_file:
