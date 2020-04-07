@@ -74,14 +74,9 @@ def get_obj_lists():
     obj_tree['Root']['Root']['params']['eventq_index']['Value'] = 0
     return obj_tree, instance_tree
 
-#eager instantiation occurs here, pass through object from state via current_sym_object
+#eager instantiation, pass through object from state via current_sym_object
 def instantiate_object(object):
     param_dict = object.SimObject.enumerateParams()
-
-    print(object.name)
-    print(object.parameters)
-    print(param_dict)
-    print()
 
     for param, value in object.parameters.items():
         if(isinstance(object.parameters[param]["Default"], AttrProxy)):
@@ -110,10 +105,6 @@ def instantiate_object(object):
 def load_instantiate(object):
     object.SimObject = object.SimObject()
     param_dict = object.SimObject._params
-
-    print(object.name)
-    print(object.parameters)
-    print(param_dict)
 
     # Some parameters are included in the class but not in the actual parameters
     #   given in enumerateParams TODO: look into this
@@ -170,7 +161,7 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
         m5_children.append((sym, sim))
 
     #TODO: possible error with the eager instantiation happening here?
-    #set user-defined attributes here, do some type checking to do different things
+    #set user-defined attributes, do some type checking to do different things
     for param, param_info in symobject.parameters.items():
         if isinstance(param_info["Value"], unicode):
             print(param_info["Type"])

@@ -12,7 +12,8 @@ class instantiateDialog(QDialog):
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
 
         self.text = QLabel(self)
-        self.text.setText("Warning: Once you instantiate, you cannot modify any values. As such, we will save before continuing.")
+        self.text.setText("""Warning: Once you instantiate, you cannot modify
+any values. As such, we will save before continuing.""")
 
         self.buttonBox = QDialogButtonBox(QBtn)
         self.buttonBox.accepted.connect(self.accept)
@@ -31,7 +32,7 @@ class saveChangesDialog(QDialog):
         QBtn = QDialogButtonBox.Yes | QDialogButtonBox.No
 
         self.text = QLabel(self)
-        self.text.setText("Would you like to save changes before " + reason + "?")
+        self.text.setText("Would you like to save before " + reason + "?")
 
         self.buttonBox = QDialogButtonBox(QBtn)
         self.buttonBox.accepted.connect(self.accept)

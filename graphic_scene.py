@@ -51,9 +51,6 @@ class GraphicsScene(QGraphicsScene):
         new_object.z = z
         new_object.ports = newObject["ports"]
 
-        print("\nports are:")
-        print(newObject["ports"])
-
         new_object_connections = {}
 
         # rebuild the connection dictionary for the object

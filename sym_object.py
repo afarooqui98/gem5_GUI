@@ -37,7 +37,6 @@ class SymObject(QGraphicsItemGroup):
             self.x = x
             self.y = y
             self.setPos(x, y)
-            self.state.coord_map[(self.x, self.y)] = self.name
             return
 
         # set initial position to center of scene
@@ -52,11 +51,9 @@ class SymObject(QGraphicsItemGroup):
                             item.scenePos().y() + item.height + 10)
                 self.x = self.scenePos().x()
                 self.y = self.scenePos().y()
-                self.state.coord_map[(self.x, self.y)] = self.name
 
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
-        self.state.coord_map[(self.x, self.y)] = self.name
         self.state.current_sym_object = self
 
     def instantiateSimObject(self):
@@ -123,6 +120,7 @@ class SymObject(QGraphicsItemGroup):
         # get object that was clicked on (since multiple objects can be stacked
         # on top of each other)
         clicked = self.getClickedObject(event)
+        #bring clicked object to foreground so drag events have object clarity
         clicked.setZValue(100)
 
         if not clicked:
@@ -150,7 +148,6 @@ class SymObject(QGraphicsItemGroup):
         self.state.current_sym_object = clicked
         self.state.mainWindow.populateAttributes(None,
             clicked.component_name, False)
-        self.state.line_drawer.draw_lines = 1
 
     # remove visual and backend respresentations of object
     def delete(self):
@@ -163,12 +160,9 @@ class SymObject(QGraphicsItemGroup):
                 self.resizeUIObject(parent, 1, 120 - parent.width)
         for child_name in self.connected_objects:
             #self.state.sym_objects[child_name].delete()
-            del self.state.coord_map[(self.state.sym_objects[child_name].x, \
-                self.state.sym_objects[child_name].y)]
             del self.state.sym_objects[child_name]
 
         self.state.current_sym_object = None
-        del self.state.coord_map[(self.x, self.y)]
         del self.state.sym_objects[name]
 
 
@@ -179,7 +173,7 @@ class SymObject(QGraphicsItemGroup):
         super(SymObject, self).mouseMoveEvent(event)
 
     def modifyConnections(self, event, sym_object):
-        #middle of port
+        # set connection to middle of port
         num_ports = len(sym_object.ports)
         if not num_ports:
             return
@@ -223,8 +217,6 @@ class SymObject(QGraphicsItemGroup):
         if self.x == self.pos().x() and self.y == self.pos().y():
             return
 
-        z_score = -1
-        parent = None
         #iterate through all sym objects on the screen and check if the object's
         # current position overlaps with any of them
         parent = self.getFrontmostOverLappingObject()
@@ -242,7 +234,6 @@ class SymObject(QGraphicsItemGroup):
             object.setZValue(object.z)
 
         # update the object's position parameters
-        # del self.state.coord_map[(self.x, self.y)]
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
         self.detachChildren()
@@ -281,8 +272,7 @@ class SymObject(QGraphicsItemGroup):
 
     def isClicked(self, event):
         click_x, click_y = event.scenePos().x(), event.scenePos().y()
-        # if the click position is within the text item's bounding box, return
-        # true
+        # return if the click position is within the text item's bounding box
         if (click_x > self.scenePos().x() and click_x < self.scenePos().x() + \
             self.width and click_y > self.scenePos().y() and click_y < \
             self.scenePos().y() + self.height):
@@ -441,7 +431,6 @@ class SymObject(QGraphicsItemGroup):
     # attaches all children of the current sym_object to it so they move as one
     def attachChildren(self):
         for child_name in self.connected_objects:
-            print(child_name)
             self.addToGroup(self.state.sym_objects[child_name])
             #attach descendants
             self.state.sym_objects[child_name].attachChildren()
@@ -449,7 +438,6 @@ class SymObject(QGraphicsItemGroup):
     # detaches children to allow for independent movement
     def detachChildren(self):
         for child_name in self.connected_objects:
-            #self.state.sym_objects[child_name].detachChildren()
             self.removeFromGroup(self.state.sym_objects[child_name])
 
     # updates a symobjects name

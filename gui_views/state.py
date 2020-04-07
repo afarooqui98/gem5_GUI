@@ -11,7 +11,6 @@ class State():
     def __init__(self, instances, catalog):
         self.drag_state = True
         self.draw_wire_state = False
-        self.coord_map = {} # Map coordinates to name of symobject
         self.sym_objects = {} # Map name to actual symobject (has coords)
         self.current_sym_object = None
         self.line_drawer = None
@@ -31,7 +30,7 @@ class State():
     def drawLines(self, p):
         for object in self.sym_objects.values():
             for name, connection in object.connections.items():
-                if name[0] == "parent": #don't need to draw line twice
+                if name[0] == "parent": #draw line once
                     self.drawConnection(p, connection)
 
 
@@ -45,6 +44,7 @@ class State():
         connection.line.setZValue(1000)
 
 
+#finds the gem5 path
 def get_path():
     gem5_parent_dir = sys.executable.split("gem5")[0]
     for root, dirs, files in os.walk(gem5_parent_dir, topdown=False):
