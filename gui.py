@@ -28,19 +28,15 @@ class MainWindow(QMainWindow):
         self.gridLayout = QVBoxLayout()
         self.gridLayout.setObjectName("gridLayout")
 
-        self.buttonView = ButtonView(self.gridLayout, self.state, self) #add button view
+        #add button view
+        self.buttonView = ButtonView(self.gridLayout, self.state, self)
         #add catalog view
         self.catalogView = CatalogView(self.gridLayout, catalog, self.state)
-        self.attributeView = AttributeView(self.gridLayout, self.state) #add attributes
+        #add attributes
+        self.attributeView = AttributeView(self.gridLayout, self.state)
 
         self.state.scene = GraphicsScene(0,0, 1750, 1250, self.state)
         self.graphics_view = QGraphicsView(self.state.scene)
-
-        # might need this code later for drawing lines
-        #self.lines = LineDrawer()
-        #self.proxy = self.state.scene.addWidget(self.lines)
-        #self.proxy.setWidget(self.lines)
-        #self.graphics_view.setSceneRect(0,0, 1750, 1250)
 
         self.layout = QHBoxLayout()
         self.layout.addLayout(self.gridLayout)
@@ -52,9 +48,6 @@ class MainWindow(QMainWindow):
         # populate treeview
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
-
-    def closeEvent(self, event):
-        sys.exit()
 
     def addRow(self, value1, value2, isTreeWidgetClick):
         table = self.attributeView.attributeTable
@@ -87,25 +80,24 @@ class MainWindow(QMainWindow):
         table = self.attributeView.attributeTable
         table.clear()
         table.setRowCount(0)
-
-        if self.state.current_sym_object != None:
-            #print(self.state.current_sym_object.component_name)
-            self.addRow("Name", self.state.current_sym_object.name,
+        cur_object = self.state.current_sym_object
+        if cur_object:
+            self.addRow("Name", cur_object.name,
                         isTreeWidgetClick)
             self.addRow("Child Objects",
-                        ", ".join(self.state.current_sym_object.connected_objects),
+                        ", ".join(cur_object.connected_objects),
                         isTreeWidgetClick)
 
         if item:
             if item.parent() is None:
                 return
-            self.attributes = self.catalog[item.parent().text(0)][item.text(0)]['params']
+            self.attributes = \
+                self.catalog[item.parent().text(0)][item.text(0)]['params']
         else:
             # only load from param list if there is a sym object in the context
             if self.state.current_sym_object != None or \
                 self.state.current_sym_object.component_name == name:
                 self.attributes = self.state.current_sym_object.parameters
-                #print(self.attributes)
             else: # TODO: check when would this branch happen??
                 print("filling in name branch")
                 self.attributes = self.catalog[name]
@@ -143,19 +135,6 @@ class MainWindow(QMainWindow):
             dialog = saveChangesDialog("closing")
             if dialog.exec_():
                 self.buttonView.save_button_pressed()
-            else:
-                print("dont save changes")
-
-if __name__ == "__main__":
-    gui_application = QApplication() #create new application
-    catalog = json.load(open('result_new.json'))
-    main_window = MainWindow(catalog, None) #create new instance of main window
-    main_window.state.mainWindow = main_window
-    main_window.show() #make instance visible
-    main_window.raise_() #raise instance to top of window stack
-    gui_application.exec_() #monitor application for events
-    gui_application.quit()
-
 
 if __name__ == "__m5_main__":
     import sys
@@ -168,7 +147,8 @@ if __name__ == "__m5_main__":
     # use gem5 to get list of objects
     obj_tree, instance_tree = get_obj_lists()
     gui_application = QApplication() #create new application
-    main_window = MainWindow(obj_tree, instance_tree) #create new instance of main window
+    #create new instance of main window
+    main_window = MainWindow(obj_tree, instance_tree)
     main_window.state.mainWindow = main_window
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack

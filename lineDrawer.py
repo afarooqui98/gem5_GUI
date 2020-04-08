@@ -37,10 +37,10 @@ class LineDrawer(QWidget):
 
     def mouseReleaseEvent(self, event):
         if self.state.draw_wire_state and self.pos1 and self.pos2:
-            ret = self.setObjectConnection()
+            valid_connection = self.setObjectConnection()
             self.pos1 = None
             self.pos2 = None
-            if ret < 0:
+            if valid_connection < 0:
                 ok = QMessageBox.about(self, "Alert", "Invalid line")
 
             self.state.scene.removeItem(self.line)
@@ -71,10 +71,6 @@ class LineDrawer(QWidget):
                 num_ports = len(sym_object.sym_ports)
                 key[0] = sym_object.scenePos().x() + sym_object.width * 3 / 4
                 key[1] = sym_object.scenePos().y() + next_y
-                # print(key[0], parent_loc.x(), key[0] + 25)
-                # print(key[1], parent_loc.y(), key[1] + 10)
-                # print(key[0], child_loc.x(), key[0] + 25)
-                # print(key[1], child_loc.y(), key[1] + 10)
                 if key[0] < parent_loc.x() and \
                         parent_loc.x() < key[0] + port.rect().width():
                     if key[1] < parent_loc.y() and \
