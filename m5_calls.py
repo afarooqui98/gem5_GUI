@@ -85,13 +85,14 @@ def get_obj_lists():
     obj_tree['Root']['Root']['params']['eventq_index']['Value'] = 0
     return obj_tree, instance_tree
 
-#eager instantiation, pass through object from state via current_sym_object
-def instantiate_object(object):
+
+# Eager instantiation, pass through object from state via current_sym_object
+def param_instantiate(object):
+    #calling enumerate_params to get exact values for paramaters
     param_dict = object.SimObject.enumerateParams()
 
     for param, value in object.parameters.items():
         if(isinstance(object.parameters[param]["Default"], AttrProxy)):
-            print("encountered proxy parameters")
             continue #want to skip proxy parameters, want to do this lazily
 
         if param_dict.get(param) == None:
@@ -99,29 +100,23 @@ def instantiate_object(object):
             #   parameters given in enumerateParams TODO: look into this
             continue
         else:
-            #the objects param_dictionary is replaced from the preloaded
-            #"catalog" values to the instantiated value
-            # if hasattr(param_dict[param], 'default'):
-            #     object.parameters[param]["Default"] = param_dict[param].default
-            #     object.parameters[param]["Value"] = param_dict[param].default
-
-
-            if param_dict[param].default_val != "":
-                object.parameters[param]["Default"] = param_dict[param].default_val
-                object.parameters[param]["Value"] = param_dict[param].default_val
+            if param_dict[param].default_val != "": #if there is a default value
+                default = param_dict[param].default_val
+                object.parameters[param]["Default"] = default
+                object.parameters[param]["Value"] = default
             else:
                 continue
 
-#instantiation occurs here when an object is loaded from a model file
+
+#Instantiation occurs here when an object is loaded from a model file
 def load_instantiate(object):
     object.SimObject = object.SimObject()
     param_dict = object.SimObject._params
 
     # Some parameters are included in the class but not in the actual parameters
-    #   given in enumerateParams TODO: look into this
+    #   given in enumerateParams TODO: look into this!!!
     weird_params = []
 
-    #TODO: handle proxy params here!!!!
     for param, param_info in object.parameters.items():
         if param_dict.get(param) == None:
             weird_params.append(param)
@@ -149,17 +144,17 @@ def load_instantiate(object):
     for i in range(len(weird_params)):
         del object.parameters[weird_params[i]]
 
-    instantiate_object(object) #enumerate over params to assign default values
+    param_instantiate(object) #enumerate over params to assign default values
 
     if object.component_name == "Root":
         print(object.parameters)
         #object.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
-#recursively set parameters (ONLY if changed?) and then recursively set ports
+#recursively set parameters and then recursively set ports for instantiated objs
 def traverse_hierarchy_root(sym_catalog, symroot):
     root = symroot.SimObject
-    name , m5_children, simroot = traverse_hierarchy(sym_catalog, symroot, root)
-    name, simroot = set_ports(sym_catalog, symroot, simroot, m5_children)
+    name, simroot = traverse_hierarchy(sym_catalog, symroot, root)
+    name, simroot = set_ports(sym_catalog, symroot, simroot)
     return symroot.name, simroot
 
 
@@ -208,69 +203,47 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
     for m_child in m5_children:
         traverse_hierarchy(sym_catalog, sym_catalog[m_child[0]], m_child[1])
 
-    return (symobject.name, m5_children, simobject)
+    return (symobject.name, simobject)
 
-#port setting for objects
-def set_ports(sym_catalog, symobject, simobject, m5_children):
+# Create a port connection between two simobjects
+def connect_port(ports, port_info, sym_catalog, simobject):
+    if isinstance(port_info["Value"], str):
+        values = port_info["Value"].split(".")
+        #set port value, ex: values = ['system', 'system_port']
+        setattr(simobject, ports, getattr(sym_catalog[values[0]].SimObject,\
+                values[1]))
+    else:
+        #TODO figure out why its getting into else case
+        print("GOING BAD")
+
+
+
+#Traverse object tree starting at simobject and set ports recursively
+def set_ports(sym_catalog, symobject, simobject):
 
     for ports, port_info in symobject.ports.items():
         if isinstance(simobject, list): #for vector param value
-            print("we have a vector!")
             for i in range(len(simobject)):
-                if isinstance(port_info["Value"], str):
-                    values = port_info["Value"].split(".")
-                    print(sym_catalog[values[0]].SimObject)
-                    print(getattr(sym_catalog[values[0]].SimObject, values[1]))
-                    setattr(simobject[i], ports, getattr(sym_catalog[values[0]].SimObject, values[1]))
-                    print("simobject is: " + str(simobject[i]) + " ports are: " + str(ports))
-                    print(getattr(simobject[i], ports))
-                    print(port_info)
-                    print(values)
-                    print(getattr(simobject[i], ports).ini_str())
-                # else:
-                #         setattr(simobject, port, str(port_info["Value"]))
-                else:
-                    print("GOING BAD")
-                    # if param_info["Value"] == port_info["Default"]:
-                    #     setattr(simobject, port, port_info["Value"])
-                    # else:
-                    #     if str(port_info["Value"]) in symobject.connected_objects:
-                    #         print("object exists and can be parameterized")
+                connect_port(ports, port_info, sym_catalog, simobject[i])
         else:
-            if isinstance(port_info["Value"], str): #nonvector param value
-                values = port_info["Value"].split(".")
-                print(sym_catalog[values[0]].SimObject)
-                print(getattr(sym_catalog[values[0]].SimObject, values[1]))
-                setattr(simobject, ports, getattr(sym_catalog[values[0]].SimObject, values[1]))
-                print("simobject is: " + str(simobject) + " ports are: " + str(ports))
-                print(getattr(simobject, ports))
-                print(port_info)
-                print(values)
-                print(getattr(simobject, ports).ini_str())
-                # value_to_get = getattr(simobject._parent, values[0]) #get the parent object to get the object to connect
-                # port_to_get = getattr(value_to_get, values[1]) #get the actual port to connect
-                # setattr(simobject, port, port_to_get)
-            # else:
-            #         setattr(simobject, port, str(port_info["Value"]))
-            else:
-                print("GOING BAD")
-                # if param_info["Value"] == port_info["Default"]:
-                #     setattr(simobject, port, port_info["Value"])
-                # else:
-                #     if str(port_info["Value"]) in symobject.connected_objects:
-                #         print("object exists and can be parameterized")
+            connect_port(ports, port_info, sym_catalog, simobject) 
+            #nonvector param value
+
+    #set ports for children 
     for child in symobject.connected_objects:
-        set_ports(sym_catalog, sym_catalog[child], getattr(simobject, child), m5_children)
+        set_ports(sym_catalog, sym_catalog[child], getattr(simobject, child))
 
     return symobject.name, simobject
 
+
+#Instatiates the model and then traverses parameters for any changes
 def object_instantiate(object):
     object.SimObject = object.SimObject()
-    instantiate_object(object)
+    param_traversal(object)
 
-def instantiate():
+def instantiate_model():
     m5.instantiate()
 
 def simulate():
     exit_event = m5.simulate()
-    print('Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause()))
+    print('Exiting @ tick %i because %s' %(m5.curTick(), exit_event.getCause()))

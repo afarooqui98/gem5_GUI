@@ -105,7 +105,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 if object.component_name == "Root":
                     root_name , root = traverse_hierarchy_root(\
                                                 self.state.sym_objects, object)
-                    instantiate() #actual m5 instatiation
+                    instantiate_model() #actual m5 instatiation
                     self.simulateButton.setEnabled(True)
                     self.exportButton.setEnabled(False)
 

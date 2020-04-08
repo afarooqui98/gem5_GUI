@@ -76,11 +76,15 @@ class MainWindow(QMainWindow):
         self.state.current_sym_object = None
         self.populateAttributes(item, name, True)
 
+    # Populate the attribute table holding info for an objects params and children
     def populateAttributes(self, item, name, isTreeWidgetClick):
         table = self.attributeView.attributeTable
         table.clear()
         table.setRowCount(0)
         cur_object = self.state.current_sym_object
+
+        # If there is an object being viewed on the board display the name and 
+        #   connected objects as well
         if cur_object:
             self.addRow("Name", cur_object.name,
                         isTreeWidgetClick)
@@ -102,14 +106,13 @@ class MainWindow(QMainWindow):
                 print("filling in name branch")
                 self.attributes = self.catalog[name]
 
+        # display the param name and values
         for attribute in self.attributes.keys():
             self.addRow(attribute, str(self.attributes[attribute]["Value"]),
                                                     isTreeWidgetClick)
 
+    # This function populates the tree view with sym-objects
     def populate(self):
-        """
-        This function populates the tree view with sym-objects
-        """
         # Go through every inheritable sym-object
         for item in sorted(self.catalog.keys()):
             tree_item = QTreeWidgetItem([item])

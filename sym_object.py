@@ -56,10 +56,12 @@ class SymObject(QGraphicsItemGroup):
         self.y = self.scenePos().y()
         self.state.current_sym_object = self
 
+    # Create an instantiated simobject for the symobject
     def instantiateSimObject(self):
         object_instantiate(self) #actual simobject
 
 
+    # Create the display for the ports on the symobjects
     def initPorts(self):
         self.sym_ports = []
         x = self.scenePos().x() + self.width * 3 / 4
@@ -172,6 +174,7 @@ class SymObject(QGraphicsItemGroup):
         self.state.line_drawer.update()
         super(SymObject, self).mouseMoveEvent(event)
 
+    
     def modifyConnections(self, event, sym_object):
         # set connection to middle of port
         num_ports = len(sym_object.ports)
