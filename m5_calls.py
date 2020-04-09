@@ -100,6 +100,11 @@ def param_instantiate(object):
             #   parameters given in enumerateParams TODO: look into this
             continue
         else:
+            #if we load from a ui file, check if the default and value params
+            # are diferent
+            if object.parameters[param]["Value"] != object.parameters[param]["Default"]:
+                continue
+
             if param_dict[param].default_val != "": #if there is a default value
                 default = param_dict[param].default_val
                 object.parameters[param]["Default"] = default
@@ -226,10 +231,10 @@ def set_ports(sym_catalog, symobject, simobject):
             for i in range(len(simobject)):
                 connect_port(ports, port_info, sym_catalog, simobject[i])
         else:
-            connect_port(ports, port_info, sym_catalog, simobject) 
+            connect_port(ports, port_info, sym_catalog, simobject)
             #nonvector param value
 
-    #set ports for children 
+    #set ports for children
     for child in symobject.connected_objects:
         set_ports(sym_catalog, sym_catalog[child], getattr(simobject, child))
 
