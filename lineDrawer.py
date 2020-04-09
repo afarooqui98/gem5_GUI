@@ -46,6 +46,7 @@ class LineDrawer(QWidget):
             self.state.scene.removeItem(self.line)
             self.line = None
             self.update()
+            self.state.mostRecentSaved = False
 
     def update(self):
         self.state.drawLines(self.pen)

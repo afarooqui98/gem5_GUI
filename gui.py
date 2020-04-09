@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
     def __init__(self, catalog, instances):
         super(MainWindow, self).__init__()
         self.state = State(instances, catalog)
-        self.setWindowTitle("gem5 GUI | Untitled")
+        #self.setWindowTitle("gem5 GUI | Untitled")
         self.main = QWidget()
         self.catalog = catalog
         self.setLayoutDirection(Qt.LeftToRight)
@@ -131,9 +131,9 @@ class MainWindow(QMainWindow):
 
     # when user tries to exit, check if changes need to be saved before closing
     def closeEvent(self, event):
-        if self.state.sym_objects:
-            dialog = saveChangesDialog("closing")
-            if dialog.exec_():
+        if not self.state.mostRecentSaved:
+            self.dialog = saveChangesDialog("closing")
+            if self.dialog.exec_():
                 self.buttonView.save_button_pressed()
 
 if __name__ == "__m5_main__":
@@ -150,6 +150,7 @@ if __name__ == "__m5_main__":
     #create new instance of main window
     main_window = MainWindow(obj_tree, instance_tree)
     main_window.state.mainWindow = main_window
+    main_window.setWindowTitle("gem5 GUI | Untitled")
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack
     gui_application.exec_() #monitor application for events

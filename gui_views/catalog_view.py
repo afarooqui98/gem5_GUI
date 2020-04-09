@@ -73,6 +73,7 @@ class CatalogView(): #dropdown and search bar
         #eager instantiation
         self.state.current_sym_object.instantiateSimObject()
 
+        self.state.mostRecentSaved = False
         #allow instantiation ONLY when root is on the canvas
         #if self.state.current_sym_object.component_name == "Root":
         #    self.state.mainWindow.buttonView.exportButton.setEnabled(True)

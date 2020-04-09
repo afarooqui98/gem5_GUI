@@ -20,6 +20,9 @@ class State():
         self.catalog = catalog
         self.buttonView = None
         self.fileName = None
+        self.copyState = False
+        self.selectedObject = None
+        self.mostRecentSaved = True
 
     # sets objects in scene as draggable or not draggable based on drag_state
     def setDragState(self):
@@ -42,7 +45,6 @@ class State():
         connection.child_endpoint.y(), p)
 
         connection.line.setZValue(1000)
-
 
 #finds the gem5 path
 def get_path():

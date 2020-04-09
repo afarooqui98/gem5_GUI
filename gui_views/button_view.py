@@ -29,10 +29,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     # build the file tab
     def buildFileTab(self, mainMenu, window):
         saveAction = QAction("Save", window)
+        saveAction.setShortcut("Ctrl+S")
         saveAction.triggered.connect(self.save_button_pressed)
         saveAsAction = QAction("Save As", window)
+        saveAsAction.setShortcut("Ctrl+D")
         saveAsAction.triggered.connect(self.save_as_UI_button_pressed)
         openAction = QAction("Open", window)
+        openAction.setShortcut("Ctrl+O")
         openAction.triggered.connect(self.openUI_button_pressed)
 
         fileMenu = mainMenu.addMenu('File')
@@ -43,10 +46,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     # build the edit tab
     def buildEditTab(self, mainMenu, window):
         copyAction = QAction("Copy", window)
+        copyAction.setShortcut("Ctrl+C")
         copyAction.triggered.connect(self.copy_button_pressed)
         pasteAction = QAction("Paste", window)
+        pasteAction.setShortcut("Ctrl+P")
         pasteAction.triggered.connect(self.paste_button_pressed)
         undoAction = QAction("Undo", window)
+        undoAction.setShortcut("Ctrl+U")
         undoAction.triggered.connect(self.undo_button_pressed)
 
         editMenu = mainMenu.addMenu('Edit')
@@ -57,8 +63,10 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     # build the run tab
     def buildRunTab(self, mainMenu, window):
         instantiateAction = QAction("Instantiate", window)
+        instantiateAction.setShortcut("Ctrl+I")
         instantiateAction.triggered.connect(self.export_button_pressed)
         simulateAction = QAction("Simulate", window)
+        simulateAction.setShortcut("Ctrl+R")
         simulateAction.triggered.connect(self.simulate_button_pressed)
 
         runMenu = mainMenu.addMenu('Run')
@@ -68,6 +76,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     # build the tools tab
     def buildToolsTab(self, mainMenu, window):
         wireAction = QAction("Enable Wire", window)
+        wireAction.setShortcut("Ctrl+W")
         wireAction.triggered.connect(self.wire_button_pressed)
 
         toolsMenu = mainMenu.addMenu('Tools')
@@ -83,11 +92,38 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     #TODO
     def copy_button_pressed(self):
         print("copy button pressed")
+        if not self.state.current_sym_object:
+            return
+
+        self.state.copyState = True
+        self.state.selectedObject = self.state.current_sym_object
         return
 
     #TODO
     def paste_button_pressed(self):
-        print ("paste button pressed")
+        if not self.state.copyState:
+            return
+
+        if self.state.current_sym_object:
+            self.state.current_sym_object.rect.setBrush(QColor("White"))
+            self.state.current_sym_object.deleteButton.hide()
+
+        object_name = self.state.selectedObject.name + "_copy"
+        new_object = self.state.scene.addObjectToScene("component",
+                                    self.state.selectedObject.component_name,
+                                    object_name)
+
+        self.state.sym_objects[object_name] = new_object
+        new_object.ports = copy.deepcopy(self.state.selectedObject.ports)
+        new_object.parameters = copy.deepcopy(self.state.selectedObject.parameters)
+        new_object.SimObject = \
+                copy.deepcopy(self.state.instances[new_object.component_name])
+        new_object.initPorts()
+
+        new_object.instantiateSimObject()
+
+        self.state.current_sym_object = new_object
+        self.state.copyState = False
         return
 
     #TODO
@@ -116,7 +152,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     # loads .ui file into gui
     def openUI_button_pressed(self):
         # check if any changes have been made - to save before closing
-        if self.state.sym_objects:
+        if not self.state.mostRecentSaved:
             dialog = saveChangesDialog("opening a new file")
             if dialog.exec_():
                 self.save_button_pressed()
@@ -160,6 +196,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 z_score += 1
 
             self.state.line_drawer.update()
+
+        self.state.mostRecentSaved = True
 
     # build dictionary to export
     def getOutputData(self):
@@ -267,6 +305,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         tokens = filename.split('/')
         self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
 
+        self.state.mostRecentSaved = True
+
     # saves gui state to a .ui file, shows dialog to select output file
     # regardless of whether file exists in the state
     def save_as_UI_button_pressed(self):
@@ -288,3 +328,5 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # get file name from path
         tokens = filename.split('/')
         self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
+
+        self.state.mostRecentSaved = True

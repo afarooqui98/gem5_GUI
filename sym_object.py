@@ -164,6 +164,7 @@ class SymObject(QGraphicsItemGroup):
 
         self.state.current_sym_object = None
         del self.state.sym_objects[name]
+        self.state.mostRecentSaved = False
 
 
     def mouseMoveEvent(self, event):
@@ -171,6 +172,7 @@ class SymObject(QGraphicsItemGroup):
         self.updateChildrenConnections(event, self)
         self.state.line_drawer.update()
         super(SymObject, self).mouseMoveEvent(event)
+        self.state.mostRecentSaved = False
 
     def modifyConnections(self, event, sym_object):
         # set connection to middle of port
@@ -238,6 +240,7 @@ class SymObject(QGraphicsItemGroup):
         self.y = self.scenePos().y()
         self.detachChildren()
         self.state.line_drawer.update()
+        self.state.mostRecentSaved = False
 
     # based on mouse click position, return object with highest zscore
     def getClickedObject(self, event):
