@@ -80,7 +80,7 @@ def instantiate_object(object):
 
     for param, value in object.parameters.items():
         if(isinstance(object.parameters[param]["Default"], AttrProxy)):
-            print("encountered proxy parameters")
+            print("skipping proxy param instantiate")
             continue #want to skip proxy parameters, want to do this lazily
 
         if param_dict.get(param) == None:
@@ -93,7 +93,12 @@ def instantiate_object(object):
             # if hasattr(param_dict[param], 'default'):
             #     object.parameters[param]["Default"] = param_dict[param].default
             #     object.parameters[param]["Value"] = param_dict[param].default
+            #
 
+            #if we load from a ui file, check if the default and value params are
+            #diferent
+            if object.parameters[param]["Value"] != object.parameters[param]["Default"]:
+                continue
 
             if param_dict[param].default_val != "":
                 object.parameters[param]["Default"] = param_dict[param].default_val
