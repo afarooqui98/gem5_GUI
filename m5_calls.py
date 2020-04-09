@@ -86,8 +86,10 @@ def get_obj_lists():
     return obj_tree, instance_tree
 
 
-# Eager instantiation, pass through object from state via current_sym_object
-def param_instantiate(object):
+def get_param_info(object):
+    """Get additional info on params such as default values  after
+        instantiating object. This information is held in a dictionary produced
+        from calling enumerate_params method on instantiated object """
     #calling enumerate_params to get exact values for paramaters
     param_dict = object.SimObject.enumerateParams()
 
@@ -102,7 +104,8 @@ def param_instantiate(object):
         else:
             #if we load from a ui file, check if the default and value params
             # are diferent
-            if object.parameters[param]["Value"] != object.parameters[param]["Default"]:
+            if object.parameters[param]["Value"] != \
+                    object.parameters[param]["Default"]:
                 continue
 
             if param_dict[param].default_val != "": #if there is a default value
@@ -115,6 +118,8 @@ def param_instantiate(object):
 
 #Instantiation occurs here when an object is loaded from a model file
 def load_instantiate(object):
+    """Instantiation and some paramter/port info collection occurs here when an
+        object is loaded from a model file """
     object.SimObject = object.SimObject()
     param_dict = object.SimObject._params
 
@@ -149,14 +154,16 @@ def load_instantiate(object):
     for i in range(len(weird_params)):
         del object.parameters[weird_params[i]]
 
-    param_instantiate(object) #enumerate over params to assign default values
+    get_param_info(object) #enumerate over params to assign default values
 
-    if object.component_name == "Root":
-        print(object.parameters)
+    # if object.component_name == "Root":
+    #     print(object.parameters)
         #object.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
-#recursively set parameters and then recursively set ports for instantiated objs
+#r
 def traverse_hierarchy_root(sym_catalog, symroot):
+    """Recursively set parameters and then recursively set ports for
+        instantiated objs"""
     root = symroot.SimObject
     name, simroot = traverse_hierarchy(sym_catalog, symroot, root)
     name, simroot = set_ports(sym_catalog, symroot, simroot)
@@ -210,8 +217,8 @@ def traverse_hierarchy(sym_catalog, symobject, simobject):
 
     return (symobject.name, simobject)
 
-# Create a port connection between two simobjects
 def connect_port(ports, port_info, sym_catalog, simobject):
+    """Create a port connection between two simobjects"""
     if isinstance(port_info["Value"], str):
         values = port_info["Value"].split(".")
         #set port value, ex: values = ['system', 'system_port']
@@ -223,9 +230,8 @@ def connect_port(ports, port_info, sym_catalog, simobject):
 
 
 
-#Traverse object tree starting at simobject and set ports recursively
 def set_ports(sym_catalog, symobject, simobject):
-
+    """ Traverse object tree starting at simobject and set ports recursively """
     for ports, port_info in symobject.ports.items():
         if isinstance(simobject, list): #for vector param value
             for i in range(len(simobject)):
@@ -241,10 +247,11 @@ def set_ports(sym_catalog, symobject, simobject):
     return symobject.name, simobject
 
 
-#Instatiates the model and then traverses parameters for any changes
 def object_instantiate(object):
+    """ Creates an instantiated object for the symobject and gets any new
+        info on the parameters """
     object.SimObject = object.SimObject()
-    param_traversal(object)
+    get_param_info(object)
 
 def instantiate_model():
     m5.instantiate()

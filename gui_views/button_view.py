@@ -208,7 +208,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             ports = {}
             for port in object.ports.keys():
                 ports[port] = {}
-                print(type(object.ports[port]["Value"]))
                 ports[port]["Value"] = str(object.ports[port]["Value"])
 
             newObject["ports"] = ports
