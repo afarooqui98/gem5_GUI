@@ -49,7 +49,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         copyAction.setShortcut("Ctrl+C")
         copyAction.triggered.connect(self.copy_button_pressed)
         pasteAction = QAction("Paste", window)
-        pasteAction.setShortcut("Ctrl+P")
+        pasteAction.setShortcut("Ctrl+V")
         pasteAction.triggered.connect(self.paste_button_pressed)
         undoAction = QAction("Undo", window)
         undoAction.setShortcut("Ctrl+U")
@@ -318,6 +318,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # stop if cancel is pressed
         if not filename:
             return
+
+        self.state.filename = filename
 
         savedObjects = self.getOutputData()
 
