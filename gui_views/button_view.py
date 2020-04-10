@@ -113,7 +113,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                                     self.state.selectedObject.component_name,
                                     object_name)
 
-        self.state.sym_objects[object_name] = new_object
         new_object.ports = copy.deepcopy(self.state.selectedObject.ports)
         new_object.parameters = copy.deepcopy(self.state.selectedObject.parameters)
         new_object.SimObject = \
@@ -124,6 +123,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.current_sym_object = new_object
         self.state.copyState = False
+        self.state.selectedObject = None
+
         return
 
     #TODO
@@ -286,11 +287,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # check if file is already open
         if self.state.fileName:
             filename = self.state.fileName
-        else:
-            # show dialog box to let user create output file
+        else:             # show dialog box to let user create output file
             filename = QFileDialog.getSaveFileName(None, "",
                                            "",
                                            "gem5 UI Files (*.ui)")[0]
+
         # stop if cancel is pressed
         if not filename:
             return
@@ -319,7 +320,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not filename:
             return
 
-        self.state.filename = filename
+        self.state.fileName = filename
 
         savedObjects = self.getOutputData()
 
