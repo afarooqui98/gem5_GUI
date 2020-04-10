@@ -59,6 +59,9 @@ class SymObject(QGraphicsItemGroup):
     # Create an instantiated simobject for the symobject
     def instantiateSimObject(self):
         object_instantiate(self) #actual simobject
+        if self.component_name == "Root":
+            # allows user to click on intantiate button
+            self.state.mainWindow.buttonView.instantiate.setEnabled(True)
 
 
     # Create the display for the ports on the symobjects
@@ -174,7 +177,7 @@ class SymObject(QGraphicsItemGroup):
         self.state.line_drawer.update()
         super(SymObject, self).mouseMoveEvent(event)
 
-    
+
     def modifyConnections(self, event, sym_object):
         # set connection to middle of port
         num_ports = len(sym_object.ports)

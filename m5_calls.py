@@ -156,9 +156,9 @@ def load_instantiate(object):
 
     get_param_info(object) #enumerate over params to assign default values
 
-    # if object.component_name == "Root":
-    #     print(object.parameters)
-        #object.state.mainWindow.buttonView.exportButton.setEnabled(True)
+    if object.component_name == "Root":
+        # allows user to click on intantiate button
+        object.state.mainWindow.buttonView.instantiate.setEnabled(True)
 
 #r
 def traverse_hierarchy_root(sym_catalog, symroot):

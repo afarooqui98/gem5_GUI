@@ -16,8 +16,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state = state
 
         # set up main menu - add tabs and connect each button to handler
-        mainMenu = window.menuBar()
-        self.buildMenuBar(mainMenu, window)
+        self.mainMenu = window.menuBar()
+        self.buildMenuBar(self.mainMenu, window)
 
     # build the main menu bar
     def buildMenuBar(self, mainMenu, window):
@@ -25,6 +25,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.buildEditTab(mainMenu, window)
         self.buildRunTab(mainMenu, window)
         self.buildToolsTab(mainMenu, window)
+
 
     # build the file tab
     def buildFileTab(self, mainMenu, window):
@@ -64,6 +65,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         runMenu = mainMenu.addMenu('Run')
         runMenu.addAction(instantiateAction)
         runMenu.addAction(simulateAction)
+        # Grey out the actions until we can actually instantiate or simulate
+        self.instantiate = instantiateAction
+        self.instantiate.setEnabled(False)
+        self.simulate = simulateAction
+        self.simulate.setEnabled(False)
+
 
     # build the tools tab
     def buildToolsTab(self, mainMenu, window):
@@ -100,14 +107,14 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         dlg = instantiateDialog()
         if dlg.exec_():
             print("Success!")
+            self.instantiate.setEnabled(False)
+            self.simulate.setEnabled(True)
             self.save_button_pressed() #want to save before instantiation
             for object in self.state.sym_objects.values():
                 if object.component_name == "Root":
                     root_name , root = traverse_hierarchy_root(\
                                                 self.state.sym_objects, object)
                     instantiate_model() #actual m5 instatiation
-                    self.simulateButton.setEnabled(True)
-                    self.exportButton.setEnabled(False)
 
     # creates a python file that can be run with gem5
     def simulate_button_pressed(self):
