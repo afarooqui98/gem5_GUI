@@ -6,7 +6,6 @@ from lineDrawer import *
 from PySide2.QtCore import *
 from gui_views import state
 from sym_object import *
-from m5_calls import load_instantiate
 import string
 import random
 import collections
@@ -62,8 +61,6 @@ class GraphicsScene(QGraphicsScene):
         new_object.z = z
         new_object.ports = convert(newObject["ports"])
 
-        print(convert(newObject["ports"]))
-
         new_object_connections = {}
 
         # rebuild the connection dictionary for the object
@@ -84,13 +81,10 @@ class GraphicsScene(QGraphicsScene):
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object
         self.state.current_sym_object = new_object
-        self.state.current_sym_object.SimObject = \
-            copy.deepcopy(
-        self.state.instances[self.state.current_sym_object.component_name])
         self.state.current_sym_object.initPorts()
 
         # instantiate the simobject and set its parameters
-        load_instantiate(self.state.current_sym_object)
+        self.state.current_sym_object.load_instantiate()
 
         self.addItem(new_object)
         return new_object

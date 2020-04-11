@@ -5,6 +5,7 @@ from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from gui_views import state
 from m5_calls import *
+import copy
 
 
 class SymObject(QGraphicsItemGroup):
@@ -29,6 +30,11 @@ class SymObject(QGraphicsItemGroup):
         self.parent_name = None
         self.to_export = 1
         self.scene = scene
+        self.sim_object = \
+            copy.deepcopy(
+            self.state.instances[self.component_name])
+        self.sim_object_instance = None
+
 
         self.initUIObject(self, 0, 0)
         # if we are loading from a file, we dont need to check for overlapping
@@ -55,13 +61,90 @@ class SymObject(QGraphicsItemGroup):
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
         self.state.current_sym_object = self
-
-    # Create an instantiated simobject for the symobject
-    def instantiateSimObject(self):
-        object_instantiate(self) #actual simobject
         if self.component_name == "Root":
             # allows user to click on intantiate button
             self.state.mainWindow.buttonView.instantiate.setEnabled(True)
+
+    def get_param_info(self):
+        """Get additional info on params such as default values  after
+            instantiating object. This information is held in a dictionary produced
+            from calling enumerate_params method on instantiated object """
+        #calling enumerate_params to get exact values for paramaters
+        param_dict = self.sim_object_instance.enumerateParams()
+
+        for param, value in self.parameters.items():
+            if(isinstance(self.parameters[param]["Default"], AttrProxy)):
+                continue #want to skip proxy parameters, want to do this lazily
+
+            if param_dict.get(param) == None:
+                # Some parameters are included in the class but not in the actual
+                #   parameters given in enumerateParams TODO: look into this
+                continue
+            else:
+                #if we load from a ui file, check if the default and value params
+                # are diferent
+                if self.parameters[param]["Value"] != \
+                        self.parameters[param]["Default"]:
+                    continue
+
+                if param_dict[param].default_val != "": #if there is a default value
+                    default = param_dict[param].default_val
+                    self.parameters[param]["Default"] = default
+                    self.parameters[param]["Value"] = default
+                else:
+                    continue
+
+    #Instantiation occurs here when an object is loaded from a model file
+    def load_instantiate(self):
+        """Instantiation and some paramter/port info collection occurs here when an
+            object is loaded from a model file """
+        self.sim_object_instance = self.sim_object()
+        param_dict = self.sim_object_instance._params
+        port_dict = self.sim_object_instance._ports
+
+        # Some parameters are included in the class but not in the actual parameters
+        #   given in enumerateParams TODO: look into this!!!
+        weird_params = []
+
+        for port, port_info in self.ports.items():
+            if port_info["Value"] == None:
+                port_info["Value"] = port_dict.get(port) #load default port
+
+        for param, param_info in self.parameters.items():
+            if param_dict.get(param) == None:
+                weird_params.append(param)
+                continue
+
+            #Check is set since some of the types for parametrs are VectorParam objs
+            if inspect.isclass(param_dict[param].ptype):
+                self.parameters[param]["Type"] = param_dict[param].ptype
+            else:
+                self.parameters[param]["Type"] = type(param_dict[param].ptype)
+
+            self.parameters[param]["Description"] = param_dict[param].desc
+
+            if hasattr(param_dict[param], 'default'):
+                self.parameters[param]["Default"] = param_dict[param].default
+            else:
+                self.parameters[param]["Default"] = None
+
+            #If the value was changed in the model file then no need to load in
+            #   the default, otherwise the value is set to the default
+            if "Value" not in self.parameters[param]:
+                self.parameters[param]["Value"] = \
+                    self.parameters[param]["Default"]
+
+        for i in range(len(weird_params)):
+            del self.parameters[weird_params[i]]
+
+        self.get_param_info() #enumerate over params to assign default values
+
+    # Create an instantiated simobject for the symobject
+    def instantiateSimObject(self):
+        """ Creates an instantiated object for the symobject and gets any new
+            info on the parameters """
+        self.sim_object_instance = self.sim_object()
+        self.get_param_info()
 
 
     # Create the display for the ports on the symobjects
