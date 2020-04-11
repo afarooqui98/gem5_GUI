@@ -9,7 +9,18 @@ from sym_object import *
 from m5_calls import load_instantiate
 import string
 import random
+import collections
 import copy
+
+def convert(data):
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convert, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convert, data))
+    else:
+        return data
 
 class GraphicsScene(QGraphicsScene):
     """this class provides a scene to manage objects"""
@@ -41,7 +52,8 @@ class GraphicsScene(QGraphicsScene):
         parameters = newObject["parameters"]
         connected_objects = newObject["connected_objects"]
         parent = newObject["parent_name"]
-        connections = newObject["connections"]
+        connections = convert(newObject["connections"])
+        print(connections)
 
         new_object = SymObject(x, y, width, height, self, component_name, name,
             True, self.state)

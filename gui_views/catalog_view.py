@@ -38,7 +38,6 @@ class CatalogView(): #dropdown and search bar
 
     def removeHighlight(self, item):
         if self.state.current_sym_object:
-            print("creating new obj, unhighlighting previous selection")
             self.state.current_sym_object.rect.setBrush(QColor("White"))
 
     #this creates a new symobject at some point in the CanvasView
