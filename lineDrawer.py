@@ -21,9 +21,18 @@ class LineDrawer(QWidget):
         self.line = None
         self.pen = QPen(Qt.black, 2)
 
+    # if clicking anywhere on the scene, unhighlight the currently selected
+    # object and clear the attribute table
     def mousePressEvent(self, event):
         if self.state.draw_wire_state:
             self.pos1 = event.pos()
+        else:
+            if self.state.current_sym_object:
+                self.state.current_sym_object.rect.setBrush(QColor("White"))
+                self.state.current_sym_object = None
+                table = self.state.mainWindow.attributeView.attributeTable
+                table.clear()
+                table.setRowCount(0)
 
     def mouseMoveEvent(self, event):
         if self.state.draw_wire_state and self.pos1:
