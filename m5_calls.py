@@ -122,10 +122,15 @@ def load_instantiate(object):
         object is loaded from a model file """
     object.SimObject = object.SimObject()
     param_dict = object.SimObject._params
+    port_dict = object.SimObject._ports
 
     # Some parameters are included in the class but not in the actual parameters
     #   given in enumerateParams TODO: look into this!!!
     weird_params = []
+
+    for port, port_info in object.ports.items():
+        if port_info["Value"] == None:
+            port_info["Value"] = port_dict.get(port) #load default port
 
     for param, param_info in object.parameters.items():
         if param_dict.get(param) == None:
@@ -225,9 +230,8 @@ def connect_port(ports, port_info, sym_catalog, simobject):
         setattr(simobject, ports, getattr(sym_catalog[values[0]].SimObject,\
                 values[1]))
     else:
+        pass
         #TODO figure out why its getting into else case
-        print("GOING BAD")
-
 
 
 def set_ports(sym_catalog, symobject, simobject):

@@ -215,7 +215,10 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             ports = {}
             for port in object.ports.keys():
                 ports[port] = {}
-                ports[port]["Value"] = str(object.ports[port]["Value"])
+                if isinstance(object.ports[port]["Value"], str):
+                    ports[port]["Value"] = str(object.ports[port]["Value"])
+                else:
+                    ports[port]["Value"] = None
 
             newObject["ports"] = ports
             newObject["connected_objects"] = object.connected_objects

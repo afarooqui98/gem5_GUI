@@ -53,7 +53,6 @@ class GraphicsScene(QGraphicsScene):
         connected_objects = newObject["connected_objects"]
         parent = newObject["parent_name"]
         connections = convert(newObject["connections"])
-        print(connections)
 
         new_object = SymObject(x, y, width, height, self, component_name, name,
             True, self.state)
@@ -61,7 +60,9 @@ class GraphicsScene(QGraphicsScene):
         new_object.connected_objects = connected_objects
         new_object.parent_name = parent
         new_object.z = z
-        new_object.ports = newObject["ports"]
+        new_object.ports = convert(newObject["ports"])
+
+        print(convert(newObject["ports"]))
 
         new_object_connections = {}
 
