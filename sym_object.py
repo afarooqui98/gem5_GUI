@@ -61,9 +61,6 @@ class SymObject(QGraphicsItemGroup):
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
         self.state.current_sym_object = self
-        if self.component_name == "Root":
-            # allows user to click on intantiate button
-            self.state.mainWindow.buttonView.instantiate.setEnabled(True)
 
     def get_param_info(self):
         """Get additional info on params such as default values  after

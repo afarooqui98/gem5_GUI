@@ -86,6 +86,10 @@ class GraphicsScene(QGraphicsScene):
         # instantiate the simobject and set its parameters
         self.state.current_sym_object.load_instantiate()
 
+        if component_name == "Root":
+            #found a root object loaded in from a ui file
+            self.state.mainWindow.buttonView.instantiate.setEnabled(True)
+
         self.addItem(new_object)
         return new_object
 
@@ -102,6 +106,10 @@ class GraphicsScene(QGraphicsScene):
                                 False, self.state)
 
         self.state.sym_objects[name] = new_object
+
+        if component_name == "Root":
+            #user created a root object, can instantiate now
+            self.state.mainWindow.buttonView.instantiate.setEnabled(True)
 
         #self.state.current_sym_object = new_object
         self.addItem(new_object)
