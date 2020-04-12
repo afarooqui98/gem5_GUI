@@ -34,3 +34,7 @@ before running gem5, navigate to the bottom of gui.py and the top of m5calls.py,
 In order to run the gui:
 
     <gem5.opt path> gui.py
+
+You may need to specify the gem5 root directory if the above does not work. On the command line:
+
+    GEM5_HOME=<path to gem5>
