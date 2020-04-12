@@ -29,7 +29,7 @@ class State():
     # draws each line in lines using the QPen p
     def drawLines(self, p):
         for object in self.sym_objects.values():
-            for name, connection in object.connections.items():
+            for name, connection in object.ui_connections.items():
                 if name[0] == "parent": #draw line once
                     self.drawConnection(p, connection)
 

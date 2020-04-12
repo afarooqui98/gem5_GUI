@@ -55,11 +55,11 @@ class GraphicsScene(QGraphicsScene):
 
         new_object = SymObject(x, y, width, height, self, component_name, name,
             True, self.state)
-        new_object.parameters = parameters
+        new_object.instance_params = parameters
         new_object.connected_objects = connected_objects
         new_object.parent_name = parent
         new_object.z = z
-        new_object.ports = convert(newObject["ports"])
+        new_object.instance_ports = convert(newObject["ports"])
 
         new_object_connections = {}
 
@@ -76,7 +76,7 @@ class GraphicsScene(QGraphicsScene):
                 connection["key"][2], connection["key"][3])
             new_object_connections[key] = new_connection
 
-        new_object.connections = new_object_connections
+        new_object.ui_connections = new_object_connections
 
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object

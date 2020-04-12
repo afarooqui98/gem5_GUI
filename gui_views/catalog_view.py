@@ -60,9 +60,9 @@ class CatalogView(): #dropdown and search bar
         #modify state to accomodate the new object
         self.state.current_sym_object = \
             self.state.scene.addObjectToScene("component", item.text(0), name)
-        self.state.current_sym_object.parameters = \
+        self.state.current_sym_object.instance_params = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['params'])
-        self.state.current_sym_object.ports = \
+        self.state.current_sym_object.instance_ports = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
         self.state.current_sym_object.initPorts()
 

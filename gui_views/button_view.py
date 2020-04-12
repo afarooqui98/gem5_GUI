@@ -145,12 +145,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         # clear out existing objects and wires before loading from file
         for object in self.state.sym_objects.values():
-            for name, connection in object.connections.items():
+            for name, connection in object.ui_connections.items():
                 if connection.line:
                     self.state.scene.removeItem(connection.line)
 
             self.state.scene.removeItem(object)
-            object.connections.clear()
+            object.ui_connections.clear()
 
         self.state.sym_objects.clear()
 
@@ -187,36 +187,36 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             params = {}
             #Storing the parameters
-            for param in object.parameters:
+            for param in object.instance_params:
                 params[str(param)] = {}
 
                 # TODO: Insert err message here if a parameter has not been set
-                if object.parameters[param]["Value"] is None:
+                if object.instance_params[param]["Value"] is None:
                     print("Error must set required parameter")
                     params[str(param)]["Value"] = None
 
                 #Only need to store the values of parameters changed for now
-                if object.parameters[param]["Default"] != \
-                    object.parameters[param]["Value"]:
-                    param_type = type(object.parameters[param]["Value"])
+                if object.instance_params[param]["Default"] != \
+                    object.instance_params[param]["Value"]:
+                    param_type = type(object.instance_params[param]["Value"])
                     if (param_type == str or param_type == int or \
                             param_type == bool or param_type == unicode or \
                             param_type == list):
                         params[str(param)]["Value"] = \
-                            object.parameters[param]["Value"]
+                            object.instance_params[param]["Value"]
                     else:
                         # weird case if a value is a class but shouldn't really
                         #   hit this case since all user inputs are strings
                         params[str(param)]["Value"] = \
-                            object.parameters[param]["Value"].__dict__
+                            object.instance_params[param]["Value"].__dict__
 
             newObject["parameters"] = params
 
             ports = {}
-            for port in object.ports.keys():
+            for port in object.instance_ports.keys():
                 ports[port] = {}
-                if isinstance(object.ports[port]["Value"], str):
-                    ports[port]["Value"] = str(object.ports[port]["Value"])
+                if isinstance(object.instance_ports[port]["Value"], str):
+                    ports[port]["Value"] = str(object.instance_ports[port]["Value"])
                 else:
                     ports[port]["Value"] = None
 
@@ -225,21 +225,21 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             connections = []
 
-            for c in object.connections:
+            for c in object.ui_connections:
                 newConnection = {}
                 newConnection["key"] = c
                 newConnection["parent_endpoint_x"] = \
-                        object.connections[c].parent_endpoint.x()
+                        object.ui_connections[c].parent_endpoint.x()
                 newConnection["parent_endpoint_y"] = \
-                        object.connections[c].parent_endpoint.y()
+                        object.ui_connections[c].parent_endpoint.y()
                 newConnection["child_endpoint_x"] = \
-                        object.connections[c].child_endpoint.x()
+                        object.ui_connections[c].child_endpoint.x()
                 newConnection["child_endpoint_y"] = \
-                        object.connections[c].child_endpoint.y()
+                        object.ui_connections[c].child_endpoint.y()
                 newConnection["parent_port_num"] = \
-                        object.connections[c].parent_port_num
+                        object.ui_connections[c].parent_port_num
                 newConnection["child_port_num"] = \
-                        object.connections[c].child_port_num
+                        object.ui_connections[c].child_port_num
                 connections.append(newConnection)
 
             newObject["connections"] = connections

@@ -150,7 +150,7 @@ def traverse_params(sym_catalog, symobject, simobject):
         m5_children.append((sym, sim))
 
     # Setting the paramerters for the object instance
-    for param, param_info in symobject.parameters.items():
+    for param, param_info in symobject.instance_params.items():
         set_param_value(simobject, symobject, param, param_info, m5_children)
 
     # Recurse for the objects children
@@ -172,7 +172,7 @@ def set_port_value(port, port_info, sym_catalog, simobject):
 
 def traverse_ports(sym_catalog, symobject, simobject):
     """ Traverse object tree starting at simobject and set ports recursively """
-    for port, port_info in symobject.ports.items():
+    for port, port_info in symobject.instance_ports.items():
         if isinstance(simobject, list): #for vector param value
             for i in range(len(simobject)):
                 set_port_value(port, port_info, sym_catalog, simobject[i])
