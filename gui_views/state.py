@@ -46,7 +46,10 @@ class State():
 
 #finds the gem5 path
 def get_path():
-    gem5_parent_dir = sys.executable.split("gem5")[0]
+    gem5_parent_dir = os.getenv("GEM5_HOME")
+    #if parent dir not explicitly set, procure it from executable path
+    if not gem5_parent_dir:
+        gem5_parent_dir = sys.executable.split("gem5")[0]
     for root, dirs, files in os.walk(gem5_parent_dir, topdown=False):
         for name in dirs:
             abs_path = os.path.join(root, name)
