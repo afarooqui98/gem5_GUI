@@ -83,7 +83,7 @@ class MainWindow(QMainWindow):
         table.setRowCount(0)
         cur_object = self.state.current_sym_object
 
-        # If there is an object being viewed on the board display the name and 
+        # If there is an object being viewed on the board display the name and
         #   connected objects as well
         if cur_object:
             self.addRow("Name", cur_object.name,
@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
             # only load from param list if there is a sym object in the context
             if self.state.current_sym_object != None or \
                 self.state.current_sym_object.component_name == name:
-                self.attributes = self.state.current_sym_object.parameters
+                self.attributes = self.state.current_sym_object.instance_params
             else: # TODO: check when would this branch happen??
                 print("filling in name branch")
                 self.attributes = self.catalog[name]

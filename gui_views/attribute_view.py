@@ -62,7 +62,7 @@ class AttributeView(): #table view for parameters, as well as the description
             current_x = self.state.current_sym_object.x
             current_y = self.state.current_sym_object.y
             current_name = self.state.current_sym_object.name
-            
+
             self.state.sym_objects[current_name] = self.state.current_sym_object
         elif currentAttribute == "Child Objects":
             self.state.current_sym_object.connected_objects = currentValue
@@ -70,14 +70,14 @@ class AttributeView(): #table view for parameters, as well as the description
             self.state.line_drawer.connectSubObject(self.state.current_sym_object.name,
                                                 currentValue)
         else:
-            if currentAttribute not in self.state.current_sym_object.parameters:
-                self.state.current_sym_object.parameters[currentAttribute] = {}
-                if "Value" not in self.state.current_sym_object.parameters[currentAttribute]:
-                    self.state.current_sym_object.parameters[currentAttribute]["Value"] = currentValue
-                    self.state.current_sym_object.parameters[currentAttribute]["Type"] = \
+            if currentAttribute not in self.state.current_sym_object.instance_params:
+                self.state.current_sym_object.instance_params[currentAttribute] = {}
+                if "Value" not in self.state.current_sym_object.instance_params[currentAttribute]:
+                    self.state.current_sym_object.instance_params[currentAttribute]["Value"] = currentValue
+                    self.state.current_sym_object.instance_params[currentAttribute]["Type"] = \
                         self.state.catalog["SimObject"][self.state.current_sym_object.component_name]['ports'][currentAttribute]['Type']
             else:
-                self.state.current_sym_object.parameters[currentAttribute]["Value"] = \
+                self.state.current_sym_object.instance_params[currentAttribute]["Value"] = \
                                                                     currentValue
 
         # item no longer editable, disconnect
