@@ -11,8 +11,9 @@ import random
 import collections
 import copy
 
-"""convert a dictionary with unicode keys and values to utf-8"""
 def convert(data):
+    """convert a dictionary with unicode keys and values to utf-8"""
+    
     if isinstance(data, basestring):
         return str(data)
     elif isinstance(data, collections.Mapping):
