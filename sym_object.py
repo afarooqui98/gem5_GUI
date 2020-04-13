@@ -14,19 +14,19 @@ class SymObject(QGraphicsItemGroup):
                     loadingFromFile, state):
         super(SymObject, self).__init__()
 
-        """common variables"""
+        #common variables
         self.state = state
         self.component_name = component_name
         self.connected_objects = []
         self.parent_name = None
         self.scene = scene
 
-        """backend members
-            instance_ports and instance_params: keep metadata about connections
-            and are employed to make connections via m5
+        #backend members
+        #instance_ports and instance_params: keep metadata about connections
+        #and are employed to make connections via m5
 
-            sim_object and sim_object_instance: former is class, latter is class
-            instance"""
+        #sim_object and sim_object_instance: former is class, latter is class
+        #instance
         self.instance_params = {}
         self.instane_ports = {}
         self.sim_object = \
@@ -53,7 +53,7 @@ class SymObject(QGraphicsItemGroup):
         self.ui_connections = {}
         self.to_export = 1
 
-        """constructing the baseline ui elements"""
+        #constructing the baseline ui elements
         self.initUIObject(self, 0, 0)
         # if we are loading from a file, we dont need to check for overlapping
         # and can set position
@@ -80,10 +80,11 @@ class SymObject(QGraphicsItemGroup):
         self.y = self.scenePos().y()
         self.state.current_sym_object = self
 
-    """Get additional info on params such as default values  after
+    def get_param_info(self):
+        """Get additional info on params such as default values  after
         instantiating object. This information is held in a dictionary produced
         from calling enumerate_params method on instantiated object """
-    def get_param_info(self):
+        
         #calling enumerate_params to get exact values for parameters
         param_dict = self.sim_object_instance.enumerateParams()
 
@@ -108,10 +109,11 @@ class SymObject(QGraphicsItemGroup):
                     self.instance_params[param]["Value"] = default
                 else:
                     continue
-
-    """Instantiation and some paramter/port info collection occurs here when an
-        object is loaded from a model file """
+                    
     def load_instantiate(self):
+        """Instantiation and some paramter/port info collection occurs here when an
+        object is loaded from a model file """
+        
         self.sim_object_instance = self.sim_object()
         param_dict = self.sim_object_instance._params
         port_dict = self.sim_object_instance._ports
@@ -153,15 +155,16 @@ class SymObject(QGraphicsItemGroup):
 
         self.get_param_info() #enumerate over params to assign default values
 
-    """ Creates an instantiated object for the symobject and gets any new
-        info on the instance_params """
     def instantiateSimObject(self):
+        """ Creates an instantiated object for the symobject and gets any new
+        info on the instance_params """
+        
         self.sim_object_instance = self.sim_object()
         self.get_param_info()
 
-
-    """Create the display for the ports on the symobjects"""
     def initPorts(self):
+        """Create the display for the ports on the symobjects"""
+        
         self.ui_ports = []
         x = self.scenePos().x() + self.width * 3 / 4
         num_ports = len(self.instance_ports)
@@ -187,8 +190,9 @@ class SymObject(QGraphicsItemGroup):
 
             #self.addToGroup(port)
 
-    """creates the QGraphicsItem that shows up in the scene"""
     def initUIObject(self, object, x, y):
+        """creates the QGraphicsItem that shows up in the scene"""
+        
         # initializing to (x, y) so that future positions are relative to (x, y)
         object.rect = QGraphicsRectItem(x, y, object.width, object.height)
         object.rect.setBrush(QColor("White"))
@@ -217,7 +221,6 @@ class SymObject(QGraphicsItemGroup):
         object.setAcceptDrops(True)
         object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
-    """register mouse press events"""
     def mousePressEvent(self, event):
         # get object that was clicked on (since multiple objects can be stacked
         # on top of each other)
@@ -251,9 +254,10 @@ class SymObject(QGraphicsItemGroup):
         self.state.mainWindow.populateAttributes(None,
             clicked.component_name, False)
 
-    """remove visual respresentations of object"""
-    """TODO: implement backend removal, possibly in other function"""
     def delete(self):
+        """remove visual respresentations of object"""
+        #TODO: implement backend removal, possibly in other function
+        
         name = self.name
         self.state.scene.removeItem(self)
         if self.parent_name:
@@ -312,9 +316,10 @@ class SymObject(QGraphicsItemGroup):
             self.modifyConnections(event, object)
             self.updateChildrenConnections(event, object)
 
-    """when mouse is release on object, update its position including the case
-        where it overlaps and deal with subobject being created"""
     def mouseReleaseEvent(self, event):
+        """when mouse is release on object, update its position including the case
+        where it overlaps and deal with subobject being created"""
+        
         super(SymObject, self).mouseReleaseEvent(event)
 
         # if object has not moved
@@ -343,8 +348,8 @@ class SymObject(QGraphicsItemGroup):
         self.detachChildren()
         self.state.line_drawer.update()
 
-    """based on mouse click position, return object with highest zscore"""
     def getClickedObject(self, event):
+        """based on mouse click position, return object with highest zscore"""
         frontmost_object = None
         highest_zscore = -1
         for key in self.state.sym_objects:
@@ -359,8 +364,8 @@ class SymObject(QGraphicsItemGroup):
 
         return frontmost_object
 
-    """based on object being dragged, return object with highest zscore"""
     def getFrontmostOverLappingObject(self):
+        """based on object being dragged, return object with highest zscore"""
         frontmost_object = None
         highest_zscore = -1
         for key in self.state.sym_objects:
@@ -401,8 +406,9 @@ class SymObject(QGraphicsItemGroup):
             return self.isDescendant(self.state.sym_objects[child_name])
         return False
 
-    """checks if the delete button was pressed based on mouse click"""
     def deleteButtonPressed(self, event):
+        """checks if the delete button was pressed based on mouse click"""
+        
         # get x and y coordinate of mouse click
         click_x, click_y = event.scenePos().x(), event.scenePos().y()
 
@@ -421,8 +427,9 @@ class SymObject(QGraphicsItemGroup):
 
         return False
 
-    """checks if two objects overlap"""
     def doesOverlap(self, item):
+        """checks if two objects overlap"""
+        
         l1_x = self.scenePos().x()
         l1_y = self.scenePos().y()
         r1_x = self.scenePos().x() + self.width
@@ -434,8 +441,9 @@ class SymObject(QGraphicsItemGroup):
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap
 
-    """resizes a sym_object when another object is placed in it"""
     def resizeUIObject(self, item, force_resize, size):
+        """resizes a sym_object when another object is placed in it"""
+        
         item.removeFromGroup(item.rect)
         self.state.scene.removeItem(item.rect)
         item.removeFromGroup(item.rect_text)
@@ -532,21 +540,24 @@ class SymObject(QGraphicsItemGroup):
 
         return rightmost
 
-    """attaches all children of the current sym_object to
-        it so they move as one"""
     def attachChildren(self):
+        """attaches all children of the current sym_object to
+        it so they move as one"""
+        
         for child_name in self.connected_objects:
             self.addToGroup(self.state.sym_objects[child_name])
             #attach descendants
             self.state.sym_objects[child_name].attachChildren()
 
-    """detaches children to allow for independent movement"""
     def detachChildren(self):
+        """detaches children to allow for independent movement"""
+        
         for child_name in self.connected_objects:
             self.removeFromGroup(self.state.sym_objects[child_name])
 
-    """updates a symobjects name"""
     def updateName(self, newName):
+        """updates a symobjects name"""
+        
         # changed name on visualization of symobject
         self.rect_text.setPlainText(newName)
 
