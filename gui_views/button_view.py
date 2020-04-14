@@ -8,6 +8,9 @@ import sys, random
 import copy
 from gui_views import state
 import json
+import logging
+logging.basicConfig(filename='debug.log', filemode='w', \
+    format='%(name)s - %(levelname)s - %(message)s')
 
 from m5_calls import *
 
@@ -89,24 +92,24 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     #TODO
     def copy_button_pressed(self):
-        print("copy button pressed")
+        logging.info("copy button pressed")
         return
 
     #TODO
     def paste_button_pressed(self):
-        print ("paste button pressed")
+        logging.info("paste button pressed")
         return
 
     #TODO
     def undo_button_pressed(self):
-        print ("undo button pressed")
+        logging.info("undo button pressed")
         return
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
         dlg = instantiateDialog()
         if dlg.exec_():
-            print("Success!")
+            logging.debug("Export Success!")
             self.instantiate.setEnabled(False)
             self.simulate.setEnabled(True)
             self.save_button_pressed() #want to save before instantiation
@@ -192,7 +195,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
                 # TODO: Insert err message here if a parameter has not been set
                 if object.instance_params[param]["Value"] is None:
-                    print("Error must set required parameter")
+                    logging.error("Error must set required parameter")
                     params[str(param)]["Value"] = None
 
                 #Only need to store the values of parameters changed for now

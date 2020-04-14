@@ -1,6 +1,9 @@
 import sys
 import os
 import inspect
+import logging
+logging.basicConfig(filename='debug.log', filemode='w', \
+    format='%(name)s - %(levelname)s - %(message)s')
 from gui_views.state import *
 get_path()
 sys.path.append(os.getenv('gem5_path'))
@@ -127,13 +130,14 @@ def set_param_value(simobject, symobject, param, param_info, m5_children):
             if isinstance(param_info["Default"], AttrProxy):
                 result, found = param_info["Default"].find(simobject)
                 if not found:
-                    print("PROXY GOING BAD")
+                    logging.debug("Proxy not found given param " + param \
+                    + " for " + symObject.component_name)
                 else:
                     param_info["Value"] = result
             setattr(simobject, param, param_info["Value"])
         else:
             if str(param_info["Value"]) in symobject.connected_objects:
-                print("object exists and can be parameterized")
+                logging.error("object exists and can be parameterized")
 
 def traverse_params(sym_catalog, symobject, simobject):
     """ Recursively goes through object tree starting at symobject and
@@ -167,7 +171,7 @@ def set_port_value(port, port_info, sym_catalog, simobject):
         setattr(simobject, port,\
             getattr(sym_catalog[values[0]].sim_object_instance,values[1]))
     else:
-        pass
+        logging.debug("Port value for " + port + " is not set")
         #TODO figure out why its getting into else case
 
 def traverse_ports(sym_catalog, symobject, simobject):

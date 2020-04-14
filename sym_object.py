@@ -84,7 +84,7 @@ class SymObject(QGraphicsItemGroup):
         """Get additional info on params such as default values  after
         instantiating object. This information is held in a dictionary produced
         from calling enumerate_params method on instantiated object """
-        
+
         #calling enumerate_params to get exact values for parameters
         param_dict = self.sim_object_instance.enumerateParams()
 
@@ -109,11 +109,11 @@ class SymObject(QGraphicsItemGroup):
                     self.instance_params[param]["Value"] = default
                 else:
                     continue
-                    
+
     def load_instantiate(self):
         """Instantiation and some paramter/port info collection occurs here when an
         object is loaded from a model file """
-        
+
         self.sim_object_instance = self.sim_object()
         param_dict = self.sim_object_instance._params
         port_dict = self.sim_object_instance._ports
@@ -158,13 +158,13 @@ class SymObject(QGraphicsItemGroup):
     def instantiateSimObject(self):
         """ Creates an instantiated object for the symobject and gets any new
         info on the instance_params """
-        
+
         self.sim_object_instance = self.sim_object()
         self.get_param_info()
 
     def initPorts(self):
         """Create the display for the ports on the symobjects"""
-        
+
         self.ui_ports = []
         x = self.scenePos().x() + self.width * 3 / 4
         num_ports = len(self.instance_ports)
@@ -192,7 +192,7 @@ class SymObject(QGraphicsItemGroup):
 
     def initUIObject(self, object, x, y):
         """creates the QGraphicsItem that shows up in the scene"""
-        
+
         # initializing to (x, y) so that future positions are relative to (x, y)
         object.rect = QGraphicsRectItem(x, y, object.width, object.height)
         object.rect.setBrush(QColor("White"))
@@ -257,7 +257,7 @@ class SymObject(QGraphicsItemGroup):
     def delete(self):
         """remove visual respresentations of object"""
         #TODO: implement backend removal, possibly in other function
-        
+
         name = self.name
         self.state.scene.removeItem(self)
         if self.parent_name:
@@ -319,7 +319,7 @@ class SymObject(QGraphicsItemGroup):
     def mouseReleaseEvent(self, event):
         """when mouse is release on object, update its position including the case
         where it overlaps and deal with subobject being created"""
-        
+
         super(SymObject, self).mouseReleaseEvent(event)
 
         # if object has not moved
@@ -408,7 +408,7 @@ class SymObject(QGraphicsItemGroup):
 
     def deleteButtonPressed(self, event):
         """checks if the delete button was pressed based on mouse click"""
-        
+
         # get x and y coordinate of mouse click
         click_x, click_y = event.scenePos().x(), event.scenePos().y()
 
@@ -429,7 +429,7 @@ class SymObject(QGraphicsItemGroup):
 
     def doesOverlap(self, item):
         """checks if two objects overlap"""
-        
+
         l1_x = self.scenePos().x()
         l1_y = self.scenePos().y()
         r1_x = self.scenePos().x() + self.width
@@ -443,7 +443,7 @@ class SymObject(QGraphicsItemGroup):
 
     def resizeUIObject(self, item, force_resize, size):
         """resizes a sym_object when another object is placed in it"""
-        
+
         item.removeFromGroup(item.rect)
         self.state.scene.removeItem(item.rect)
         item.removeFromGroup(item.rect_text)
@@ -489,23 +489,6 @@ class SymObject(QGraphicsItemGroup):
             # place first child at x coordinate of parent
             next_x = item.scenePos().x()
 
-            # re-render all children to deal with any cases of nested children
-            # being resized
-            # print(item.name, item.scenePos().x(), item.scenePos().y())
-            # for child in item.connected_objects:
-            #     cur_child = self.state.sym_objects[child]
-            #     child_y = item.scenePos().y() + item.height - cur_child.height
-            #     cur_child.setPos(next_x, child_y)
-            #     cur_child.x = cur_child.scenePos().x()
-            #     cur_child.y = cur_child.scenePos().y()
-            #     next_x += cur_child.width + 10
-            #     print(cur_child.name, cur_child.scenePos().x(), cur_child.scenePos().y())
-
-
-            # if not force_resize:
-            #     self.setPos(next_x, child_y)
-            #     self.x = self.scenePos().x()
-            #     self.y = self.scenePos().y()
 
         # recursively traverse upwards and resize each parent
         if item.parent_name:
@@ -543,7 +526,7 @@ class SymObject(QGraphicsItemGroup):
     def attachChildren(self):
         """attaches all children of the current sym_object to
         it so they move as one"""
-        
+
         for child_name in self.connected_objects:
             self.addToGroup(self.state.sym_objects[child_name])
             #attach descendants
@@ -551,13 +534,13 @@ class SymObject(QGraphicsItemGroup):
 
     def detachChildren(self):
         """detaches children to allow for independent movement"""
-        
+
         for child_name in self.connected_objects:
             self.removeFromGroup(self.state.sym_objects[child_name])
 
     def updateName(self, newName):
         """updates a symobjects name"""
-        
+
         # changed name on visualization of symobject
         self.rect_text.setPlainText(newName)
 
