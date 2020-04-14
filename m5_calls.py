@@ -194,14 +194,24 @@ def traverse_ports(sym_catalog, symobject, simobject):
 def traverse_hierarchy_root(sym_catalog, symroot):
     """Recursively set parameters and then recursively set ports for
         instantiated objs"""
-    root = symroot.sim_object_instance
-    name, simroot = traverse_params(sym_catalog, symroot, root)
-    name, simroot = traverse_ports(sym_catalog, symroot, simroot)
+    try:
+        root = symroot.sim_object_instance
+        name, simroot = traverse_params(sym_catalog, symroot, root)
+        name, simroot = traverse_ports(sym_catalog, symroot, simroot)
+    except:
+        logging.error("Could not create simobject tree")
     return symroot.name, simroot
 
 def instantiate_model():
-    m5.instantiate()
+    try:
+        m5.instantiate()
+    except AttributeError:
+        logging.error("Instantiate error on proxy param")
 
 def simulate():
-    exit_event = m5.simulate()
-    print('Exiting @ tick %i because %s' %(m5.curTick(), exit_event.getCause()))
+    try:
+        exit_event = m5.simulate()
+        print('Exiting @ tick %i because %s' %(m5.curTick(), \
+            exit_event.getCause()))
+    except AttributeError:
+        logging.error("Simulation error")
