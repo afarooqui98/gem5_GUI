@@ -9,10 +9,14 @@ from gui_views.button_view import *
 from gui_views.catalog_view import *
 from gui_views.attribute_view import *
 from gui_views.state import *
+from m5_calls import isSimObjectParam
 
 import sys, random
 import copy
 import json
+import logging
+logging.basicConfig(filename='debug.log', filemode='w', \
+    format='%(name)s - %(levelname)s - %(message)s')
 
 class MainWindow(QMainWindow):
     """this class creates the main window"""
@@ -49,7 +53,7 @@ class MainWindow(QMainWindow):
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
 
-    def addRow(self, value1, value2, isTreeWidgetClick):
+    def addRow(self, value1, value2, isTreeWidgetClick, isSimObject):
         table = self.attributeView.attributeTable
         table.insertRow(table.rowCount())
         # set column 0 value
@@ -65,6 +69,10 @@ class MainWindow(QMainWindow):
 
         # set column 1 value
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value2))
+        if isSimObject: #add a drop down of child objects
+            comboBox = QComboBox()
+            comboBox.addItems(self.state.current_sym_object.connected_objects)
+            table.setCellWidget(table.rowCount() - 1, 1, comboBox)
         cell = table.item(table.rowCount() - 1, 1)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
         if not isTreeWidgetClick and value2 == None:
@@ -87,11 +95,10 @@ class MainWindow(QMainWindow):
         #   connected objects as well
         if cur_object:
             self.addRow("Name", cur_object.name,
-                        isTreeWidgetClick)
+                        isTreeWidgetClick, False)
             self.addRow("Child Objects",
                         ", ".join(cur_object.connected_objects),
-                        isTreeWidgetClick)
-
+                        isTreeWidgetClick, False)
         if item:
             if item.parent() is None:
                 return
@@ -103,13 +110,14 @@ class MainWindow(QMainWindow):
                 self.state.current_sym_object.component_name == name:
                 self.attributes = self.state.current_sym_object.instance_params
             else: # TODO: check when would this branch happen??
-                print("filling in name branch")
+                logging.debug("filling in name branch")
                 self.attributes = self.catalog[name]
 
         # display the param name and values
         for attribute in self.attributes.keys():
+            isSim = cur_object and isSimObjectParam(self.attributes[attribute])
             self.addRow(attribute, str(self.attributes[attribute]["Value"]),
-                                                    isTreeWidgetClick)
+                                                    isTreeWidgetClick, isSim)
 
     # This function populates the tree view with sym-objects
     def populate(self):

@@ -7,6 +7,9 @@ import sys, random
 import copy
 from gui_views import state
 import json
+import logging
+logging.basicConfig(filename='debug.log', filemode='w', \
+    format='%(name)s - %(levelname)s - %(message)s')
 
 class AttributeView(): #table view for parameters, as well as the description
     def __init__(self, layout, state):
@@ -38,6 +41,8 @@ class AttributeView(): #table view for parameters, as well as the description
     # this function feeds into the next one, after the cell is changed it will
     # trigger
     def makeEditable(self, item):
+        if self.state.current_sym_object == None or not item:
+            return
         # set item to editable
         item.setFlags(item.flags() | Qt.ItemIsEditable)
         self.attributeTable.itemChanged.connect(self.modifyFields)
@@ -45,9 +50,6 @@ class AttributeView(): #table view for parameters, as well as the description
     # this signal disconnects itself after finishing execution, since we only
     # want to trigger it AFTER a double press
     def modifyFields(self, item):
-        if self.state.current_sym_object == None or not item:
-            return
-
         # get attributes
         currentColumn = self.attributeTable.column(item)
         currentRow = self.attributeTable.row(item)

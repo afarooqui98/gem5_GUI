@@ -102,7 +102,9 @@ def get_obj_lists():
 
     return obj_tree, instance_tree
 
-
+def isSimObjectParam(param_info):
+    """ Given metadata of parameter see if it is a SimObject Param"""
+    return issubclass(param_info["Type"], SimObject)
 
 
 def set_param_value(simobject, symobject, param, param_info, m5_children):
@@ -113,7 +115,7 @@ def set_param_value(simobject, symobject, param, param_info, m5_children):
     if isinstance(param_info["Value"], unicode):
         # Check if the param's type is another Simobject, which means
         #   it must be set as a child of the object already
-        if issubclass(param_info["Type"], SimObject):
+        if isSimObjectParam(param_info):
             for obj in m5_children:
                 sym, sim = obj
                 if sym == param_info["Value"]:
