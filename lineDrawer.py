@@ -27,9 +27,10 @@ class LineDrawer(QWidget):
         if self.state.draw_wire_state:
             self.pos1 = event.pos()
         else:
-            if self.state.current_sym_object:
-                self.state.current_sym_object.rect.setBrush(QColor("White"))
-                self.state.current_sym_object = None
+            if len(self.state.selected_sym_objects):
+                for sym_object in self.state.selected_sym_objects:
+                    sym_object.rect.setBrush(QColor("White"))
+                del self.state.selected_sym_objects[:]
                 table = self.state.mainWindow.attributeView.attributeTable
                 table.clear()
                 table.setRowCount(0)

@@ -37,8 +37,9 @@ class CatalogView(): #dropdown and search bar
         self.treeWidget.itemDoubleClicked.connect(self.createSymObject)
 
     def removeHighlight(self, item):
-        if self.state.current_sym_object:
-            self.state.current_sym_object.rect.setBrush(QColor("White"))
+        if len(self.state.selected_sym_objects):
+            for sym_object in self.state.selected_sym_objects:
+                sym_object.rect.setBrush(QColor("White"))
 
     #this creates a new symobject at some point in the CanvasView
     def createSymObject(self, item):
@@ -57,21 +58,22 @@ class CatalogView(): #dropdown and search bar
                 pass
             return
 
+        del self.state.selected_sym_objects[:]
         #modify state to accomodate the new object
-        self.state.current_sym_object = \
+        self.state.selected_sym_objects[0] = \
             self.state.scene.addObjectToScene("component", item.text(0), name)
-        self.state.current_sym_object.instance_params = \
+        self.state.selected_sym_objects[0].instance_params = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['params'])
-        self.state.current_sym_object.instance_ports = \
+        self.state.selected_sym_objects[0].instance_ports = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
-        self.state.current_sym_object.initPorts()
+        self.state.selected_sym_objects[0].initPorts()
 
         #eager instantiation
-        self.state.current_sym_object.instantiateSimObject()
+        self.state.selected_sym_objects[0].instantiateSimObject()
 
         self.state.mostRecentSaved = False
         #allow instantiation ONLY when root is on the canvas
-        #if self.state.current_sym_object.component_name == "Root":
+        #if self.state.selected_sym_objects.component_name == "Root":
         #    self.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
     # make tree view searchable

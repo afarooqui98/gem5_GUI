@@ -78,7 +78,8 @@ class SymObject(QGraphicsItemGroup):
 
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
-        self.state.current_sym_object = self
+        del self.state.selected_sym_objects[:]
+        self.state.selected_sym_objects.append(self)
 
     def get_param_info(self):
         """Get additional info on params such as default values  after
@@ -222,6 +223,16 @@ class SymObject(QGraphicsItemGroup):
         object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
     def mousePressEvent(self, event):
+        modifiers = QApplication.keyboardModifiers()
+        if modifiers == Qt.ShiftModifier:
+            print('Shift+Click')
+        else:
+            # hide button on previously selected object
+            if len(self.state.selected_sym_objects):
+                for sym_object in self.state.selected_sym_objects:
+                    sym_object.delete_button.hide()
+                    sym_object.rect.setBrush(QColor("White"))
+            del self.state.selected_sym_objects[:]
         # get object that was clicked on (since multiple objects can be stacked
         # on top of each other)
         clicked = self.getClickedObject(event)
@@ -234,11 +245,6 @@ class SymObject(QGraphicsItemGroup):
         clicked.attachChildren()
         super(SymObject, clicked).mousePressEvent(event)
 
-        # hide button on previously selected object
-        if self.state.current_sym_object:
-            self.state.current_sym_object.delete_button.hide()
-            self.state.current_sym_object.rect.setBrush(QColor("White"))
-
         # show button for current object
         clicked.delete_button.show()
         clicked.rect.setBrush(QColor("Green"))
@@ -250,9 +256,10 @@ class SymObject(QGraphicsItemGroup):
             return
 
         # set currentsymobject to self and update attributes for it
-        self.state.current_sym_object = clicked
-        self.state.mainWindow.populateAttributes(None,
-            clicked.component_name, False)
+        self.state.selected_sym_objects.append(clicked)
+        if len(self.state.selected_sym_objects) == 1:
+            self.state.mainWindow.populateAttributes(None,
+                clicked.component_name, False)
 
     def delete(self):
         """remove visual respresentations of object"""
@@ -269,7 +276,7 @@ class SymObject(QGraphicsItemGroup):
             #self.state.sym_objects[child_name].delete()
             del self.state.sym_objects[child_name]
 
-        self.state.current_sym_object = None
+        del self.state.selected_sym_objects[:]
         del self.state.sym_objects[name]
         self.state.mostRecentSaved = False
 

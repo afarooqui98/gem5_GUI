@@ -99,11 +99,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     #TODO
     def copy_button_pressed(self):
         print("copy button pressed")
-        if not self.state.current_sym_object:
+        if not len(self.state.selected_sym_objects):
             return
 
         self.state.copyState = True
-        self.state.selectedObject = self.state.current_sym_object
+        self.state.selectedObject = self.state.selected_sym_objects
         return
 
     #TODO
@@ -111,9 +111,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not self.state.copyState:
             return
 
-        if self.state.current_sym_object:
-            self.state.current_sym_object.rect.setBrush(QColor("White"))
-            self.state.current_sym_object.deleteButton.hide()
+        if len(self.state.selected_sym_objects):
+            self.state.selected_sym_objects.rect.setBrush(QColor("White"))
+            self.state.selected_sym_objects.deleteButton.hide()
 
         object_name = self.state.selectedObject.name + "_copy"
         new_object = self.state.scene.addObjectToScene("component",
@@ -128,7 +128,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         new_object.instantiateSimObject()
 
-        self.state.current_sym_object = new_object
+        self.state.selected_sym_objects = new_object
         self.state.copyState = False
         self.state.selectedObject = None
 

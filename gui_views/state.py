@@ -12,7 +12,7 @@ class State():
         self.drag_state = True
         self.draw_wire_state = False
         self.sym_objects = {} # Map name to actual symobject (has coords)
-        self.current_sym_object = None
+        self.selected_sym_objects = []
         self.line_drawer = None
         self.scene = None
         self.mainWindow = None
