@@ -6,10 +6,22 @@ from lineDrawer import *
 from PySide2.QtCore import *
 from gui_views import state
 from sym_object import *
-from m5_calls import load_instantiate
 import string
 import random
+import collections
 import copy
+
+def convert(data):
+    """convert a dictionary with unicode keys and values to utf-8"""
+    
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convert, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convert, data))
+    else:
+        return data
 
 class GraphicsScene(QGraphicsScene):
     """this class provides a scene to manage objects"""
@@ -41,15 +53,15 @@ class GraphicsScene(QGraphicsScene):
         parameters = newObject["parameters"]
         connected_objects = newObject["connected_objects"]
         parent = newObject["parent_name"]
-        connections = newObject["connections"]
+        connections = convert(newObject["connections"])
 
         new_object = SymObject(x, y, width, height, self, component_name, name,
             True, self.state)
-        new_object.parameters = parameters
+        new_object.instance_params = parameters
         new_object.connected_objects = connected_objects
         new_object.parent_name = parent
         new_object.z = z
-        new_object.ports = newObject["ports"]
+        new_object.instance_ports = convert(newObject["ports"])
 
         new_object_connections = {}
 
@@ -66,18 +78,19 @@ class GraphicsScene(QGraphicsScene):
                 connection["key"][2], connection["key"][3])
             new_object_connections[key] = new_connection
 
-        new_object.connections = new_object_connections
+        new_object.ui_connections = new_object_connections
 
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object
         self.state.current_sym_object = new_object
-        self.state.current_sym_object.SimObject = \
-            copy.deepcopy(
-        self.state.instances[self.state.current_sym_object.component_name])
         self.state.current_sym_object.initPorts()
 
         # instantiate the simobject and set its parameters
-        load_instantiate(self.state.current_sym_object)
+        self.state.current_sym_object.load_instantiate()
+
+        if component_name == "Root":
+            #found a root object loaded in from a ui file
+            self.state.mainWindow.buttonView.instantiate.setEnabled(True)
 
         self.addItem(new_object)
         return new_object
@@ -95,6 +108,10 @@ class GraphicsScene(QGraphicsScene):
                                 False, self.state)
 
         self.state.sym_objects[name] = new_object
+
+        if component_name == "Root":
+            #user created a root object, can instantiate now
+            self.state.mainWindow.buttonView.instantiate.setEnabled(True)
 
         #self.state.current_sym_object = new_object
         self.addItem(new_object)

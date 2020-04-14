@@ -16,8 +16,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state = state
 
         # set up main menu - add tabs and connect each button to handler
-        mainMenu = window.menuBar()
-        self.buildMenuBar(mainMenu, window)
+        self.mainMenu = window.menuBar()
+        self.buildMenuBar(self.mainMenu, window)
 
     # build the main menu bar
     def buildMenuBar(self, mainMenu, window):
@@ -25,6 +25,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.buildEditTab(mainMenu, window)
         self.buildRunTab(mainMenu, window)
         self.buildToolsTab(mainMenu, window)
+
 
     # build the file tab
     def buildFileTab(self, mainMenu, window):
@@ -72,6 +73,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         runMenu = mainMenu.addMenu('Run')
         runMenu.addAction(instantiateAction)
         runMenu.addAction(simulateAction)
+        # Grey out the actions until we can actually instantiate or simulate
+        self.instantiate = instantiateAction
+        self.instantiate.setEnabled(False)
+        self.simulate = simulateAction
+        self.simulate.setEnabled(False)
+
 
     # build the tools tab
     def buildToolsTab(self, mainMenu, window):
@@ -113,8 +120,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                                     self.state.selectedObject.component_name,
                                     object_name)
 
-        new_object.ports = copy.deepcopy(self.state.selectedObject.ports)
-        new_object.parameters = copy.deepcopy(self.state.selectedObject.parameters)
+        new_object.instance_ports = copy.deepcopy(self.state.selectedObject.instance_ports)
+        new_object.instance_params = copy.deepcopy(self.state.selectedObject.instance_params)
         new_object.SimObject = \
                 copy.deepcopy(self.state.instances[new_object.component_name])
         new_object.initPorts()
@@ -137,14 +144,14 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         dlg = instantiateDialog()
         if dlg.exec_():
             print("Success!")
+            self.instantiate.setEnabled(False)
+            self.simulate.setEnabled(True)
             self.save_button_pressed() #want to save before instantiation
             for object in self.state.sym_objects.values():
                 if object.component_name == "Root":
                     root_name , root = traverse_hierarchy_root(\
                                                 self.state.sym_objects, object)
-                    instantiate() #actual m5 instatiation
-                    self.simulateButton.setEnabled(True)
-                    self.exportButton.setEnabled(False)
+                    instantiate_model() #actual m5 instatiation
 
     # creates a python file that can be run with gem5
     def simulate_button_pressed(self):
@@ -175,12 +182,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         # clear out existing objects and wires before loading from file
         for object in self.state.sym_objects.values():
-            for name, connection in object.connections.items():
+            for name, connection in object.ui_connections.items():
                 if connection.line:
                     self.state.scene.removeItem(connection.line)
 
             self.state.scene.removeItem(object)
-            object.connections.clear()
+            object.ui_connections.clear()
 
         self.state.sym_objects.clear()
 
@@ -219,57 +226,59 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             params = {}
             #Storing the parameters
-            for param in object.parameters:
+            for param in object.instance_params:
                 params[str(param)] = {}
 
                 # TODO: Insert err message here if a parameter has not been set
-                if object.parameters[param]["Value"] is None:
+                if object.instance_params[param]["Value"] is None:
                     print("Error must set required parameter")
                     params[str(param)]["Value"] = None
 
                 #Only need to store the values of parameters changed for now
-                if object.parameters[param]["Default"] != \
-                    object.parameters[param]["Value"]:
-                    param_type = type(object.parameters[param]["Value"])
+                if object.instance_params[param]["Default"] != \
+                    object.instance_params[param]["Value"]:
+                    param_type = type(object.instance_params[param]["Value"])
                     if (param_type == str or param_type == int or \
                             param_type == bool or param_type == unicode or \
                             param_type == list):
                         params[str(param)]["Value"] = \
-                            object.parameters[param]["Value"]
+                            object.instance_params[param]["Value"]
                     else:
                         # weird case if a value is a class but shouldn't really
                         #   hit this case since all user inputs are strings
                         params[str(param)]["Value"] = \
-                            object.parameters[param]["Value"].__dict__
+                            object.instance_params[param]["Value"].__dict__
 
             newObject["parameters"] = params
 
             ports = {}
-            for port in object.ports.keys():
+            for port in object.instance_ports.keys():
                 ports[port] = {}
-                print(type(object.ports[port]["Value"]))
-                ports[port]["Value"] = str(object.ports[port]["Value"])
+                if isinstance(object.instance_ports[port]["Value"], str):
+                    ports[port]["Value"] = str(object.instance_ports[port]["Value"])
+                else:
+                    ports[port]["Value"] = None
 
             newObject["ports"] = ports
             newObject["connected_objects"] = object.connected_objects
 
             connections = []
 
-            for c in object.connections:
+            for c in object.ui_connections:
                 newConnection = {}
                 newConnection["key"] = c
                 newConnection["parent_endpoint_x"] = \
-                        object.connections[c].parent_endpoint.x()
+                        object.ui_connections[c].parent_endpoint.x()
                 newConnection["parent_endpoint_y"] = \
-                        object.connections[c].parent_endpoint.y()
+                        object.ui_connections[c].parent_endpoint.y()
                 newConnection["child_endpoint_x"] = \
-                        object.connections[c].child_endpoint.x()
+                        object.ui_connections[c].child_endpoint.x()
                 newConnection["child_endpoint_y"] = \
-                        object.connections[c].child_endpoint.y()
+                        object.ui_connections[c].child_endpoint.y()
                 newConnection["parent_port_num"] = \
-                        object.connections[c].parent_port_num
+                        object.ui_connections[c].parent_port_num
                 newConnection["child_port_num"] = \
-                        object.connections[c].child_port_num
+                        object.ui_connections[c].child_port_num
                 connections.append(newConnection)
 
             newObject["connections"] = connections
@@ -300,8 +309,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         # with the selected file write our JSON object
         with open(filename, 'w') as outfile:
-            json.dump(savedObjects, outfile)
-
+            json.dump(savedObjects, outfile, indent=4)
         # get file name from path
         tokens = filename.split('/')
         self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
@@ -326,7 +334,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         # with the selected file write our JSON object
         with open(filename, 'w') as outfile:
-            json.dump(savedObjects, outfile)
+            json.dump(savedObjects, outfile, indent=4)
 
         # get file name from path
         tokens = filename.split('/')

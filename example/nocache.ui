@@ -13,14 +13,14 @@
                     "Value": "False"
                 }
             }, 
-            "height": 451.0, 
+            "height": 385.0, 
             "connections": [], 
             "width": 1050, 
             "connected_objects": [
                 "sys"
             ], 
-            "y": 399.0, 
-            "x": 440.0, 
+            "y": 363.0, 
+            "x": 516.0, 
             "z": 0, 
             "ports": {}, 
             "component_name": "Root"
@@ -61,7 +61,7 @@
                 "work_item_id": {}, 
                 "exit_on_work_items": {}
             }, 
-            "height": 366.0, 
+            "height": 370.0, 
             "connections": [
                 {
                     "child_port_num": 2, 
@@ -72,21 +72,21 @@
                         "system_port", 
                         "slave"
                     ], 
-                    "parent_endpoint_x": 1151.0, 
-                    "parent_endpoint_y": 497.0, 
-                    "child_endpoint_y": 513.0, 
-                    "child_endpoint_x": 855.0
+                    "parent_endpoint_x": 1208.0, 
+                    "parent_endpoint_y": 479.25, 
+                    "child_endpoint_y": 455.5, 
+                    "child_endpoint_x": 952.0
                 }
             ], 
             "width": 750, 
             "connected_objects": [
-                "cpu", 
                 "membus", 
                 "memctrl", 
+                "cpu", 
                 "clk_domain"
             ], 
-            "y": 411.0, 
-            "x": 496.0, 
+            "y": 368.0, 
+            "x": 551.0, 
             "z": 1, 
             "ports": {
                 "system_port": {
@@ -132,10 +132,10 @@
                         "slave", 
                         "icache_port"
                     ], 
-                    "parent_endpoint_x": 781.0, 
-                    "parent_endpoint_y": 621.0, 
-                    "child_endpoint_y": 513.0, 
-                    "child_endpoint_x": 857.0
+                    "parent_endpoint_x": 850.0, 
+                    "parent_endpoint_y": 539.0, 
+                    "child_endpoint_y": 455.5, 
+                    "child_endpoint_x": 952.0
                 }, 
                 {
                     "child_port_num": 1, 
@@ -146,10 +146,10 @@
                         "master", 
                         "port"
                     ], 
-                    "parent_endpoint_x": 645.0, 
-                    "parent_endpoint_y": 501.0, 
-                    "child_endpoint_y": 495.0, 
-                    "child_endpoint_x": 855.0
+                    "parent_endpoint_x": 733.0, 
+                    "parent_endpoint_y": 433.5, 
+                    "child_endpoint_y": 438.83333333333337, 
+                    "child_endpoint_x": 952.0
                 }, 
                 {
                     "child_port_num": 2, 
@@ -160,10 +160,10 @@
                         "slave", 
                         "system_port"
                     ], 
-                    "parent_endpoint_x": 1151.0, 
-                    "parent_endpoint_y": 497.0, 
-                    "child_endpoint_y": 513.0, 
-                    "child_endpoint_x": 855.0
+                    "parent_endpoint_x": 1208.0, 
+                    "parent_endpoint_y": 479.25, 
+                    "child_endpoint_y": 455.5, 
+                    "child_endpoint_x": 952.0
                 }, 
                 {
                     "child_port_num": 1, 
@@ -174,10 +174,10 @@
                         "master", 
                         "int_slave"
                     ], 
-                    "parent_endpoint_x": 687.0, 
-                    "parent_endpoint_y": 666.0, 
-                    "child_endpoint_y": 496.0, 
-                    "child_endpoint_x": 854.0
+                    "parent_endpoint_x": 739.0, 
+                    "parent_endpoint_y": 629.1666666666666, 
+                    "child_endpoint_y": 438.83333333333337, 
+                    "child_endpoint_x": 952.0
                 }, 
                 {
                     "child_port_num": 2, 
@@ -188,10 +188,10 @@
                         "slave", 
                         "dcache_port"
                     ], 
-                    "parent_endpoint_x": 802.0, 
-                    "parent_endpoint_y": 731.0, 
-                    "child_endpoint_y": 514.0, 
-                    "child_endpoint_x": 857.0
+                    "parent_endpoint_x": 850.0, 
+                    "parent_endpoint_y": 639.0, 
+                    "child_endpoint_y": 455.5, 
+                    "child_endpoint_x": 952.0
                 }, 
                 {
                     "child_port_num": 1, 
@@ -202,10 +202,10 @@
                         "master", 
                         "pio"
                     ], 
-                    "parent_endpoint_x": 686.0, 
-                    "parent_endpoint_y": 700.0, 
-                    "child_endpoint_y": 496.0, 
-                    "child_endpoint_x": 855.0
+                    "parent_endpoint_x": 739.0, 
+                    "parent_endpoint_y": 662.5, 
+                    "child_endpoint_y": 438.83333333333337, 
+                    "child_endpoint_x": 952.0
                 }, 
                 {
                     "child_port_num": 2, 
@@ -216,26 +216,26 @@
                         "slave", 
                         "int_master"
                     ], 
-                    "parent_endpoint_x": 690.0, 
-                    "parent_endpoint_y": 685.0, 
-                    "child_endpoint_y": 513.0, 
-                    "child_endpoint_x": 856.0
+                    "parent_endpoint_x": 739.0, 
+                    "parent_endpoint_y": 645.8333333333333, 
+                    "child_endpoint_y": 455.5, 
+                    "child_endpoint_x": 952.0
                 }
             ], 
             "width": 150, 
             "connected_objects": [], 
-            "y": 447.0, 
-            "x": 725.0, 
+            "y": 393.0, 
+            "x": 820.0, 
             "z": 2, 
             "ports": {
                 "default": {
-                    "Value": "<m5.params.RequestPort object at 0x7f474e9e5c10>"
-                }, 
-                "master": {
-                    "Value": "<m5.params.VectorRequestPort object at 0x7f474e9e5c90>"
+                    "Value": null
                 }, 
                 "slave": {
-                    "Value": "<m5.params.VectorResponsePort object at 0x7f474e9e5c50>"
+                    "Value": null
+                }, 
+                "master": {
+                    "Value": null
                 }
             }, 
             "component_name": "SystemXBar"
@@ -343,16 +343,16 @@
                         "port", 
                         "master"
                     ], 
-                    "parent_endpoint_x": 645.0, 
-                    "parent_endpoint_y": 501.0, 
-                    "child_endpoint_y": 495.0, 
-                    "child_endpoint_x": 855.0
+                    "parent_endpoint_x": 733.0, 
+                    "parent_endpoint_y": 433.5, 
+                    "child_endpoint_y": 438.83333333333337, 
+                    "child_endpoint_x": 952.0
                 }
             ], 
             "width": 150, 
             "connected_objects": [], 
-            "y": 448.0, 
-            "x": 518.0, 
+            "y": 396.0, 
+            "x": 601.0, 
             "z": 2, 
             "ports": {
                 "port": {
@@ -381,8 +381,8 @@
             "connected_objects": [
                 "volts"
             ], 
-            "y": 547.0, 
-            "x": 830.0, 
+            "y": 492.0, 
+            "x": 911.0, 
             "z": 2, 
             "ports": {}, 
             "component_name": "SrcClockDomain"
@@ -437,10 +437,10 @@
                         "icache_port", 
                         "slave"
                     ], 
-                    "parent_endpoint_x": 781.0, 
-                    "parent_endpoint_y": 621.0, 
-                    "child_endpoint_y": 513.0, 
-                    "child_endpoint_x": 857.0
+                    "parent_endpoint_x": 850.0, 
+                    "parent_endpoint_y": 539.0, 
+                    "child_endpoint_y": 455.5, 
+                    "child_endpoint_x": 952.0
                 }, 
                 {
                     "child_port_num": 2, 
@@ -451,18 +451,18 @@
                         "dcache_port", 
                         "slave"
                     ], 
-                    "parent_endpoint_x": 802.0, 
-                    "parent_endpoint_y": 731.0, 
-                    "child_endpoint_y": 514.0, 
-                    "child_endpoint_x": 857.0
+                    "parent_endpoint_x": 850.0, 
+                    "parent_endpoint_y": 639.0, 
+                    "child_endpoint_y": 455.5, 
+                    "child_endpoint_x": 952.0
                 }
             ], 
             "width": 300, 
             "connected_objects": [
                 "interrupts"
             ], 
-            "y": 552.0, 
-            "x": 520.0, 
+            "y": 489.0, 
+            "x": 587.0, 
             "z": 2, 
             "ports": {
                 "icache_port": {
@@ -487,8 +487,8 @@
             "connections": [], 
             "width": 150, 
             "connected_objects": [], 
-            "y": 686.0, 
-            "x": 845.0, 
+            "y": 576.0, 
+            "x": 967.0, 
             "z": 3, 
             "ports": {}, 
             "component_name": "VoltageDomain"
@@ -514,10 +514,10 @@
                         "int_master", 
                         "slave"
                     ], 
-                    "parent_endpoint_x": 690.0, 
-                    "parent_endpoint_y": 685.0, 
-                    "child_endpoint_y": 513.0, 
-                    "child_endpoint_x": 856.0
+                    "parent_endpoint_x": 739.0, 
+                    "parent_endpoint_y": 645.8333333333333, 
+                    "child_endpoint_y": 455.5, 
+                    "child_endpoint_x": 952.0
                 }, 
                 {
                     "child_port_num": 1, 
@@ -528,10 +528,10 @@
                         "pio", 
                         "master"
                     ], 
-                    "parent_endpoint_x": 686.0, 
-                    "parent_endpoint_y": 700.0, 
-                    "child_endpoint_y": 496.0, 
-                    "child_endpoint_x": 855.0
+                    "parent_endpoint_x": 739.0, 
+                    "parent_endpoint_y": 662.5, 
+                    "child_endpoint_y": 438.83333333333337, 
+                    "child_endpoint_x": 952.0
                 }, 
                 {
                     "child_port_num": 1, 
@@ -542,16 +542,16 @@
                         "int_slave", 
                         "master"
                     ], 
-                    "parent_endpoint_x": 687.0, 
-                    "parent_endpoint_y": 666.0, 
-                    "child_endpoint_y": 496.0, 
-                    "child_endpoint_x": 854.0
+                    "parent_endpoint_x": 739.0, 
+                    "parent_endpoint_y": 629.1666666666666, 
+                    "child_endpoint_y": 438.83333333333337, 
+                    "child_endpoint_x": 952.0
                 }
             ], 
             "width": 150, 
             "connected_objects": [], 
-            "y": 633.0, 
-            "x": 555.0, 
+            "y": 600.0, 
+            "x": 607.0, 
             "z": 3, 
             "ports": {
                 "int_slave": {
