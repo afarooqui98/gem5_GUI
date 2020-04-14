@@ -46,6 +46,13 @@ class State():
 
         connection.line.setZValue(1000)
 
+    def removeHighlight(self):
+        if len(self.selected_sym_objects):
+            for sym_object in self.selected_sym_objects:
+                sym_object.rect.setBrush(QColor("White"))
+                sym_object.delete_button.hide()
+
+
 #finds the gem5 path
 def get_path():
     gem5_parent_dir = os.getenv("GEM5_HOME")

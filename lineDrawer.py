@@ -27,13 +27,11 @@ class LineDrawer(QWidget):
         if self.state.draw_wire_state:
             self.pos1 = event.pos()
         else:
-            if len(self.state.selected_sym_objects):
-                for sym_object in self.state.selected_sym_objects:
-                    sym_object.rect.setBrush(QColor("White"))
-                del self.state.selected_sym_objects[:]
-                table = self.state.mainWindow.attributeView.attributeTable
-                table.clear()
-                table.setRowCount(0)
+            self.state.removeHighlight()
+            del self.state.selected_sym_objects[:]
+            table = self.state.mainWindow.attributeView.attributeTable
+            table.clear()
+            table.setRowCount(0)
 
     def mouseMoveEvent(self, event):
         if self.state.draw_wire_state and self.pos1:

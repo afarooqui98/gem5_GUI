@@ -224,14 +224,9 @@ class SymObject(QGraphicsItemGroup):
 
     def mousePressEvent(self, event):
         modifiers = QApplication.keyboardModifiers()
-        if modifiers == Qt.ShiftModifier:
-            print('Shift+Click')
-        else:
+        if modifiers != Qt.ShiftModifier:
             # hide button on previously selected object
-            if len(self.state.selected_sym_objects):
-                for sym_object in self.state.selected_sym_objects:
-                    sym_object.delete_button.hide()
-                    sym_object.rect.setBrush(QColor("White"))
+            self.state.removeHighlight()
             del self.state.selected_sym_objects[:]
         # get object that was clicked on (since multiple objects can be stacked
         # on top of each other)
@@ -255,8 +250,9 @@ class SymObject(QGraphicsItemGroup):
             clicked.delete()
             return
 
-        # set currentsymobject to self and update attributes for it
-        self.state.selected_sym_objects.append(clicked)
+        # add clicked to list if not present and update attributes for it
+        if not clicked in self.state.selected_sym_objects:
+            self.state.selected_sym_objects.append(clicked)
         if len(self.state.selected_sym_objects) == 1:
             self.state.mainWindow.populateAttributes(None,
                 clicked.component_name, False)

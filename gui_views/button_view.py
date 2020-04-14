@@ -96,48 +96,40 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.setDragState()
         self.state.line_drawer.update()
 
-    #TODO
     def copy_button_pressed(self):
         print("copy button pressed")
         if not len(self.state.selected_sym_objects):
             return
 
         self.state.copyState = True
-        self.state.selectedObject = self.state.selected_sym_objects
-        return
+        self.state.copied_objects = list(self.state.selected_sym_objects)
 
     #TODO
     def paste_button_pressed(self):
         if not self.state.copyState:
             return
 
-        if len(self.state.selected_sym_objects):
-            self.state.selected_sym_objects.rect.setBrush(QColor("White"))
-            self.state.selected_sym_objects.deleteButton.hide()
+        self.state.removeHighlight()
+        for selectedObject in self.state.copied_objects:
+            object_name = selectedObject.name + "_copy"
+            new_object = self.state.scene.addObjectToScene("component",
+                                    selectedObject.component_name, object_name)
 
-        object_name = self.state.selectedObject.name + "_copy"
-        new_object = self.state.scene.addObjectToScene("component",
-                                    self.state.selectedObject.component_name,
-                                    object_name)
-
-        new_object.instance_ports = copy.deepcopy(self.state.selectedObject.instance_ports)
-        new_object.instance_params = copy.deepcopy(self.state.selectedObject.instance_params)
-        new_object.SimObject = \
+            new_object.instance_ports = copy.deepcopy(selectedObject.instance_ports)
+            new_object.instance_params = copy.deepcopy(selectedObject.instance_params)
+            new_object.SimObject = \
                 copy.deepcopy(self.state.instances[new_object.component_name])
-        new_object.initPorts()
+            new_object.initPorts()
 
-        new_object.instantiateSimObject()
+            new_object.instantiateSimObject()
+            self.state.sym_objects[object_name] = new_object
 
-        self.state.selected_sym_objects = new_object
         self.state.copyState = False
-        self.state.selectedObject = None
-
-        return
+        del self.state.copied_objects[:]
 
     #TODO
     def undo_button_pressed(self):
         print ("undo button pressed")
-        return
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):

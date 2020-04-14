@@ -33,13 +33,8 @@ class CatalogView(): #dropdown and search bar
 
         #handlers
         self.edit.textChanged.connect(self.searchItem)
-        self.treeWidget.itemClicked.connect(self.removeHighlight)
+        self.treeWidget.itemClicked.connect(self.state.removeHighlight)
         self.treeWidget.itemDoubleClicked.connect(self.createSymObject)
-
-    def removeHighlight(self, item):
-        if len(self.state.selected_sym_objects):
-            for sym_object in self.state.selected_sym_objects:
-                sym_object.rect.setBrush(QColor("White"))
 
     #this creates a new symobject at some point in the CanvasView
     def createSymObject(self, item):
