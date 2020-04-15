@@ -34,11 +34,11 @@ class SymObject(QGraphicsItemGroup):
             self.state.instances[self.component_name])
         self.sim_object_instance = None
 
-        """ui members
-            rect, rect_text, ui_ports, delete_button: define the QGraphicsItem
-            that shows up in the gui
+        #ui members
+        #    rect, rect_text, ui_ports, delete_button: define the QGraphicsItem
+        #    that shows up in the gui
 
-            ui_connections: lineDrawer instances that allow user to draw lines"""
+        #    ui_connections: lineDrawer instances that allow user to draw lines
         self.x = scene.width() / 2 - width
         self.y = scene.height() / 2 - height
         self.z = 0
@@ -51,7 +51,6 @@ class SymObject(QGraphicsItemGroup):
         self.delete
         self.ui_ports = []
         self.ui_connections = {}
-        self.to_export = 1
 
         #constructing the baseline ui elements
         self.initUIObject(self, 0, 0)

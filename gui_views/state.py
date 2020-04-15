@@ -21,7 +21,7 @@ class State():
         self.buttonView = None
         self.fileName = None
         self.copyState = False
-        self.selectedObject = None
+        self.copied_objects = []
         self.mostRecentSaved = True
 
     # sets objects in scene as draggable or not draggable based on drag_state

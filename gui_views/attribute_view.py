@@ -66,7 +66,6 @@ class AttributeView(): #table view for parameters, as well as the description
             self.state.sym_objects[current_name] = self.state.selected_sym_objects[0]
         elif currentAttribute == "Child Objects":
             self.state.selected_sym_objects[0].connected_objects = currentValue
-            self.state.sym_objects[currentValue].to_export = 0
             self.state.line_drawer.connectSubObject(self.state.selected_sym_objects[0].name,
                                                 currentValue)
         else:
