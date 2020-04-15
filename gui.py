@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
     def __init__(self, catalog, instances):
         super(MainWindow, self).__init__()
         self.state = State(instances, catalog)
-        self.setWindowTitle("gem5 GUI | Untitled")
+        #self.setWindowTitle("gem5 GUI | Untitled")
         self.main = QWidget()
         self.catalog = catalog
         self.setLayoutDirection(Qt.LeftToRight)
@@ -73,7 +73,7 @@ class MainWindow(QMainWindow):
     # if single clicking from the treeWidget, don't want to set the current sym
     # object
     def treeWidgetClicked(self, item, name):
-        self.state.current_sym_object = None
+        del self.state.selected_sym_objects[:]
         self.populateAttributes(item, name, True)
 
     # Populate the attribute table holding info for an objects params and children
@@ -81,11 +81,11 @@ class MainWindow(QMainWindow):
         table = self.attributeView.attributeTable
         table.clear()
         table.setRowCount(0)
-        cur_object = self.state.current_sym_object
 
         # If there is an object being viewed on the board display the name and
         #   connected objects as well
-        if cur_object:
+        if len(self.state.selected_sym_objects) == 1:
+            cur_object = self.state.selected_sym_objects[0]
             self.addRow("Name", cur_object.name,
                         isTreeWidgetClick)
             self.addRow("Child Objects",
@@ -99,9 +99,9 @@ class MainWindow(QMainWindow):
                 self.catalog[item.parent().text(0)][item.text(0)]['params']
         else:
             # only load from param list if there is a sym object in the context
-            if self.state.current_sym_object != None or \
-                self.state.current_sym_object.component_name == name:
-                self.attributes = self.state.current_sym_object.instance_params
+            if len(self.state.selected_sym_objects) == 1 or \
+                self.state.selected_sym_objects[0].component_name == name:
+                self.attributes = self.state.selected_sym_objects[0].instance_params
             else: # TODO: check when would this branch happen??
                 print("filling in name branch")
                 self.attributes = self.catalog[name]
@@ -134,9 +134,9 @@ class MainWindow(QMainWindow):
 
     # when user tries to exit, check if changes need to be saved before closing
     def closeEvent(self, event):
-        if self.state.sym_objects:
-            dialog = saveChangesDialog("closing")
-            if dialog.exec_():
+        if not self.state.mostRecentSaved:
+            self.dialog = saveChangesDialog("closing")
+            if self.dialog.exec_():
                 self.buttonView.save_button_pressed()
 
 if __name__ == "__m5_main__":
@@ -153,6 +153,7 @@ if __name__ == "__m5_main__":
     #create new instance of main window
     main_window = MainWindow(obj_tree, instance_tree)
     main_window.state.mainWindow = main_window
+    main_window.setWindowTitle("gem5 GUI | Untitled")
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack
     gui_application.exec_() #monitor application for events

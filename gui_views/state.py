@@ -12,7 +12,7 @@ class State():
         self.drag_state = True
         self.draw_wire_state = False
         self.sym_objects = {} # Map name to actual symobject (has coords)
-        self.current_sym_object = None
+        self.selected_sym_objects = []
         self.line_drawer = None
         self.scene = None
         self.mainWindow = None
@@ -20,6 +20,9 @@ class State():
         self.catalog = catalog
         self.buttonView = None
         self.fileName = None
+        self.copyState = False
+        self.copied_objects = []
+        self.mostRecentSaved = True
 
     # sets objects in scene as draggable or not draggable based on drag_state
     def setDragState(self):
@@ -42,6 +45,12 @@ class State():
         connection.child_endpoint.y(), p)
 
         connection.line.setZValue(1000)
+
+    def removeHighlight(self):
+        if len(self.selected_sym_objects):
+            for sym_object in self.selected_sym_objects:
+                sym_object.rect.setBrush(QColor("White"))
+                sym_object.delete_button.hide()
 
 
 #finds the gem5 path
