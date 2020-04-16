@@ -29,6 +29,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     # build the file tab
     def buildFileTab(self, mainMenu, window):
+        newAction = QAction("New File", window)
+        newAction.setShortcut("Ctrl+N")
+        newAction.triggered.connect(self.new_button_pressed)
         saveAction = QAction("Save", window)
         saveAction.setShortcut("Ctrl+S")
         saveAction.triggered.connect(self.save_button_pressed)
@@ -40,6 +43,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         openAction.triggered.connect(self.openUI_button_pressed)
 
         fileMenu = mainMenu.addMenu('File')
+        fileMenu.addAction(newAction)
         fileMenu.addAction(saveAction)
         fileMenu.addAction(saveAsAction)
         fileMenu.addAction(openAction)
@@ -95,6 +99,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.draw_wire_state = not self.state.draw_wire_state
         self.state.setDragState()
         self.state.line_drawer.update()
+
+    def new_button_pressed(self):
+        print("new button pressed")
 
     def copy_button_pressed(self):
         print("copy button pressed")
