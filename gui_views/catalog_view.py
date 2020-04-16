@@ -60,19 +60,25 @@ class CatalogView(): #dropdown and search bar
 
         del self.state.selected_sym_objects[:]
         #modify state to accomodate the new object
-        self.state.selected_sym_objects[0] = \
+        new_object = \
             self.state.scene.addObjectToScene("component", item.text(0), name)
-        self.state.selected_sym_objects[0].instance_params = \
+        new_object.instance_params = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['params'])
-        self.state.selected_sym_objects[0].instance_ports = \
+        new_object.instance_ports = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
-        self.state.selected_sym_objects[0].initPorts()
+        new_object.initPorts()
 
         #eager instantiation
-        self.state.selected_sym_objects[0].instantiateSimObject()
+        new_object.instantiateSimObject()
 
         if new_parent:
             child = self.state.selected_sym_objects[0]
+            '''
+            if new_parent.connected_objects:
+                temp = self.state.sym_objects[new_parent.connected_objects[0]]
+                child.setPos(temp.scenePos().x(), temp.scenePos().y())
+            '''
+
             child.resizeUIObject(new_parent, 1, child.width)
             child.parent_name = new_parent.name # add new parent
             child.z = new_parent.z + 1 # update z index
@@ -82,8 +88,16 @@ class CatalogView(): #dropdown and search bar
             for object in self.state.sym_objects.values():
                 object.setZValue(object.z)
 
+            # TODO: set final position 
+
             child.x = child.scenePos().x()
             child.y = child.scenePos().y()
+
+            self.state.removeHighlight()
+            child.rect.setBrush(QColor("Green"))
+            self.state.selected_sym_objects.append(child)
+            self.state.mainWindow.populateAttributes(None, child.component_name,
+                                                    False)
 
         self.state.mostRecentSaved = False
         #allow instantiation ONLY when root is on the canvas

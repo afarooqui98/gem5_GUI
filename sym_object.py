@@ -241,6 +241,7 @@ class SymObject(QGraphicsItemGroup):
 
         # show button for current object
         clicked.delete_button.show()
+        self.state.removeHighlight()
         clicked.rect.setBrush(QColor("Green"))
 
         # check if mouse press is on delete button
