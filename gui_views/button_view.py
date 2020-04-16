@@ -101,7 +101,23 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.line_drawer.update()
 
     def new_button_pressed(self):
-        print("new button pressed")
+        # check if any changes have been made - to save before closing
+        if not self.state.mostRecentSaved:
+            dialog = saveChangesDialog("opening a new file")
+            if dialog.exec_():
+                self.save_button_pressed()
+
+        # clear out existing objects and wires
+        for object in self.state.sym_objects.values():
+            for name, connection in object.ui_connections.items():
+                if connection.line:
+                    self.state.scene.removeItem(connection.line)
+
+            self.state.scene.removeItem(object)
+            object.ui_connections.clear()
+
+        # clear out backend sym object dictionary
+        self.state.sym_objects.clear()
 
     def copy_button_pressed(self):
         print("copy button pressed")
