@@ -53,6 +53,11 @@ class CatalogView(): #dropdown and search bar
                 pass
             return
 
+        new_parent = None
+
+        if len(self.state.selected_sym_objects) == 1:
+            new_parent = self.state.selected_sym_objects[0]
+
         del self.state.selected_sym_objects[:]
         #modify state to accomodate the new object
         self.state.selected_sym_objects[0] = \
@@ -65,6 +70,20 @@ class CatalogView(): #dropdown and search bar
 
         #eager instantiation
         self.state.selected_sym_objects[0].instantiateSimObject()
+
+        if new_parent:
+            child = self.state.selected_sym_objects[0]
+            child.resizeUIObject(new_parent, 1, child.width)
+            child.parent_name = new_parent.name # add new parent
+            child.z = new_parent.z + 1 # update z index
+            if not child.name in new_parent.connected_objects:
+                new_parent.connected_objects.append(child.name)
+
+            for object in self.state.sym_objects.values():
+                object.setZValue(object.z)
+
+            child.x = child.scenePos().x()
+            child.y = child.scenePos().y()
 
         self.state.mostRecentSaved = False
         #allow instantiation ONLY when root is on the canvas

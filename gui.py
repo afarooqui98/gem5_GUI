@@ -73,7 +73,7 @@ class MainWindow(QMainWindow):
     # if single clicking from the treeWidget, don't want to set the current sym
     # object
     def treeWidgetClicked(self, item, name):
-        del self.state.selected_sym_objects[:]
+        # del self.state.selected_sym_objects[:]
         self.populateAttributes(item, name, True)
 
     # Populate the attribute table holding info for an objects params and children
