@@ -14,6 +14,7 @@ from m5_calls import isSimObjectParam
 import sys, random
 import copy
 import json
+import functools
 import logging
 logging.basicConfig(filename='debug.log', filemode='w', \
     format='%(name)s - %(levelname)s - %(message)s')
@@ -49,11 +50,12 @@ class MainWindow(QMainWindow):
         self.main.setLayout(self.layout)
         self.setCentralWidget(self.main)
 
+        self.combo_box_select = False
         # populate treeview
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
 
-    def addRow(self, value1, value2, isTreeWidgetClick, isSimObject):
+    def addRow(self, value_col1, value_col2, isTreeWidgetClick, isSimObject):
         table = self.attributeView.attributeTable
         table.insertRow(table.rowCount())
         # set column 0 value
@@ -71,12 +73,41 @@ class MainWindow(QMainWindow):
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value2))
         if isSimObject: #add a drop down of child objects
             comboBox = QComboBox()
-            comboBox.addItems(self.state.current_sym_object.connected_objects)
+            # Create list for dropdown including the default value
+            dropdown_list = copy.deepcopy(\
+                self.state.current_sym_object.connected_objects)
+            if value2 in items:
+                items.remove(value2)
+            # Make whatever value or default value the first option
+            items = [value2] + items
+
+            comboBox.addItems(items)
+            comboBox.currentTextChanged.connect(functools.partial(\
+                self.modify_combo, comboBox, value1))
             table.setCellWidget(table.rowCount() - 1, 1, comboBox)
+
         cell = table.item(table.rowCount() - 1, 1)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
         if not isTreeWidgetClick and value2 == None:
             cell.setBackground(QColor("indianred"))
+
+
+    def modify_combo(self, comboBox, currentAttribute, value):
+        # if the value is name or connected objects, set the param instead of
+        # the dict
+        if currentAttribute not in self.state.current_sym_object.instance_params:
+            self.state.current_sym_object.instance_params[currentAttribute] = {}
+            if "Value" not in self.state.current_sym_object.instance_params[currentAttribute]:
+                self.state.current_sym_object.instance_params[currentAttribute]["Value"] = value
+                self.state.current_sym_object.instance_params[currentAttribute]["Type"] = \
+                    self.state.catalog["SimObject"][self.state.current_sym_object.component_name]['ports'][currentAttribute]['Type']
+        else:
+            self.state.current_sym_object.instance_params[currentAttribute]["Value"] = value
+
+
+
+
+
 
     # if single clicking from the treeWidget, don't want to set the current sym
     # object
