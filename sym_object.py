@@ -583,3 +583,15 @@ class SymObject(QGraphicsItemGroup):
 
         # update member variable
         self.name = newName
+
+
+    def addSubObject(self, child):
+        '''add child to parent's (self's) UI object and setting parameters'''
+        child.resizeUIObject(self, 1, child.width)
+        child.parent_name = self.name
+        child.z = self.z + 1
+        if not child.name in self.connected_objects:
+            self.connected_objects.append(child.name)
+
+        for object in self.state.sym_objects.values():
+            object.setZValue(object.z)

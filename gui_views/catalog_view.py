@@ -71,24 +71,30 @@ class CatalogView(): #dropdown and search bar
         #eager instantiation
         new_object.instantiateSimObject()
 
+        # if sub object is being added through catalog
         if new_parent:
             child = self.state.selected_sym_objects[0]
-            '''
+
+            # need to set initial position of new object to force resize and
+            # make sure there is enough space to fit object
+            hasChildren = False
             if new_parent.connected_objects:
-                temp = self.state.sym_objects[new_parent.connected_objects[0]]
-                child.setPos(temp.scenePos().x(), temp.scenePos().y())
-            '''
+                hasChildren = True
+                lastChild = self.state.sym_objects[new_parent.connected_objects[-1]]
+                child.setPos(lastChild.scenePos().x() + 10, lastChild.scenePos().y() + 10)
 
-            child.resizeUIObject(new_parent, 1, child.width)
-            child.parent_name = new_parent.name # add new parent
-            child.z = new_parent.z + 1 # update z index
-            if not child.name in new_parent.connected_objects:
-                new_parent.connected_objects.append(child.name)
+            # configure child as a UI subobject of parent
+            new_parent.addSubObject(child)
 
-            for object in self.state.sym_objects.values():
-                object.setZValue(object.z)
-
-            # TODO: set final position 
+            # if parent already has child subobjects, set the new child's
+            # position to the right bottom corner as it is guaranteed to be
+            # empty
+            if hasChildren:
+                pos_x = new_parent.scenePos().x() + new_parent.width \
+                                                                - child.width
+                pos_y = new_parent.scenePos().y() + new_parent.height \
+                                                                - child.height
+                child.setPos(pos_x, pos_y)
 
             child.x = child.scenePos().x()
             child.y = child.scenePos().y()
