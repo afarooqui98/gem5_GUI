@@ -42,8 +42,8 @@ class AttributeView(): #table view for parameters, as well as the description
     def makeEditable(self, item):
         """ this function feeds into the next one, after the cell is
         changed it will trigger """
-        if self.state.current_sym_object == None or not item:
-            return
+        if len(self.state.selected_sym_objects) != 1 or not item:
+             return
         # set item to editable
         item.setFlags(item.flags() | Qt.ItemIsEditable)
         self.attributeTable.itemChanged.connect(self.modifyFields)
@@ -52,7 +52,7 @@ class AttributeView(): #table view for parameters, as well as the description
     def modifyParam(self, currentAttribute, updatedValue):
         """Given the current Attribute(param) and a new value entered in the
             gui, update the current symobject's value for the parameter"""
-        instance_params = self.state.current_sym_object.instance_params
+        instance_params = self.state.selected_sym_objects[0].instance_params
         # if the value is name or connected objects, set the param instead of
         # the dict
         if currentAttribute not in instance_params:
@@ -60,7 +60,7 @@ class AttributeView(): #table view for parameters, as well as the description
             #TODO look into this check, it seems like we do not need it
             if "Value" not in instance_params[currentAttribute]:
                 catalog = self.state.catalog
-                name = self.state.current_sym_object.component_name
+                name = self.state.selected_sym_objects[0].component_name
                 instance_params[currentAttribute]["Value"] = updatedValue
                 instance_params[currentAttribute]["Type"] = \
                     catalog["SimObject"][name]['ports'][currentAttribute]['Type']
@@ -81,22 +81,24 @@ class AttributeView(): #table view for parameters, as well as the description
         # if the value is name or connected objects, set the param instead of
         # the dict
         if currentAttribute == "Name":
-            self.state.current_sym_object.updateName(currentValue)
-            current_x = self.state.current_sym_object.x
-            current_y = self.state.current_sym_object.y
-            current_name = self.state.current_sym_object.name
+            self.state.selected_sym_objects[0].updateName(currentValue)
+            current_x = self.state.selected_sym_objects[0].x
+            current_y = self.state.selected_sym_objects[0].y
+            current_name = self.state.selected_sym_objects[0].name
 
-            self.state.sym_objects[current_name] = self.state.current_sym_object
+            self.state.sym_objects[current_name] = self.state.selected_sym_objects[0]
         elif currentAttribute == "Child Objects":
-            self.state.current_sym_object.connected_objects = currentValue
-            self.state.sym_objects[currentValue].to_export = 0
-            self.state.line_drawer.connectSubObject(\
-                self.state.current_sym_object.name, currentValue)
+            self.state.selected_sym_objects[0].connected_objects = currentValue
+            self.state.line_drawer.connectSubObject(self.state.selected_sym_objects[0].name,
+                                                currentValue)
         else:
             self.modifyParam(currentAttribute, currentValue)
+
 
         # item no longer editable, disconnect
         self.attributeTable.itemChanged.disconnect(self.modifyFields)
         item.setFlags(item.flags() ^ Qt.ItemIsEditable)
         if currentValue:
             item.setBackground(QColor("white"))
+
+        self.state.mostRecentSaved = False

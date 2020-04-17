@@ -27,12 +27,11 @@ class LineDrawer(QWidget):
         if self.state.draw_wire_state:
             self.pos1 = event.pos()
         else:
-            if self.state.current_sym_object:
-                self.state.current_sym_object.rect.setBrush(QColor("White"))
-                self.state.current_sym_object = None
-                table = self.state.mainWindow.attributeView.attributeTable
-                table.clear()
-                table.setRowCount(0)
+            self.state.removeHighlight()
+            del self.state.selected_sym_objects[:]
+            table = self.state.mainWindow.attributeView.attributeTable
+            table.clear()
+            table.setRowCount(0)
 
     def mouseMoveEvent(self, event):
         if self.state.draw_wire_state and self.pos1:
@@ -55,6 +54,7 @@ class LineDrawer(QWidget):
             self.state.scene.removeItem(self.line)
             self.line = None
             self.update()
+            self.state.mostRecentSaved = False
 
     def update(self):
         self.state.drawLines(self.pen)

@@ -13,7 +13,7 @@ import copy
 
 def convert(data):
     """convert a dictionary with unicode keys and values to utf-8"""
-    
+
     if isinstance(data, basestring):
         return str(data)
     elif isinstance(data, collections.Mapping):
@@ -82,11 +82,10 @@ class GraphicsScene(QGraphicsScene):
 
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object
-        self.state.current_sym_object = new_object
-        self.state.current_sym_object.initPorts()
+        new_object.initPorts()
 
         # instantiate the simobject and set its parameters
-        self.state.current_sym_object.load_instantiate()
+        new_object.load_instantiate()
 
         if component_name == "Root":
             #found a root object loaded in from a ui file
@@ -113,7 +112,6 @@ class GraphicsScene(QGraphicsScene):
             #user created a root object, can instantiate now
             self.state.mainWindow.buttonView.instantiate.setEnabled(True)
 
-        #self.state.current_sym_object = new_object
         self.addItem(new_object)
         return new_object
 
