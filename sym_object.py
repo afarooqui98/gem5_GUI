@@ -256,6 +256,9 @@ class SymObject(QGraphicsItemGroup):
             self.state.mainWindow.populateAttributes(None,
                 clicked.component_name, False)
 
+    def instanceDelete(self):
+        #TODO: depth first search of the objects
+
     def delete(self):
         """remove visual respresentations of object"""
         #TODO: implement backend removal, possibly in other function
@@ -271,6 +274,7 @@ class SymObject(QGraphicsItemGroup):
             #self.state.sym_objects[child_name].delete()
             del self.state.sym_objects[child_name]
 
+        self.instanceDelete()
         del self.state.selected_sym_objects[:]
         del self.state.sym_objects[name]
         self.state.mostRecentSaved = False
@@ -446,6 +450,11 @@ class SymObject(QGraphicsItemGroup):
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap
 
+    def connectSimObjectAsAttrToParent(self, parent_obj):
+        setattr(parent_obj.sim_object_instance, self.component_name, self.sim_object_instance)
+        attr_name = self.component_name.encode("utf-8")
+        self.sim_object_instance = getattr(parent_obj.sim_object_instance, attr_name)
+
     def resizeUIObject(self, item, force_resize, size):
         """resizes a sym_object when another object is placed in it"""
 
@@ -512,6 +521,7 @@ class SymObject(QGraphicsItemGroup):
             #     self.x = self.scenePos().x()
             #     self.y = self.scenePos().y()
 
+        self.connectSimObjectAsAttrToParent(item)
         # recursively traverse upwards and resize each parent
         if item.parent_name:
             item.resizeUIObject(self.state.sym_objects[item.parent_name], \
