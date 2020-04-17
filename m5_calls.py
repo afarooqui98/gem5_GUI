@@ -199,7 +199,7 @@ def traverse_hierarchy_root(sym_catalog, symroot):
         name, simroot = traverse_params(sym_catalog, symroot, root)
         name, simroot = traverse_ports(sym_catalog, symroot, simroot)
     except:
-         logging.error("Could not create simobject tree")
+        logging.error("Could not create simobject tree")
     return symroot.name, simroot
 
 def instantiate_model():
