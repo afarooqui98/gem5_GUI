@@ -2,8 +2,6 @@ import sys
 import os
 import inspect
 import logging
-logging.basicConfig(filename='debug.log', filemode='w', \
-    format='%(name)s - %(levelname)s - %(message)s')
 from gui_views.state import *
 get_path()
 sys.path.append(os.getenv('gem5_path'))
@@ -201,7 +199,7 @@ def traverse_hierarchy_root(sym_catalog, symroot):
         name, simroot = traverse_params(sym_catalog, symroot, root)
         name, simroot = traverse_ports(sym_catalog, symroot, simroot)
     except:
-        logging.error("Could not create simobject tree")
+         logging.error("Could not create simobject tree")
     return symroot.name, simroot
 
 def instantiate_model():

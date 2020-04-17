@@ -16,8 +16,7 @@ import copy
 import json
 import functools
 import logging
-logging.basicConfig(filename='debug.log', filemode='w', \
-    format='%(name)s - %(levelname)s - %(message)s')
+
 
 class MainWindow(QMainWindow):
     """this class creates the main window"""
