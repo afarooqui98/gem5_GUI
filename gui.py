@@ -8,6 +8,7 @@ from gui_views.catalog_view import *
 from gui_views.button_view import *
 from gui_views.catalog_view import *
 from gui_views.attribute_view import *
+from gui_views.debug_view import *
 from gui_views.state import *
 from m5_calls import isSimObjectParam
 
@@ -46,13 +47,27 @@ class MainWindow(QMainWindow):
         self.layout.addLayout(self.gridLayout)
         self.layout.addWidget(self.graphics_view)
 
+
+        #add debug window
+        self.debug_hidden = False # Flag for toggling debug widget
+        self.debug_widget = DebugWidget(self.state)
+        self.layout.addWidget(self.debug_widget)
+        self.toggleDebug()
+
         self.main.setLayout(self.layout)
         self.setCentralWidget(self.main)
 
-        self.combo_box_select = False
         # populate treeview
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
+
+    def toggleDebug(self):
+        """ Enables or disables the debug widget from being shown"""
+        if self.debug_hidden:
+            self.debug_widget.show()
+        else:
+            self.debug_widget.hide()
+        self.debug_hidden = not self.debug_hidden
 
     def addRow(self, param, value, isTreeWidgetClick, isSimObject):
         """ Adds the param and value to a row of the table."""

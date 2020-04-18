@@ -100,8 +100,17 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         printAction = QAction("Enable Debug Statements", window)
         printAction.triggered.connect(self.switch_debug_output)
 
+        toggleAction = QAction("Show Debug Window", window)
+        toggleAction.triggered.connect(self.toggleDebugWindow)
+
         debugMenu = mainMenu.addMenu('Debug')
         debugMenu.addAction(printAction)
+        debugMenu.addAction(toggleAction)
+
+
+    def toggleDebugWindow(self):
+        """ Event handler which proxies toggling the debug widget"""
+        self.state.mainWindow.toggleDebug()
 
     def switch_debug_output(self):
         """ This handler switches between stdout and a file for debug msgs"""
