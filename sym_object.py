@@ -158,8 +158,10 @@ class SymObject(QGraphicsItemGroup):
     def instantiateSimObject(self):
         """ Creates an instantiated object for the symobject and gets any new
         info on the instance_params """
-
-        self.sim_object_instance = self.sim_object()
+        if self.component_name == "Root":
+            self.sim_object_instance = getRoot()
+        else:
+            self.sim_object_instance = self.sim_object()
         self.get_param_info()
 
     def initPorts(self):

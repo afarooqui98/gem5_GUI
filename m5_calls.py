@@ -219,3 +219,11 @@ def simulate():
     except:
         e = sys.exc_info()[0]
         logging.error("Simulation error caused by %s" % e.__name__)
+
+def getRoot():
+    print("finding root inst")
+    if Root.getInstance() == None:
+        return Root()
+    else:
+        print("existing inst")
+        return Root.getInstance()
