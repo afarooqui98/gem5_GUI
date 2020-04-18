@@ -194,13 +194,14 @@ def traverse_ports(sym_catalog, symobject, simobject):
 def traverse_hierarchy_root(sym_catalog, symroot):
     """Recursively set parameters and then recursively set ports for
         instantiated objs"""
+    simroot = None
     try:
         root = symroot.sim_object_instance
         name, simroot = traverse_params(sym_catalog, symroot, root)
         name, simroot = traverse_ports(sym_catalog, symroot, simroot)
     except:
         e = sys.exc_info()[0]
-        logging.error("Could not create simobject tree due to " + e)
+        logging.error("Could not create simobject tree due to " + str(e))
     return symroot.name, simroot
 
 def instantiate_model():
