@@ -201,19 +201,21 @@ def traverse_hierarchy_root(sym_catalog, symroot):
         name, simroot = traverse_ports(sym_catalog, symroot, simroot)
     except:
         e = sys.exc_info()[0]
-        logging.error("Could not create simobject tree due to " + str(e))
+        logging.error("Could not create simobject tree due to %s" % e.__name__)
     return symroot.name, simroot
 
 def instantiate_model():
     try:
         m5.instantiate()
-    except AttributeError:
-        logging.error("Instantiate error on proxy param by AttributeError")
+    except:
+        e = sys.exc_info()[0]
+        logging.error("Instantiate error on proxy param by %s" % e.__name__)
 
 def simulate():
     try:
         exit_event = m5.simulate()
         print('Exiting @ tick %i because %s' %(m5.curTick(), \
             exit_event.getCause()))
-    except AttributeError:
-        logging.error("Simulation error caused by AttributeError")
+    except:
+        e = sys.exc_info()[0]
+        logging.error("Simulation error caused by %s" % e.__name__)
