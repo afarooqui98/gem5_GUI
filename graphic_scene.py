@@ -82,11 +82,10 @@ class GraphicsScene(QGraphicsScene):
 
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object
-        self.state.selected_sym_objects[0] = new_object
-        self.state.selected_sym_objects[0].initPorts()
+        new_object.initPorts()
 
         # instantiate the simobject and set its parameters
-        self.state.selected_sym_objects[0].load_instantiate()
+        new_object.load_instantiate()
 
         if component_name == "Root":
             #found a root object loaded in from a ui file

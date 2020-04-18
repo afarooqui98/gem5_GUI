@@ -1,6 +1,7 @@
 import sys
 import os
 import inspect
+import logging
 from gui_views.state import *
 get_path()
 sys.path.append(os.getenv('gem5_path'))
@@ -99,7 +100,9 @@ def get_obj_lists():
 
     return obj_tree, instance_tree
 
-
+def isSimObjectParam(param_info):
+    """ Given metadata of parameter see if it is a SimObject Param"""
+    return issubclass(param_info["Type"], SimObject)
 
 
 def set_param_value(simobject, symobject, param, param_info, m5_children):
@@ -110,7 +113,7 @@ def set_param_value(simobject, symobject, param, param_info, m5_children):
     if isinstance(param_info["Value"], unicode):
         # Check if the param's type is another Simobject, which means
         #   it must be set as a child of the object already
-        if issubclass(param_info["Type"], SimObject):
+        if isSimObjectParam(param_info):
             for obj in m5_children:
                 sym, sim = obj
                 if sym == param_info["Value"]:
@@ -127,13 +130,14 @@ def set_param_value(simobject, symobject, param, param_info, m5_children):
             if isinstance(param_info["Default"], AttrProxy):
                 result, found = param_info["Default"].find(simobject)
                 if not found:
-                    print("PROXY GOING BAD")
+                    logging.debug("Proxy not found given param " + param \
+                    + " for " + symObject.component_name)
                 else:
                     param_info["Value"] = result
             setattr(simobject, param, param_info["Value"])
         else:
             if str(param_info["Value"]) in symobject.connected_objects:
-                print("object exists and can be parameterized")
+                logging.error("object exists and can be parameterized")
 
 def traverse_params(sym_catalog, symobject, simobject):
     """ Recursively goes through object tree starting at symobject and
@@ -167,7 +171,7 @@ def set_port_value(port, port_info, sym_catalog, simobject):
         setattr(simobject, port,\
             getattr(sym_catalog[values[0]].sim_object_instance,values[1]))
     else:
-        pass
+        logging.debug("Port value for " + port + " is not set")
         #TODO figure out why its getting into else case
 
 def traverse_ports(sym_catalog, symobject, simobject):
@@ -190,14 +194,25 @@ def traverse_ports(sym_catalog, symobject, simobject):
 def traverse_hierarchy_root(sym_catalog, symroot):
     """Recursively set parameters and then recursively set ports for
         instantiated objs"""
-    root = symroot.sim_object_instance
-    name, simroot = traverse_params(sym_catalog, symroot, root)
-    name, simroot = traverse_ports(sym_catalog, symroot, simroot)
+    try:
+        root = symroot.sim_object_instance
+        name, simroot = traverse_params(sym_catalog, symroot, root)
+        name, simroot = traverse_ports(sym_catalog, symroot, simroot)
+    except:
+        e = sys.exc_info()[0]
+        logging.error("Could not create simobject tree due to " + e)
     return symroot.name, simroot
 
 def instantiate_model():
-    m5.instantiate()
+    try:
+        m5.instantiate()
+    except AttributeError:
+        logging.error("Instantiate error on proxy param by AttributeError")
 
 def simulate():
-    exit_event = m5.simulate()
-    print('Exiting @ tick %i because %s' %(m5.curTick(), exit_event.getCause()))
+    try:
+        exit_event = m5.simulate()
+        print('Exiting @ tick %i because %s' %(m5.curTick(), \
+            exit_event.getCause()))
+    except AttributeError:
+        logging.error("Simulation error caused by AttributeError")

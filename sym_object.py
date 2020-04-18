@@ -494,23 +494,6 @@ class SymObject(QGraphicsItemGroup):
             # place first child at x coordinate of parent
             next_x = item.scenePos().x()
 
-            # re-render all children to deal with any cases of nested children
-            # being resized
-            # print(item.name, item.scenePos().x(), item.scenePos().y())
-            # for child in item.connected_objects:
-            #     cur_child = self.state.sym_objects[child]
-            #     child_y = item.scenePos().y() + item.height - cur_child.height
-            #     cur_child.setPos(next_x, child_y)
-            #     cur_child.x = cur_child.scenePos().x()
-            #     cur_child.y = cur_child.scenePos().y()
-            #     next_x += cur_child.width + 10
-            #     print(cur_child.name, cur_child.scenePos().x(), cur_child.scenePos().y())
-
-
-            # if not force_resize:
-            #     self.setPos(next_x, child_y)
-            #     self.x = self.scenePos().x()
-            #     self.y = self.scenePos().y()
 
         # recursively traverse upwards and resize each parent
         if item.parent_name:
