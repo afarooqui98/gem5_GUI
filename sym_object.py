@@ -185,7 +185,7 @@ class SymObject(QGraphicsItemGroup):
             port_name.setPos(port_box.boundingRect().center() - \
                 port_name.boundingRect().center())
             self.addToGroup(port_name)
-            self.ui_ports.append((sim_object_instance_port, port_box))
+            self.ui_ports.append((sim_object_instance_port, port_box, port_name))
             next_y += (self.height - delete_button_height) / num_ports
 
             #self.addToGroup(port)
@@ -343,6 +343,15 @@ class SymObject(QGraphicsItemGroup):
             self.z = parent.z + 1 # update z index
             if not self.name in parent.connected_objects:
                 parent.connected_objects.append(self.name) # add new child
+        else:
+            if self.parent_name:
+                # if the object is dragged out of a parent, remove the parent,
+                # child relationship
+                curParent = self.state.sym_objects[self.parent_name]
+                curParent.resizeParent(self)
+                curParent.connected_objects.remove(self.name)
+                self.parent_name = None
+
 
         for object in self.state.sym_objects.values():
             object.setZValue(object.z)
@@ -376,8 +385,7 @@ class SymObject(QGraphicsItemGroup):
         highest_zscore = -1
         for key in self.state.sym_objects:
             object = self.state.sym_objects[key]
-            if self != object and not self.isAncestor(object) and \
-               not self.isDescendant(object):
+            if self != object and not self.isDescendant(object):
                 if self.doesOverlap(object):
                     if object.z > highest_zscore:
                         highest_zscore = object.z
@@ -454,14 +462,15 @@ class SymObject(QGraphicsItemGroup):
         self.state.scene.removeItem(item.rect)
         item.removeFromGroup(item.rect_text)
         self.state.scene.removeItem(item.rect_text)
-        #item.removeFromGroup(item.text)
-        #self.state.scene.removeItem(item.text)
         item.removeFromGroup(item.delete_button)
         self.state.scene.removeItem(item.delete_button)
         for port in item.ui_ports:
             port_box = port[1]
+            port_name = port[2]
             item.removeFromGroup(port_box)
             self.state.scene.removeItem(port_box)
+            item.removeFromGroup(port_name)
+            self.state.scene.removeItem(port_name)
 
         item.x = item.scenePos().x()
         item.y = item.scenePos().y()
@@ -487,7 +496,7 @@ class SymObject(QGraphicsItemGroup):
                         rightmost_object.scenePos().x() - rightmost_object.width
 
         if item.connected_objects:
-            if x_diff < size:
+            if x_diff < 0:
                 item.width += size
             if y_diff > 0:
                 item.height += y_diff
@@ -595,3 +604,26 @@ class SymObject(QGraphicsItemGroup):
 
         for object in self.state.sym_objects.values():
             object.setZValue(object.z)
+
+    def resizeParent(self, child):
+        '''reduce the size of the parent if it has one child'''
+        self.removeFromGroup(self.rect)
+        self.state.scene.removeItem(self.rect)
+        self.removeFromGroup(self.rect_text)
+        self.state.scene.removeItem(self.rect_text)
+        self.removeFromGroup(self.delete_button)
+        self.state.scene.removeItem(self.delete_button)
+        for port in self.ui_ports:
+            port_box = port[1]
+            port_name = port[2]
+            self.removeFromGroup(port_box)
+            self.state.scene.removeItem(port_box)
+            self.removeFromGroup(port_name)
+            self.state.scene.removeItem(port_name)
+
+        if len(self.connected_objects) == 1:
+            self.width -= child.width
+            self.height -= child.width
+
+        self.initUIObject(self, self.x, self.y)
+        self.initPorts()
