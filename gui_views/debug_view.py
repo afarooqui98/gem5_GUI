@@ -48,7 +48,7 @@ class DebugWidget(QWidget):
         self.debug_layout.addWidget(self.logfile_edit)
         self.debug_layout.addWidget(self.stdout_box)
         self.debug_layout.addWidget(self.flag_search)
-        self.debug_layout.addWidget(self.flag_list)
+        self.debug_layout.addWidget(self.flag_list, 50)
         self.debug_layout.addStretch(5)
         self.debug_layout.setSpacing(10)
 

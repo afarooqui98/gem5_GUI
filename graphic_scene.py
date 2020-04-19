@@ -41,9 +41,8 @@ class GraphicsScene(QGraphicsScene):
 
         self.addWidget(self.state.line_drawer)
 
-    # load object from saved UI file
     def loadSavedObject(self, type, name, newObject):
-
+        """load object from saved UI file"""
         x = newObject["x"]
         y = newObject["y"]
         z = newObject["z"]
@@ -95,14 +94,13 @@ class GraphicsScene(QGraphicsScene):
         return new_object
 
     def addObjectToScene(self, type, component_name, name):
-
+        """Creates symobject representation of object and adds to the scene"""
         # generate random string name for object
         if not name:
             name = ''.join(random.choice(string.ascii_lowercase)
                             for i in range(7))
 
         # add object rectangle to scene
-
         new_object = SymObject(0, 0, 150, 75, self, component_name, name,
                                 False, self.state)
 
@@ -115,18 +113,18 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(new_object)
         return new_object
 
-    # if an object is dragged into the scene
     def dragEnterEvent(self,event):
+        """if an object is dragged into the scene"""
         if self.state.drag_state:
             event.accept()
 
-    # if an object is dragged around on the scene
     def dragMoveEvent(self,event):
+        """if an object is dragged around on the scene"""
         if self.state.drag_state:
             event.accept()
 
-    # if an object is dropped on the scene
     def dropEvent(self,event):
+        """if an object is dropped on the scene"""
         if self.state.drag_state:
             event.accept()
         else:
