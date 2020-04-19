@@ -157,28 +157,40 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.copyState = True
         self.state.copied_objects = list(self.state.selected_sym_objects)
 
-    #TODO
     def paste_button_pressed(self):
         if not self.state.copyState:
             return
 
         self.state.removeHighlight()
         for selectedObject in self.state.copied_objects:
-            object_name = selectedObject.name + "_copy"
-            new_object = self.state.scene.addObjectToScene("component",
-                                    selectedObject.component_name, object_name)
-
-            new_object.instance_ports = copy.deepcopy(selectedObject.instance_ports)
-            new_object.instance_params = copy.deepcopy(selectedObject.instance_params)
-            new_object.SimObject = \
-                copy.deepcopy(self.state.instances[new_object.component_name])
-            new_object.initPorts()
-
-            new_object.instantiateSimObject()
-            self.state.sym_objects[object_name] = new_object
-
+            self.copy_sym_object(selectedObject)
         self.state.copyState = False
         del self.state.copied_objects[:]
+
+    def copy_sym_object(self, selectedObject):
+        object_name = selectedObject.name + "_copy"
+        new_object = self.state.scene.addObjectToScene("component",
+                                selectedObject.component_name, object_name)
+        if selectedObject.parent_name:
+            parent_name = selectedObject.parent_name + "_copy"
+            parent = self.state.sym_objects[parent_name]
+            parent.addSubObject(new_object)
+            new_object.parent_name = parent_name
+            parent.connected_objects.append(new_object.name)
+            
+        new_object.z = selectedObject.z
+        new_object.instance_ports = copy.deepcopy(selectedObject.instance_ports)
+        new_object.instance_params = copy.deepcopy(selectedObject.instance_params)
+        new_object.SimObject = \
+            copy.deepcopy(self.state.instances[new_object.component_name])
+        new_object.initPorts()
+
+        new_object.instantiateSimObject()
+        self.state.sym_objects[object_name] = new_object
+        for child_name in selectedObject.connected_objects:
+            child = self.state.sym_objects[child_name]
+            self.copy_sym_object(child)
+
 
     #TODO
     def undo_button_pressed(self):

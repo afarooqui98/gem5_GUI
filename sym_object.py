@@ -485,7 +485,7 @@ class SymObject(QGraphicsItemGroup):
                         rightmost_object.scenePos().x() - rightmost_object.width
 
         if item.connected_objects:
-            if x_diff < 0:
+            if x_diff < size:
                 item.width += size
             if y_diff > 0:
                 item.height += y_diff
