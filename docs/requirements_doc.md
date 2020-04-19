@@ -2,7 +2,6 @@
 
 #### Ahmed Farooqui, Ravishdeep Singh, Rohit Dhamankar, Shivam Desai
 #### University of California, Davis
-https://github.com/afarooqui98/ECS193a/edit/master/docs/requirements_doc.md
 
 ## Introduction
 
