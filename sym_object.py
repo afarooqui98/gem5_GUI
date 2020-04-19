@@ -457,20 +457,7 @@ class SymObject(QGraphicsItemGroup):
 
     def resizeUIObject(self, item, force_resize, size):
         """resizes a sym_object when another object is placed in it"""
-
-        item.removeFromGroup(item.rect)
-        self.state.scene.removeItem(item.rect)
-        item.removeFromGroup(item.rect_text)
-        self.state.scene.removeItem(item.rect_text)
-        item.removeFromGroup(item.delete_button)
-        self.state.scene.removeItem(item.delete_button)
-        for port in item.ui_ports:
-            port_box = port[1]
-            port_name = port[2]
-            item.removeFromGroup(port_box)
-            self.state.scene.removeItem(port_box)
-            item.removeFromGroup(port_name)
-            self.state.scene.removeItem(port_name)
+        item.removeUIObjects()
 
         item.x = item.scenePos().x()
         item.y = item.scenePos().y()
@@ -607,6 +594,17 @@ class SymObject(QGraphicsItemGroup):
 
     def resizeParent(self, child):
         '''reduce the size of the parent if it has one child'''
+        self.removeUIObjects()
+
+        if len(self.connected_objects) == 1:
+            self.width -= child.width
+            self.height -= child.width
+
+        self.initUIObject(self, self.x, self.y)
+        self.initPorts()
+
+    def removeUIObjects(self):
+        '''disconnect all the symobjects components before it is resized'''
         self.removeFromGroup(self.rect)
         self.state.scene.removeItem(self.rect)
         self.removeFromGroup(self.rect_text)
@@ -620,10 +618,3 @@ class SymObject(QGraphicsItemGroup):
             self.state.scene.removeItem(port_box)
             self.removeFromGroup(port_name)
             self.state.scene.removeItem(port_name)
-
-        if len(self.connected_objects) == 1:
-            self.width -= child.width
-            self.height -= child.width
-
-        self.initUIObject(self, self.x, self.y)
-        self.initPorts()
