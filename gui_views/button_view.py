@@ -21,9 +21,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.mainMenu = window.menuBar()
         self.buildMenuBar(self.mainMenu, window)
 
-        # Set debug statement output
-        self.debug_statements = True
-        self.switch_debug_output()
 
     # build the main menu bar
     def buildMenuBar(self, mainMenu, window):
@@ -97,14 +94,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         toolsMenu.addAction(wireAction)
 
     def buildDebugTab(self, mainMenu, window):
-        printAction = QAction("Enable Debug Statements", window)
-        printAction.triggered.connect(self.switch_debug_output)
 
         toggleAction = QAction("Show Debug Window", window)
         toggleAction.triggered.connect(self.toggleDebugWindow)
 
         debugMenu = mainMenu.addMenu('Debug')
-        debugMenu.addAction(printAction)
         debugMenu.addAction(toggleAction)
 
 
@@ -112,21 +106,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         """ Event handler which proxies toggling the debug widget"""
         self.state.mainWindow.toggleDebug()
 
-    def switch_debug_output(self):
-        """ This handler switches between stdout and a file for debug msgs"""
-        #Get rid of current stream
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
-
-        if self.debug_statements:
-            # redirect debug msgs to file
-            logging.basicConfig(filename='debug.log', filemode='w', level= \
-                logging.DEBUG, format='%(name)s - %(levelname)s - %(message)s')
-            self.debug_statements = False
-        else:
-            # redirect debug msgs to terminal
-            logging.basicConfig(level=logging.DEBUG)
-            self.debug_statements = True
 
     # changes gui state to allow for wire drawing and disable object dragging
     def wire_button_pressed(self):
