@@ -14,7 +14,7 @@ Currently, gem5 is a highly active open source project that simulates different 
 ## System Architecture
 ![Sample Mockup for GUI](https://lh3.googleusercontent.com/Mt63W_M_vAmhWoj0TZRSEkX4HImpBlKc7CEHHW4LY3DWzmJIfQ8jLgpQIFRFAdGKx3nag5z9u1npWYqJejgRaT-A8lkSlHBF_XYKfpKS-qpZQwPz0ZaTyY9npvaBcDvN6mKt_2k)
 
-![GUI Architecture](architecture.jpg)
+![GUI Architecture](https://lh3.googleusercontent.com/kXC5Z-s27iuzWKmvDEteqzpl5c_CSPyXb64dq5v3ByAwsI4BJQYWbpUQDgBn-tpGGpTHFu6-sGjTOC561eeE-H60Ad1Z6dYwmvcti_9FozA8hcufProGifHlnXt-axfMeDlKz8aPqNUVIz5m_mYsUrSIR1Nkjxph_kw_kiOU3fpIXMLOG_AJcOXehANCWM1h0_fGSSmhjwvuDrbd0ZdCbKi83C9QfPeOwO0k6SjzylrcMQgC-AfaEEk7inIj0UlbFUDHW9CRz_mQ6E5EuGuep5ib6iPHvCFxrOjWSGEEMlrNFjpE0KhBzuT-vRrBS9dW7wQlNLNdUrxZB7ajLZiYVaEv0TDp__0SqlSyn0k_66sJgqvoiu_pubRi8nuYVztEm_xeC1HWdnf1-y8l4F5b17PgsD7S8co71BXyNtV05YdRDRKHoKsxaEk1HpnVj9-35w_YrrUiy0zDwKPVJTmxHKAHxZ4U1lnlBT5OLbQgYqNd0-xmnWFY8kLRVemLqub-nDKeNzXiIBK73mnqpH4rYW9-IqJ1esGcD7REYCc0tVsGFG2Yq7WIHYdudNerD8xMprCQKvAHvghJeTtK5fbE-JTf5j23HRIcShKT1Xel0aIazgk7FEsOH6J5_2q8MAZHfazUh81Z9EdZ1HjzZGZ-GccupJRjapWT-SJYVSzdMLxct9WZsZ_oGaVrkKTk=w1754-h1241-no)
 
 Our primary architecture will be based on this general design mockup. There is a logical front and back end to this system, but physically they may exist in the same space. The categories are as follows:
 

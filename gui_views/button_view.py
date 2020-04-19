@@ -8,6 +8,8 @@ import sys, random
 import copy
 from gui_views import state
 import json
+import logging
+
 
 from m5_calls import *
 
@@ -19,12 +21,17 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.mainMenu = window.menuBar()
         self.buildMenuBar(self.mainMenu, window)
 
+        # Set debug statement output
+        self.debug_statements = True
+        self.switch_debug_output()
+
     # build the main menu bar
     def buildMenuBar(self, mainMenu, window):
         self.buildFileTab(mainMenu, window)
         self.buildEditTab(mainMenu, window)
         self.buildRunTab(mainMenu, window)
         self.buildToolsTab(mainMenu, window)
+        self.buildDebugTab(mainMenu, window)
 
 
     # build the file tab
@@ -93,6 +100,29 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         toolsMenu = mainMenu.addMenu('Tools')
         toolsMenu.addAction(wireAction)
 
+    def buildDebugTab(self, mainMenu, window):
+        printAction = QAction("Enable Debug Statements", window)
+        printAction.triggered.connect(self.switch_debug_output)
+
+        debugMenu = mainMenu.addMenu('Debug')
+        debugMenu.addAction(printAction)
+
+    def switch_debug_output(self):
+        """ This handler switches between stdout and a file for debug msgs"""
+        #Get rid of current stream
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
+
+        if self.debug_statements:
+            # redirect debug msgs to file
+            logging.basicConfig(filename='debug.log', filemode='w', level= \
+                logging.DEBUG, format='%(name)s - %(levelname)s - %(message)s')
+            self.debug_statements = False
+        else:
+            # redirect debug msgs to terminal
+            logging.basicConfig(level=logging.DEBUG)
+            self.debug_statements = True
+
     # changes gui state to allow for wire drawing and disable object dragging
     def wire_button_pressed(self):
         self.state.drag_state = not self.state.drag_state
@@ -120,7 +150,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.sym_objects.clear()
 
     def copy_button_pressed(self):
-        print("copy button pressed")
+        logging.debug("copy button pressed")
         if not len(self.state.selected_sym_objects):
             return
 
@@ -152,13 +182,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     #TODO
     def undo_button_pressed(self):
-        print ("undo button pressed")
+        logging.debug("undo button pressed")
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
         dlg = instantiateDialog()
         if dlg.exec_():
-            print("Success!")
+            logging.debug("Export Success!")
             self.instantiate.setEnabled(False)
             self.simulate.setEnabled(True)
             self.save_button_pressed() #want to save before instantiation
@@ -246,7 +276,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
                 # TODO: Insert err message here if a parameter has not been set
                 if object.instance_params[param]["Value"] is None:
-                    print("Error must set required parameter")
+                    logging.error("Error must set required parameter")
                     params[str(param)]["Value"] = None
 
                 #Only need to store the values of parameters changed for now
