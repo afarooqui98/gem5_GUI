@@ -9,10 +9,14 @@ from gui_views.button_view import *
 from gui_views.catalog_view import *
 from gui_views.attribute_view import *
 from gui_views.state import *
+from m5_calls import isSimObjectParam
 
 import sys, random
 import copy
 import json
+import functools
+import logging
+
 
 class MainWindow(QMainWindow):
     """this class creates the main window"""
@@ -45,39 +49,57 @@ class MainWindow(QMainWindow):
         self.main.setLayout(self.layout)
         self.setCentralWidget(self.main)
 
+        self.combo_box_select = False
         # populate treeview
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
 
-    def addRow(self, value1, value2, isTreeWidgetClick):
+    def addRow(self, param, value, isTreeWidgetClick, isSimObject):
+        """ Adds the param and value to a row of the table."""
         table = self.attributeView.attributeTable
         table.insertRow(table.rowCount())
+
         # set column 0 value
-        table.setItem(table.rowCount() - 1, 0,
-                                    QTableWidgetItem(value1))
+        table.setItem(table.rowCount() - 1, 0, QTableWidgetItem(param))
         cell = table.item(table.rowCount() - 1, 0)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
 
-        if value1 == "Name" or value1 == "Child Objects":
-            pass
-        else:
-            cell.setToolTip(self.attributes[value1]["Description"])
+        if param != "Name" and param != "Child Objects":
+            cell.setToolTip(self.attributes[param]["Description"])
 
         # set column 1 value
-        table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value2))
+        table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value))
+        if isSimObject: #add a drop down of child objects
+            comboBox = QComboBox()
+            # Create list for dropdown including the default value
+            dropdown_list = copy.deepcopy(\
+                self.state.selected_sym_objects[0].connected_objects)
+            if value in dropdown_list:
+                dropdown_list.remove(value)
+            # Make whatever value or default value the first option
+            dropdown_list = [value] + dropdown_list
+
+            comboBox.addItems(dropdown_list)
+            # Add event handler to update values in the symobject structure
+            comboBox.currentTextChanged.connect(functools.partial(\
+                self.attributeView.modifyParam, param))
+            table.setCellWidget(table.rowCount() - 1, 1, comboBox)
+
         cell = table.item(table.rowCount() - 1, 1)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
-        if not isTreeWidgetClick and value2 == None:
+        if not isTreeWidgetClick and value == 'None': # check if param is req
             cell.setBackground(QColor("indianred"))
 
-    # if single clicking from the treeWidget, don't want to set the current sym
-    # object
+
     def treeWidgetClicked(self, item, name):
         # del self.state.selected_sym_objects[:]
+        """not deleting selected sym objects anymore since we need
+        it when adding from catalog directly"""
         self.populateAttributes(item, name, True)
 
-    # Populate the attribute table holding info for an objects params and children
     def populateAttributes(self, item, name, isTreeWidgetClick):
+        """Populate the attribute table holding info for an objects
+            params and children"""
         table = self.attributeView.attributeTable
         table.clear()
         table.setRowCount(0)
@@ -87,11 +109,10 @@ class MainWindow(QMainWindow):
         if len(self.state.selected_sym_objects) == 1:
             cur_object = self.state.selected_sym_objects[0]
             self.addRow("Name", cur_object.name,
-                        isTreeWidgetClick)
+                        isTreeWidgetClick, False)
             self.addRow("Child Objects",
                         ", ".join(cur_object.connected_objects),
-                        isTreeWidgetClick)
-
+                        isTreeWidgetClick, False)
         if item:
             if item.parent() is None:
                 return
@@ -103,16 +124,21 @@ class MainWindow(QMainWindow):
                 self.state.selected_sym_objects[0].component_name == name:
                 self.attributes = self.state.selected_sym_objects[0].instance_params
             else: # TODO: check when would this branch happen??
-                print("filling in name branch")
+                logging.debug("filling in name branch")
                 self.attributes = self.catalog[name]
 
         # display the param name and values
         for attribute in self.attributes.keys():
+            # Simobject params are special cases with dropdowns in the table
+            isSim = False
+            if len(self.state.selected_sym_objects) > 0:
+                isSim = self.state.selected_sym_objects[0] and \
+                    isSimObjectParam(self.attributes[attribute])
             self.addRow(attribute, str(self.attributes[attribute]["Value"]),
-                                                    isTreeWidgetClick)
+                                                    isTreeWidgetClick, isSim)
 
-    # This function populates the tree view with sym-objects
     def populate(self):
+        """ This function populates the tree view with sym-objects"""
         # Go through every inheritable sym-object
         for item in sorted(self.catalog.keys()):
             tree_item = QTreeWidgetItem([item])
@@ -121,19 +147,10 @@ class MainWindow(QMainWindow):
                 tree_item.addChild(QTreeWidgetItem([sub_item]))
             self.catalogView.treeWidget.addTopLevelItem(tree_item)
 
-    # TODO still need this function to get description of parametrs
-    def populateDescription(self, item):
-        info = ""
-        info += self.attributes[item.text()]["Description"]
-        info += "\n"
-        info += "Type: " + self.attributes[item.text()]["Type"]
-        if self.attributes[item.text()]["Default"] is not None:
-            info += "\n" + "Default Value: " + \
-                    self.attributes[item.text()]["Default"]
-        self.label.setText(info)
 
-    # when user tries to exit, check if changes need to be saved before closing
     def closeEvent(self, event):
+        """When user tries to exit, check if changes need to be saved
+            before closing"""
         if not self.state.mostRecentSaved:
             self.dialog = saveChangesDialog("closing")
             if self.dialog.exec_():
