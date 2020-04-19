@@ -204,6 +204,13 @@ def traverse_hierarchy_root(sym_catalog, symroot):
         logging.error("Could not create simobject tree due to %s" % e.__name__)
     return symroot.name, simroot
 
+def get_debug_flags():
+    try:
+        return m5.debug.flags
+    except:
+        e = sys.exc_info()[0]
+        logging.error("Erorr returning debug flags %s" % e.__name__)
+
 def instantiate_model():
     try:
         m5.instantiate()
