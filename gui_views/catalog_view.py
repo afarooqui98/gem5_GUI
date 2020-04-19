@@ -53,18 +53,57 @@ class CatalogView(): #dropdown and search bar
                 pass
             return
 
+        new_parent = None
+
+        if len(self.state.selected_sym_objects) == 1:
+            new_parent = self.state.selected_sym_objects[0]
+
         del self.state.selected_sym_objects[:]
         #modify state to accomodate the new object
-        self.state.selected_sym_objects[0] = \
+        new_object = \
             self.state.scene.addObjectToScene("component", item.text(0), name)
-        self.state.selected_sym_objects[0].instance_params = \
+        new_object.instance_params = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['params'])
-        self.state.selected_sym_objects[0].instance_ports = \
+        new_object.instance_ports = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
-        self.state.selected_sym_objects[0].initPorts()
+        new_object.initPorts()
 
         #eager instantiation
-        self.state.selected_sym_objects[0].instantiateSimObject()
+        new_object.instantiateSimObject()
+
+        # if sub object is being added through catalog
+        if new_parent:
+            child = self.state.selected_sym_objects[0]
+
+            # need to set initial position of new object to force resize and
+            # make sure there is enough space to fit object
+            hasChildren = False
+            if new_parent.connected_objects:
+                hasChildren = True
+                lastChild = self.state.sym_objects[new_parent.connected_objects[-1]]
+                child.setPos(lastChild.scenePos().x() + 10, lastChild.scenePos().y() + 10)
+
+            # configure child as a UI subobject of parent
+            new_parent.addSubObject(child)
+
+            # if parent already has child subobjects, set the new child's
+            # position to the right bottom corner as it is guaranteed to be
+            # empty
+            if hasChildren:
+                pos_x = new_parent.scenePos().x() + new_parent.width \
+                                                                - child.width
+                pos_y = new_parent.scenePos().y() + new_parent.height \
+                                                                - child.height
+                child.setPos(pos_x, pos_y)
+
+            child.x = child.scenePos().x()
+            child.y = child.scenePos().y()
+
+            self.state.removeHighlight()
+            child.rect.setBrush(QColor("Green"))
+            self.state.selected_sym_objects.append(child)
+            self.state.mainWindow.populateAttributes(None, child.component_name,
+                                                    False)
 
         self.state.mostRecentSaved = False
         #allow instantiation ONLY when root is on the canvas
