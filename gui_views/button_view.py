@@ -171,22 +171,50 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         object_name = selectedObject.name + "_copy"
         new_object = self.state.scene.addObjectToScene("component",
                                 selectedObject.component_name, object_name)
+        #copy over parent - child relationship info
         if selectedObject.parent_name:
             parent_name = selectedObject.parent_name + "_copy"
             parent = self.state.sym_objects[parent_name]
             parent.addSubObject(new_object)
             new_object.parent_name = parent_name
             parent.connected_objects.append(new_object.name)
-            
-        new_object.z = selectedObject.z
+
+        #copy backend info
         new_object.instance_ports = copy.deepcopy(selectedObject.instance_ports)
-        new_object.instance_params = copy.deepcopy(selectedObject.instance_params)
+        new_object.instance_params = \
+            copy.deepcopy(selectedObject.instance_params)
         new_object.SimObject = \
             copy.deepcopy(self.state.instances[new_object.component_name])
+
+        #copy front end info
+        new_object.z = selectedObject.z
         new_object.initPorts()
+
+        #copy connections
+        for name, connection in selectedObject.ui_connections.items():
+            new_y = delete_button_height
+            if name[0] == "parent":
+                new_y += sym_object.scenePos().y() + connection.parent_port_num\
+                    * y_offset + y_offset / 4
+                new_coords = QPointF(new_x, new_y)
+                key = ("child", sym_object.name, name[3], name[2])
+                connection.setEndpoints(new_coords, None)
+                self.state.sym_objects[name[1]].ui_connections[key].setEndpoints(\
+                                                            new_coords, None)
+            else:
+                new_y += sym_object.scenePos().y() + connection.child_port_num \
+                    * y_offset + y_offset / 4
+                new_coords = QPointF(new_x, new_y)
+                key = ("parent", sym_object.name, name[3], name[2])
+                connection.setEndpoints(None, new_coords)
+                self.state.sym_objects[name[1]].ui_connections[key].setEndpoints(\
+                                                            None, new_coords)
+
 
         new_object.instantiateSimObject()
         self.state.sym_objects[object_name] = new_object
+
+        #recursively copy subobjects
         for child_name in selectedObject.connected_objects:
             child = self.state.sym_objects[child_name]
             self.copy_sym_object(child)
