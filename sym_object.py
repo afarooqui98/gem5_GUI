@@ -6,8 +6,6 @@ from PySide2.QtGui import *
 from gui_views import state
 from m5_calls import *
 import copy
-import collections
-
 
 class SymObject(QGraphicsItemGroup):
 
