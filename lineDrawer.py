@@ -49,7 +49,7 @@ class LineDrawer(QWidget):
             self.pos1 = None
             self.pos2 = None
             if valid_connection < 0:
-                ok = QMessageBox.about(self, "Alert", "Invalid line")
+                ok = QMessageBox.warning(self.state.mainWindow, "Alert", "Invalid line")
 
             self.state.scene.removeItem(self.line)
             self.line = None
@@ -75,7 +75,7 @@ class LineDrawer(QWidget):
             delete_button_height = sym_object.delete_button.boundingRect().\
                                                                     height()
             next_y = delete_button_height
-            for name, port in sym_object.ui_ports:
+            for name, port, _ in sym_object.ui_ports:
                 # change keys depending on where ports end up
                 num_ports = len(sym_object.ui_ports)
                 key[0] = sym_object.scenePos().x() + sym_object.width * 3 / 4

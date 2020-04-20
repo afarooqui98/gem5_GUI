@@ -111,6 +111,8 @@ class GraphicsScene(QGraphicsScene):
         if component_name == "Root":
             #user created a root object, can instantiate now
             self.state.mainWindow.buttonView.instantiate.setEnabled(True)
+        new_object.delete_button.show()
+        new_object.rect.setBrush(QColor("Green"))
 
         self.addItem(new_object)
         return new_object

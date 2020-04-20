@@ -57,7 +57,7 @@ class CatalogView(): #dropdown and search bar
 
         if len(self.state.selected_sym_objects) == 1:
             new_parent = self.state.selected_sym_objects[0]
-
+        self.state.removeHighlight()
         del self.state.selected_sym_objects[:]
         #modify state to accomodate the new object
         new_object = \
