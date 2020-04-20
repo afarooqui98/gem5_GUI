@@ -1,7 +1,26 @@
+- [GUI for GEM5](#gui-for-gem5)
+      - [Ahmed Farooqui, Ravishdeep Singh, Rohit Dhamankar, Shivam Desai](#ahmed-farooqui--ravishdeep-singh--rohit-dhamankar--shivam-desai)
+      - [University of California, Davis](#university-of-california--davis)
+  * [Introduction](#introduction)
+  * [Glossary of Terms](#glossary-of-terms)
+  * [System Architecture](#system-architecture)
+  * [Requirements](#requirements)
+  * [Technologies Employed](#technologies-employed)
+  * [Cost Analysis](#cost-analysis)
+  * [Social and Legal Considerations](#social-and-legal-considerations)
+- [Technology Survey](#technology-survey)
+  * [Virtual Machine](#virtual-machine)
+  * [Linux Distribution](#linux-distribution)
+  * [GUI](#gui)
+  * [Project Management Survey](#project-management-survey)
+  
+
 # GUI for GEM5
 
 #### Ahmed Farooqui, Ravishdeep Singh, Rohit Dhamankar, Shivam Desai
 #### University of California, Davis
+
+https://github.com/afarooqui98/ECS193a/edit/master/docs/requirements_doc.md
 
 ## Introduction
 
@@ -84,3 +103,89 @@ Since there is no hardware costs and all the technologies are free to use, we ha
 
 ## Social and Legal Considerations
 Our GUI for gem5 will be an open source project. This means that a multitude of users can use, modify, and share the work. Currently, all the files in the gem5 distribution have licenses based on BSD or MIT license. For our GUI we will be employing a modified BSD license.
+
+# Technology Survey
+
+## Virtual Machine
+   Parallels
+   
+   VirtualBox
+   
+   VMWare Workstation
+
+## Linux Distribution
+Ubuntu
+
+Fedora
+
+Red Hat
+
+Debian
+
+## GUI 
+
+* Qt
+
+	* Pros:
+		* Cross-platform
+
+    	* Suggested by client
+        
+    	* Extensively used by many organizations
+    
+    	* Lots of documentation and tutorials
+
+	* Cons:
+    	
+        * No experience using it
+
+* Kivy
+
+    * Pros:
+
+        * Cross-platform
+
+        * Written in C and graphics engine is built in OpenGL Es2
+    
+        * Well integrated with Pycharm
+
+        * Free to us under MIT license
+
+	* Cons:
+		* No experience using it
+
+        * More suitable for developing games not really used for desktop apps
+
+* GTK:
+
+    * pros:
+
+    * cross-platform
+    
+    * written in c, but has support for other languages
+    
+    * no licensing restrictions
+    
+    * cons:
+
+        * no experience using it
+
+* TKinter: (python)
+
+    * pros:
+
+        * simple, open source
+
+        * bundled with python
+
+        * lots of resources / tutorials
+
+    * cons:
+
+        * not as aesthetic as other technologies
+
+
+
+## Project Management Survey
+
+Conclusion: We will be using JIRA since the existing gem5 team uses JIRA.
