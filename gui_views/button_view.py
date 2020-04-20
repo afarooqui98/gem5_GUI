@@ -21,12 +21,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.mainMenu = window.menuBar()
         self.buildMenuBar(self.mainMenu, window)
 
-        # Set debug statement output
-        self.debug_statements = True
-        self.switch_debug_output()
 
-    # build the main menu bar
     def buildMenuBar(self, mainMenu, window):
+        """build the main menu bar"""
         self.buildFileTab(mainMenu, window)
         self.buildEditTab(mainMenu, window)
         self.buildRunTab(mainMenu, window)
@@ -34,8 +31,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.buildDebugTab(mainMenu, window)
 
 
-    # build the file tab
     def buildFileTab(self, mainMenu, window):
+        """build the file tab"""
         newAction = QAction("New File", window)
         newAction.setShortcut("Ctrl+N")
         newAction.triggered.connect(self.new_button_pressed)
@@ -55,8 +52,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         fileMenu.addAction(saveAsAction)
         fileMenu.addAction(openAction)
 
-    # build the edit tab
     def buildEditTab(self, mainMenu, window):
+        """build the edit tab"""
         copyAction = QAction("Copy", window)
         copyAction.setShortcut("Ctrl+C")
         copyAction.triggered.connect(self.copy_button_pressed)
@@ -72,8 +69,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         editMenu.addAction(pasteAction)
         editMenu.addAction(undoAction)
 
-    # build the run tab
     def buildRunTab(self, mainMenu, window):
+        """build the run tab"""
         instantiateAction = QAction("Instantiate", window)
         instantiateAction.setShortcut("Ctrl+I")
         instantiateAction.triggered.connect(self.export_button_pressed)
@@ -91,8 +88,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.simulate.setEnabled(False)
 
 
-    # build the tools tab
     def buildToolsTab(self, mainMenu, window):
+        """build the tools tab"""
         wireAction = QAction("Enable Wire", window)
         wireAction.setShortcut("Ctrl+W")
         wireAction.triggered.connect(self.wire_button_pressed)
@@ -101,30 +98,21 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         toolsMenu.addAction(wireAction)
 
     def buildDebugTab(self, mainMenu, window):
-        printAction = QAction("Enable Debug Statements", window)
-        printAction.triggered.connect(self.switch_debug_output)
+        """build the debug tab"""
+        toggleAction = QAction("Show Debug Window", window)
+        toggleAction.triggered.connect(self.toggleDebugWindow)
 
         debugMenu = mainMenu.addMenu('Debug')
-        debugMenu.addAction(printAction)
+        debugMenu.addAction(toggleAction)
 
-    def switch_debug_output(self):
-        """ This handler switches between stdout and a file for debug msgs"""
-        #Get rid of current stream
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
 
-        if self.debug_statements:
-            # redirect debug msgs to file
-            logging.basicConfig(filename='debug.log', filemode='w', level= \
-                logging.DEBUG, format='%(name)s - %(levelname)s - %(message)s')
-            self.debug_statements = False
-        else:
-            # redirect debug msgs to terminal
-            logging.basicConfig(level=logging.DEBUG)
-            self.debug_statements = True
+    def toggleDebugWindow(self):
+        """ Event handler which proxies toggling the debug widget"""
+        self.state.mainWindow.toggleDebug()
 
-    # changes gui state to allow for wire drawing and disable object dragging
     def wire_button_pressed(self):
+        """changes gui state to allow for wire drawing and
+            disable object dragging"""
         self.state.drag_state = not self.state.drag_state
         self.state.draw_wire_state = not self.state.draw_wire_state
         self.state.setDragState()
@@ -278,12 +266,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                                                 self.state.sym_objects, object)
                     instantiate_model() #actual m5 instatiation
 
-    # creates a python file that can be run with gem5
     def simulate_button_pressed(self):
+        """creates a python file that can be run with gem5"""
         simulate()
 
-    # loads .ui file into gui
     def openUI_button_pressed(self):
+        """loads .ui file into gui"""
         # check if any changes have been made - to save before closing
         if not self.state.mostRecentSaved:
             dialog = saveChangesDialog("opening a new file")
@@ -332,8 +320,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.mostRecentSaved = True
 
-    # build dictionary to export
     def getOutputData(self):
+        """build dictionary to export to file"""
         savedObjects = {}
 
         # iterate through the current objects on the scene and create a new JSON
@@ -380,7 +368,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             for port in object.instance_ports.keys():
                 ports[port] = {}
                 if isinstance(object.instance_ports[port]["Value"], str):
-                    ports[port]["Value"] = str(object.instance_ports[port]["Value"])
+                    ports[port]["Value"] = \
+                        str(object.instance_ports[port]["Value"])
                 else:
                     ports[port]["Value"] = None
 
@@ -415,9 +404,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         return savedObjects
 
-    # saves current state to open file if it exists, otherwise use dialog
-    # to select new file to save to
     def save_button_pressed(self):
+        """saves current state to open file if it exists, otherwise use dialog
+        to select new file to save to"""
         # check if file is already open
         if self.state.fileName:
             filename = self.state.fileName
@@ -441,10 +430,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.mostRecentSaved = True
 
-    # saves gui state to a .ui file, shows dialog to select output file
-    # regardless of whether file exists in the state
     def save_as_UI_button_pressed(self):
-
+        """saves gui state to a .ui file, shows dialog to select output file
+        regardless of whether file exists in the state"""
         # show dialog box to let user create output file
         filename = QFileDialog.getSaveFileName(None, "",
                                            "",
