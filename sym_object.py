@@ -6,6 +6,7 @@ from PySide2.QtGui import *
 from gui_views import state
 from m5_calls import *
 import copy
+import collections
 
 
 class SymObject(QGraphicsItemGroup):
@@ -77,6 +78,7 @@ class SymObject(QGraphicsItemGroup):
 
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
+        self.state.removeHighlight()
         del self.state.selected_sym_objects[:]
         self.state.selected_sym_objects.append(self)
 
@@ -111,8 +113,8 @@ class SymObject(QGraphicsItemGroup):
                     continue
 
     def load_instantiate(self):
-        """Instantiation and some paramter/port info collection occurs here when an
-        object is loaded from a model file """
+        """Instantiation and some paramter/port info collection occurs here when
+        an object is loaded from a model file """
 
         self.sim_object_instance = self.sim_object()
         param_dict = self.sim_object_instance._params
@@ -167,12 +169,12 @@ class SymObject(QGraphicsItemGroup):
     def initPorts(self):
         """Create the display for the ports on the symobjects"""
 
-        self.ui_ports = []
+        del self.ui_ports[:]
         x = self.scenePos().x() + self.width * 3 / 4
         num_ports = len(self.instance_ports)
         delete_button_height = self.delete_button.boundingRect().height()
         next_y = delete_button_height
-        for sim_object_instance_port in self.instance_ports:
+        for sim_object_instance_port in sorted(self.instance_ports):
             #port = QGraphicsItemGroup()
             # size of port is 25 x 10
             # y + 25 is the y we want to add the port at
@@ -242,8 +244,6 @@ class SymObject(QGraphicsItemGroup):
         super(SymObject, clicked).mousePressEvent(event)
 
         # show button for current object
-        clicked.delete_button.show()
-        self.state.removeHighlight()
         clicked.rect.setBrush(QColor("Green"))
 
         # check if mouse press is on delete button
@@ -258,6 +258,10 @@ class SymObject(QGraphicsItemGroup):
         if len(self.state.selected_sym_objects) == 1:
             self.state.mainWindow.populateAttributes(None,
                 clicked.component_name, False)
+        else: #hide attribute table
+            table = self.state.mainWindow.attributeView.attributeTable
+            table.clear()
+            table.setRowCount(0)
 
     def delete(self):
         """remove visual respresentations of object"""
@@ -346,7 +350,7 @@ class SymObject(QGraphicsItemGroup):
             if not self.name in parent.connected_objects:
                 parent.connected_objects.append(self.name) # add new child
         else:
-            if self.parent_name:
+            if self.parent_name and not self.doesOverlap(self.state.sym_objects[self.parent_name]):
                 # if the object is dragged out of a parent, remove the parent,
                 # child relationship
                 curParent = self.state.sym_objects[self.parent_name]
@@ -387,7 +391,9 @@ class SymObject(QGraphicsItemGroup):
         highest_zscore = -1
         for key in self.state.sym_objects:
             object = self.state.sym_objects[key]
-            if self != object and not self.isDescendant(object):
+            #if two objects are related
+            if self != object and not self.isAncestor(object) and \
+                not self.isDescendant(object):
                 if self.doesOverlap(object):
                     if object.z > highest_zscore:
                         highest_zscore = object.z

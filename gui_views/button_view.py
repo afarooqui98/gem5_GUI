@@ -156,16 +156,33 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.copyState = True
         self.state.copied_objects = list(self.state.selected_sym_objects)
+        self.addChildObjects()
+        #copy objects from "oldest" to "youngest"
+        self.state.copied_objects.sort(key=lambda x: x.z)
+
+    def addChildObjects(self):
+        for selectedObject in self.state.copied_objects:
+            self.addChildren(selectedObject)
+
+    def addChildren(self, object):
+        for child_name in object.connected_objects:
+            child = self.state.sym_objects[child_name]
+            if not child in self.state.copied_objects:
+                self.state.copied_objects.append(child)
+                self.addChildren(child)
 
     def paste_button_pressed(self):
         if not self.state.copyState:
             return
 
-        self.state.removeHighlight()
         for selectedObject in self.state.copied_objects:
             self.copy_sym_object(selectedObject)
+        for selectedObject in self.state.copied_objects:
+            self.copyConnection(selectedObject)
         self.state.copyState = False
+        self.state.removeHighlight()
         del self.state.copied_objects[:]
+        self.state.line_drawer.update()
 
     def copy_sym_object(self, selectedObject):
         object_name = selectedObject.name + "_copy"
@@ -174,10 +191,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         #copy over parent - child relationship info
         if selectedObject.parent_name:
             parent_name = selectedObject.parent_name + "_copy"
-            parent = self.state.sym_objects[parent_name]
-            parent.addSubObject(new_object)
-            new_object.parent_name = parent_name
-            parent.connected_objects.append(new_object.name)
+            if parent_name in self.state.sym_objects:
+                parent = self.state.sym_objects[parent_name]
+                parent.addSubObject(new_object)
+                new_object.parent_name = parent_name
+                parent.connected_objects.append(new_object.name)
 
         #copy backend info
         new_object.instance_ports = copy.deepcopy(selectedObject.instance_ports)
@@ -186,38 +204,60 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         new_object.SimObject = \
             copy.deepcopy(self.state.instances[new_object.component_name])
 
-        #copy front end info
-        new_object.z = selectedObject.z
+        #calculate z value
+        current_object_name = selectedObject.name
+        new_object.z = 0
+        while self.state.sym_objects[current_object_name].parent_name:
+            current_object_name = \
+                self.state.sym_objects[current_object_name].parent_name
+            new_object.z += 1
         new_object.initPorts()
-
-        #copy connections
-        for name, connection in selectedObject.ui_connections.items():
-            new_y = delete_button_height
-            if name[0] == "parent":
-                new_y += sym_object.scenePos().y() + connection.parent_port_num\
-                    * y_offset + y_offset / 4
-                new_coords = QPointF(new_x, new_y)
-                key = ("child", sym_object.name, name[3], name[2])
-                connection.setEndpoints(new_coords, None)
-                self.state.sym_objects[name[1]].ui_connections[key].setEndpoints(\
-                                                            new_coords, None)
-            else:
-                new_y += sym_object.scenePos().y() + connection.child_port_num \
-                    * y_offset + y_offset / 4
-                new_coords = QPointF(new_x, new_y)
-                key = ("parent", sym_object.name, name[3], name[2])
-                connection.setEndpoints(None, new_coords)
-                self.state.sym_objects[name[1]].ui_connections[key].setEndpoints(\
-                                                            None, new_coords)
-
 
         new_object.instantiateSimObject()
         self.state.sym_objects[object_name] = new_object
 
-        #recursively copy subobjects
-        for child_name in selectedObject.connected_objects:
-            child = self.state.sym_objects[child_name]
-            self.copy_sym_object(child)
+    def copyConnection(self, selectedObject):
+        object_name = selectedObject.name + "_copy"
+        new_object = self.state.sym_objects[object_name]
+        delete_button_height = new_object.delete_button.boundingRect().height()
+        num_ports = len(new_object.instance_ports)
+        y_offset = (new_object.height - delete_button_height) / num_ports
+        new_x = new_object.scenePos().x() + new_object.width * 7 / 8
+        for name, connection in selectedObject.ui_connections.items():
+            if self.state.sym_objects[name[1]] not in self.state.copied_objects:
+                continue
+            new_y = delete_button_height
+
+            object_name2 = self.state.sym_objects[name[1]].name + "_copy"
+            object2 = self.state.sym_objects[object_name2]
+            delete_button_height2 = object2.delete_button.boundingRect().height()
+            num_ports2 = len(object2.instance_ports)
+            y_offset2 = (object2.height - delete_button_height2) / num_ports2
+            new_x2 = object2.scenePos().x() + object2.width * 7 / 8
+            new_y2 = delete_button_height2
+            if name[0] == "parent":
+                new_y += new_object.scenePos().y() + connection.parent_port_num\
+                    * y_offset + y_offset / 4
+                new_y2 += object2.scenePos().y() + connection.child_port_num\
+                    * y_offset2 + y_offset2 / 4
+                new_coords = QPointF(new_x, new_y)
+                new_coords2 = QPointF(new_x2, new_y2)
+
+                key = ("parent", object_name2, name[2], name[3])
+                new_object.ui_connections[key] = Connection(new_coords, new_coords2,
+                    connection.parent_port_num, connection.child_port_num)
+                new_object.instance_ports[name[2]]['Value'] = str(object_name2) + "." + \
+                    str(name[3])
+            else:
+                new_y += new_object.scenePos().y() + connection.child_port_num \
+                    * y_offset + y_offset / 4
+                new_y2 += object2.scenePos().y() + connection.parent_port_num\
+                    * y_offset2 + y_offset2 / 4
+                new_coords = QPointF(new_x, new_y)
+                new_coords2 = QPointF(new_x2, new_y2)
+                key = ("child", object_name2, name[2], name[3])
+                new_object.ui_connections[key] = Connection(new_coords, new_coords2,
+                    connection.parent_port_num, connection.child_port_num)
 
 
     #TODO

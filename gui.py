@@ -92,9 +92,6 @@ class MainWindow(QMainWindow):
 
 
     def treeWidgetClicked(self, item, name):
-        # del self.state.selected_sym_objects[:]
-        """not deleting selected sym objects anymore since we need
-        it when adding from catalog directly"""
         self.populateAttributes(item, name, True)
 
     def populateAttributes(self, item, name, isTreeWidgetClick):
