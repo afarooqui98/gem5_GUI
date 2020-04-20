@@ -23,6 +23,7 @@ class State():
         self.copyState = False
         self.copied_objects = []
         self.mostRecentSaved = True
+        self.zoom = 1
 
     # sets objects in scene as draggable or not draggable based on drag_state
     def setDragState(self):

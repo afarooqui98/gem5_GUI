@@ -254,6 +254,7 @@ class SymObject(QGraphicsItemGroup):
         if not clicked in self.state.selected_sym_objects:
             self.state.selected_sym_objects.append(clicked)
         if len(self.state.selected_sym_objects) == 1:
+            clicked.delete_button.show()
             self.state.mainWindow.populateAttributes(None,
                 clicked.component_name, False)
         else: #hide attribute table

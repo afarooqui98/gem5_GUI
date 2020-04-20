@@ -26,6 +26,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         """build the main menu bar"""
         self.buildFileTab(mainMenu, window)
         self.buildEditTab(mainMenu, window)
+        self.buildViewTab(mainMenu, window)
         self.buildRunTab(mainMenu, window)
         self.buildToolsTab(mainMenu, window)
         self.buildDebugTab(mainMenu, window)
@@ -40,7 +41,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         saveAction.setShortcut("Ctrl+S")
         saveAction.triggered.connect(self.save_button_pressed)
         saveAsAction = QAction("Save As", window)
-        saveAsAction.setShortcut("Ctrl+D")
+        saveAsAction.setShortcut(QKeySequence("Ctrl+Shift+S"))
         saveAsAction.triggered.connect(self.save_as_UI_button_pressed)
         openAction = QAction("Open", window)
         openAction.setShortcut("Ctrl+O")
@@ -61,13 +62,34 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         pasteAction.setShortcut("Ctrl+V")
         pasteAction.triggered.connect(self.paste_button_pressed)
         undoAction = QAction("Undo", window)
-        undoAction.setShortcut("Ctrl+U")
+        undoAction.setShortcut("Ctrl+Z")
         undoAction.triggered.connect(self.undo_button_pressed)
+        redoAction = QAction("Redo", window)
+        redoAction.setShortcut(QKeySequence("Ctrl+Shift+Z"))
+        redoAction.triggered.connect(self.redo_button_pressed)
 
         editMenu = mainMenu.addMenu('Edit')
         editMenu.addAction(copyAction)
         editMenu.addAction(pasteAction)
         editMenu.addAction(undoAction)
+        editMenu.addAction(redoAction)
+
+    def buildViewTab(self, mainMenu, window):
+        """build the view tab"""
+        zoomIn = QAction("Zoom In", window)
+        zoomIn.setShortcut(QKeySequence.ZoomIn) #ctrl shift +
+        zoomIn.triggered.connect(lambda: self.zoom(1.05 * self.state.zoom))
+        zoomOut = QAction("Zoom Out", window)
+        zoomOut.setShortcut(QKeySequence("Ctrl+Shift+-"))
+        zoomOut.triggered.connect(lambda: self.zoom(.95 * self.state.zoom))
+        zoomReset = QAction("Reset Zoom", window)
+        zoomReset.setShortcut(QKeySequence("Ctrl+Shift+0"))
+        zoomReset.triggered.connect(lambda: self.zoom(1))
+
+        viewMenu = mainMenu.addMenu('View')
+        viewMenu.addAction(zoomIn)
+        viewMenu.addAction(zoomOut)
+        viewMenu.addAction(zoomReset)
 
     def buildRunTab(self, mainMenu, window):
         """build the run tab"""
@@ -100,6 +122,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def buildDebugTab(self, mainMenu, window):
         """build the debug tab"""
         toggleAction = QAction("Show Debug Window", window)
+        toggleAction.setShortcut("Ctrl+D")
         toggleAction.triggered.connect(self.toggleDebugWindow)
 
         debugMenu = mainMenu.addMenu('Debug')
@@ -251,6 +274,15 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     #TODO
     def undo_button_pressed(self):
         logging.debug("undo button pressed")
+
+    #TODO
+    def redo_button_pressed(self):
+        logging.debug("redo button pressed")
+
+    def zoom(self, val):
+        self.state.zoom = val
+        self.state.mainWindow.graphics_view.setTransform(QTransform().scale(val,
+            val).rotate(0))
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
