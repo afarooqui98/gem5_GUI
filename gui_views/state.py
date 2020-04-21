@@ -5,6 +5,7 @@ from PySide2.QtWidgets import *
 
 from graphic_scene import *
 from connection import *
+from wire import *
 import sys, random, os
 
 class State():
@@ -41,9 +42,19 @@ class State():
     def drawConnection(self, p, connection):
         if connection.line:
             self.scene.removeItem(connection.line)
-        connection.line = self.scene.addLine(connection.parent_endpoint.x(), \
-        connection.parent_endpoint.y(), connection.child_endpoint.x(), \
-        connection.child_endpoint.y(), p)
+
+        #connection.line = self.scene.addLine(connection.parent_endpoint.x(), \
+        #connection.parent_endpoint.y(), connection.child_endpoint.x(), \
+        #connection.child_endpoint.y(), pen)
+
+        line = QLineF(connection.parent_endpoint.x(), \
+                connection.parent_endpoint.y(), connection.child_endpoint.x(), \
+                    connection.child_endpoint.y())
+
+        wire = Wire(line, p)
+        self.scene.addItem(wire)
+
+        connection.line = wire
 
         connection.line.setZValue(1000)
 

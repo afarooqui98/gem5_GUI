@@ -3,6 +3,7 @@ from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QMessageBox)
 from PySide2.QtGui import QPainter, QColor, QPen
 from PySide2.QtCore import Qt, QPoint
 from connection import *
+from wire import *
 from gui_views import state
 
 class LineDrawer(QWidget):
@@ -36,11 +37,22 @@ class LineDrawer(QWidget):
     def mouseMoveEvent(self, event):
         if self.state.draw_wire_state and self.pos1:
             self.pos2 = event.pos()
-            line = self.state.scene.addLine(self.pos1.x(), self.pos1.y(), \
-                        self.pos2.x(), self.pos2.y(), self.pen)
+            #line = self.state.scene.addLine(self.pos1.x(), self.pos1.y(), \
+            #             self.pos2.x(), self.pos2.y(), self.pen)
+
+            line = QLineF(self.pos1.x(), self.pos1.y(), self.pos2.x(), self.pos2.y())
+            wire = Wire(line, self.pen)
+
+            self.state.scene.addItem(wire)
+
+            #line = Wire(self.pos1.x(), self.pos1.y(), self.pos2.x(), self.pos2.y(), self.pen)
+            #self.state.scene.addItem(line)
+
             if self.line:
                 self.state.scene.removeItem(self.line)
-            self.line = line
+
+            self.line = wire
+
             self.line.setZValue(1000)
 
     def mouseReleaseEvent(self, event):
