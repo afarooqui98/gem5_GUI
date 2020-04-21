@@ -36,10 +36,10 @@ class State():
         for object in self.sym_objects.values():
             for name, connection in object.ui_connections.items():
                 if name[0] == "parent": #draw line once
-                    self.drawConnection(p, connection)
+                    self.drawConnection(p, connection, name, object.name)
 
 
-    def drawConnection(self, p, connection):
+    def drawConnection(self, p, connection, parent_key, parent_name):
         if connection.line:
             self.scene.removeItem(connection.line)
 
@@ -51,10 +51,13 @@ class State():
                 connection.parent_endpoint.y(), connection.child_endpoint.x(), \
                     connection.child_endpoint.y())
 
-        wire = Wire(line, p)
+        wire = Wire(line, p, self)
         self.scene.addItem(wire)
 
         connection.line = wire
+
+        wire.parent_key = parent_key
+        wire.child_key = ("child", parent_name, parent_key[3], parent_key[2])
 
         connection.line.setZValue(1000)
 
