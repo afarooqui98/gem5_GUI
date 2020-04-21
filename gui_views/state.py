@@ -6,6 +6,7 @@ from PySide2.QtWidgets import *
 from graphic_scene import *
 from connection import *
 import copy
+import logging
 import sys, random, os
 
 """operations and their inverse:
@@ -25,6 +26,7 @@ class History():
     def push(self, sym_object, operation, isDeepCopy):
         if isDeepCopy:
             obj = copy.deepcopy(sym_object)
+            print(obj.name)
         else:
             obj = sym_object
 
@@ -33,9 +35,13 @@ class History():
         self.head = new_node
 
     def pop(self):
-        popped_node = self.head
-        self.head = popped_node.next
-        return popped_node
+        try:
+            popped_node = self.head
+            self.head = popped_node.next
+            return popped_node
+        except:
+            e = sys.exc_info()[0]
+            logging.error("error popping from history")
 
 class HistoryNode():
     def __init__(self, sym_object, operation):
@@ -72,7 +78,6 @@ class State():
             for name, connection in object.ui_connections.items():
                 if name[0] == "parent": #draw line once
                     self.drawConnection(p, connection)
-
 
     def drawConnection(self, p, connection):
         if connection.line:

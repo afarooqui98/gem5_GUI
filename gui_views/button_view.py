@@ -250,18 +250,22 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     #TODO
     def undo_button_pressed(self):
-        logging.debug("undo button pressed")
         last_update = self.state.history.pop()
         if last_update:
             if last_update.operation == "create" or last_update.operation == "copy":
                 last_update.sym_object.delete()
             elif last_update.operation == "delete":
                 last_update.sym_object
-            elif last_update.operation == "move_any":
+            elif last_update.operation == "move_any": #no overlap issue
+                print(self.state.sym_objects)
+                for name, obj in self.state.sym_objects.items():
+                    if last_update.sym_object.name == name.encode("utf-8"):
+                        obj.x = last_update.sym_object.x
+                        obj.y = last_update.sym_object.y
+                        obj.setPos(obj.x, obj.y)
+            elif last_update.operation == "move_child": #move and parent-child
                 pass
-            elif last_update.operation == "move_child":
-                pass
-            elif last_update.operation == "change_attr":
+            elif last_update.operation == "change_attr": #TODO: not in code yet
                 for object in self.state.sym_objects:
                     if last_update.sym_object.name == object.name:
                         object = last_update.sym_object

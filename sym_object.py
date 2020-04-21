@@ -11,11 +11,27 @@ class SymObject(QGraphicsItemGroup):
     def __copy__(self):
         obj = type(self)()
         obj.__dict__.update(self.__dict__)
+        return obj
 
     def __deepcopy__(self, memo):
-        obj = type(self)()
+        obj = type(self)(self.x, self.y, self.width, self.height, self.scene,
+         self.component_name, self.name, False, self.state)
+
         obj.__dict__.update(self.__dict__)
+
         obj.connected_objects = copy.deepcopy(self.connected_objects)
+
+        obj.instance_params = copy.deepcopy(self.instance_params)
+        obj.instance_ports = copy.deepcopy(self.instance_ports)
+        obj.sim_object = \
+            copy.deepcopy(
+            obj.state.instances[obj.component_name])
+        obj.sim_object_instance = self.sim_object_instance
+
+        obj.ui_ports = copy.deepcopy(self.ui_ports)
+        obj.ui_connections = copy.deepcopy(self.ui_connections)
+        obj.scene = self.scene
+        return obj
 
     def __init__(self, x, y, width, height, scene, component_name, name,
                     loadingFromFile, state):
@@ -231,6 +247,8 @@ class SymObject(QGraphicsItemGroup):
         object.setAcceptDrops(True)
         object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
+        #save object reference to history, possibly change this since it makes
+        #the linked list polymorphic
         self.state.history.push(self, "create", False)
 
     def mousePressEvent(self, event):
@@ -257,7 +275,7 @@ class SymObject(QGraphicsItemGroup):
         # check if mouse press is on delete button
         deletePressed = clicked.deleteButtonPressed(event)
         if deletePressed:
-            #TODO: implement backend removal, possibly in other function
+            #TODO: not finished yet, should be able to create from a delete
             self.state.history.push(self, "delete", False)
             print("delete pressed")
             clicked.delete()
@@ -265,7 +283,6 @@ class SymObject(QGraphicsItemGroup):
 
         # add clicked to list if not present and update attributes for it
         if not clicked in self.state.selected_sym_objects:
-            self.state.history.push(clicked, "change_attr", True)
             self.state.selected_sym_objects.append(clicked)
         if len(self.state.selected_sym_objects) == 1:
             self.state.mainWindow.populateAttributes(None,
@@ -351,6 +368,9 @@ class SymObject(QGraphicsItemGroup):
         #iterate through all sym objects on the screen and check if the object's
         # current position overlaps with any of them
         parent = self.getFrontmostOverLappingObject()
+
+        #add object to history, rollback x and y as well as parent-child relationship
+        self.state.history.push(self, "move_any", True)
 
         # if an overlapping object is found -> resize, update parent name AND
         # add self to the parent's list of children
