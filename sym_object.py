@@ -551,7 +551,7 @@ class SymObject(QGraphicsItemGroup):
         """updates a symobjects name"""
 
         # changed name on visualization of symobject
-        self.rect_text.setPlainText(newName)
+        self.rect_text.setPlainText(newName + "::" + self.component_name)
 
         # if sym object has a parent, change current sym object's name in
         # parent's list of child objects
@@ -567,11 +567,18 @@ class SymObject(QGraphicsItemGroup):
             for child_name in self.connected_objects:
                 self.state.sym_objects[child_name].parent_name = newName
 
-        for c in self.ui_connections:
-            connected_object_name = c[1]
+        # update the current object's name in each of its connections'
+        # connection list
+        for ui_connection in self.ui_connections:
+            connected_object_name = ui_connection[1]
             connected_object = self.state.sym_objects[connected_object_name]
             for connection in connected_object.ui_connections:
-                print(connection)
+                if connection[1] == self.name:
+                    value = connected_object.ui_connections[connection]
+                    del connected_object.ui_connections[connection]
+                    new_key = (connection[0], newName, connection[2],
+                                connection[3])
+                    connected_object.ui_connections[new_key] = value
 
         # update member variable
         self.name = newName
