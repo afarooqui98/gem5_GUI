@@ -140,7 +140,7 @@ class MainWindow(QMainWindow):
                 self.attributes = self.catalog[name]
 
         # display the param name and values
-        for attribute in self.attributes.keys():
+        for attribute in sorted(self.attributes.keys()):
             # Simobject params are special cases with dropdowns in the table
             isSim = False
             if len(self.state.selected_sym_objects) > 0:
