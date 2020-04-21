@@ -223,6 +223,8 @@ class SymObject(QGraphicsItemGroup):
         object.setAcceptDrops(True)
         object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
+        self.state.history.push(self, "create")
+
     def mousePressEvent(self, event):
         modifiers = QApplication.keyboardModifiers()
         if modifiers != Qt.ShiftModifier:
@@ -264,6 +266,8 @@ class SymObject(QGraphicsItemGroup):
     def delete(self):
         """remove visual respresentations of object"""
         #TODO: implement backend removal, possibly in other function
+
+        self.state.history.push(copy.deepcopy(self), "delete")
 
         name = self.name
         self.state.scene.removeItem(self)

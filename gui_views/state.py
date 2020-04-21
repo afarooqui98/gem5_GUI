@@ -7,6 +7,36 @@ from graphic_scene import *
 from connection import *
 import sys, random, os
 
+"""operations and their inverse:
+    #create -> delete
+    #delete -> create
+    #copy -> delete
+    #draw -> erase
+    move -> move back
+        TODO: move out of object (hard?) #move_child
+        TODO: move general (easy?) #move_any
+    TODO: change attribute -> undo change (hard?) #move_attr"""
+
+class History():
+    def __init__(self):
+        self.head = None
+
+    def push(self, sym_object, operation):
+        new_node = HistoryNode(sym_object, operation)
+        new_node.next = self.head
+        self.head = new_node
+
+    def pop(self):
+        popped_node = self.head
+        self.head = popped_node.next
+        return popped_node
+
+class HistoryNode():
+    def __init__(self, sym_object, operation):
+        self.sym_object = sym_object
+        self.operation = operation
+        self.next = None
+
 class State():
     def __init__(self, instances, catalog):
         self.drag_state = True
@@ -22,6 +52,7 @@ class State():
         self.fileName = None
         self.copyState = False
         self.copied_objects = []
+        self.history = History()
         self.mostRecentSaved = True
 
     # sets objects in scene as draggable or not draggable based on drag_state

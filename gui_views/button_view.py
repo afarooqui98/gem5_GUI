@@ -251,6 +251,24 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     #TODO
     def undo_button_pressed(self):
         logging.debug("undo button pressed")
+        last_update = self.state.history.pop()
+        if last_update:
+            if last_update.operation == "create" or last_update.operation == "copy":
+                last_update.sym_object.delete()
+            elif last_update.operation == "delete":
+                last_update.sym_object
+            elif last_update.operation == "move_any":
+                pass
+            elif last_update.operation == "move_child":
+                pass
+            elif last_update.operation == "change_attr":
+                for object in self.state.sym_objects:
+                    if last_update.sym_object.name == object.name:
+                        object = last_update.sym_object
+            else:
+                logging.debug("history: operation not found")
+        else:
+            logging.debug("undo returned null")
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
