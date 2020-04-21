@@ -567,6 +567,12 @@ class SymObject(QGraphicsItemGroup):
             for child_name in self.connected_objects:
                 self.state.sym_objects[child_name].parent_name = newName
 
+        for c in self.ui_connections:
+            connected_object_name = c[1]
+            connected_object = self.state.sym_objects[connected_object_name]
+            for connection in connected_object.ui_connections:
+                print(connection)
+
         # update member variable
         self.name = newName
 
