@@ -224,6 +224,7 @@ class SymObject(QGraphicsItemGroup):
         object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
     def mousePressEvent(self, event):
+        '''handle required operations when a sym object is clicked on'''
         modifiers = QApplication.keyboardModifiers()
         if modifiers != Qt.ShiftModifier:
             # hide button on previously selected object
@@ -273,6 +274,7 @@ class SymObject(QGraphicsItemGroup):
             parent.connected_objects.remove(name)
             if not parent.connected_objects:
                 self.resizeUIObject(parent, 1, 120 - parent.width)
+
         for child_name in self.connected_objects:
             #self.state.sym_objects[child_name].delete()
             del self.state.sym_objects[child_name]
@@ -283,6 +285,7 @@ class SymObject(QGraphicsItemGroup):
 
 
     def mouseMoveEvent(self, event):
+        '''handle changes when symobject is moved around on canvas'''
         self.modifyConnections(event, self)
         self.updateChildrenConnections(event, self)
         self.state.line_drawer.update()
@@ -291,6 +294,8 @@ class SymObject(QGraphicsItemGroup):
 
 
     def modifyConnections(self, event, sym_object):
+        '''update connection position information when an object is dragged
+        around'''
         # set connection to middle of port
         num_ports = len(sym_object.instance_ports)
         if not num_ports:
@@ -321,6 +326,7 @@ class SymObject(QGraphicsItemGroup):
 
 
     def updateChildrenConnections(self, event, sym_object):
+        """update all child connections"""
         for object_name in sym_object.connected_objects:
             object = self.state.sym_objects[object_name]
             self.modifyConnections(event, object)
@@ -401,6 +407,8 @@ class SymObject(QGraphicsItemGroup):
         return frontmost_object
 
     def isClicked(self, event):
+        """determine if a symobject was clicked on given the position of the
+        click"""
         click_x, click_y = event.scenePos().x(), event.scenePos().y()
         # return if the click position is within the text item's bounding box
         if (click_x > self.scenePos().x() and click_x < self.scenePos().x() + \
@@ -411,6 +419,7 @@ class SymObject(QGraphicsItemGroup):
         return False
 
     def isAncestor(self, item):
+        """determine if item is an ancestor of self"""
         if not self.parent_name:
             return False
         current_item = self
@@ -421,6 +430,7 @@ class SymObject(QGraphicsItemGroup):
         return False
 
     def isDescendant(self, item):
+        """determine if item is a descendant of self"""
         if item.name in self.connected_objects:
             return True
         for child_name in self.connected_objects:
@@ -511,6 +521,7 @@ class SymObject(QGraphicsItemGroup):
         self.state.line_drawer.update()
 
     def lowestChild(self, item):
+        """finds a parent's lowest child"""
         lowest = item
         y_coord = item.scenePos().y() + item.height
         for child in self.connected_objects:
@@ -522,6 +533,7 @@ class SymObject(QGraphicsItemGroup):
         return lowest
 
     def rightMostChild(self, item):
+        """finds a parent's rightmost child"""
         rightmost = item
         x_coord = item.scenePos().x() + item.width
         for child in self.connected_objects:
@@ -551,7 +563,7 @@ class SymObject(QGraphicsItemGroup):
         """updates a symobjects name"""
 
         # changed name on visualization of symobject
-        self.rect_text.setPlainText(newName)
+        self.rect_text.setPlainText(newName + "::" + self.component_name)
 
         # if sym object has a parent, change current sym object's name in
         # parent's list of child objects
@@ -566,6 +578,19 @@ class SymObject(QGraphicsItemGroup):
         if self.connected_objects:
             for child_name in self.connected_objects:
                 self.state.sym_objects[child_name].parent_name = newName
+
+        # update the current object's name in each of its connections'
+        # connection list
+        for ui_connection in self.ui_connections:
+            connected_object_name = ui_connection[1]
+            connected_object = self.state.sym_objects[connected_object_name]
+            for connection in connected_object.ui_connections:
+                if connection[1] == self.name:
+                    value = connected_object.ui_connections[connection]
+                    del connected_object.ui_connections[connection]
+                    new_key = (connection[0], newName, connection[2],
+                                connection[3])
+                    connected_object.ui_connections[new_key] = value
 
         # update member variable
         self.name = newName
