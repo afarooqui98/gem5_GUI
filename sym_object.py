@@ -17,7 +17,7 @@ class SymObject(QGraphicsItemGroup):
         obj = type(self)(self.x, self.y, self.width, self.height, self.scene,
          self.component_name, self.name, False, self.state)
 
-        obj.__dict__.update(self.__dict__)
+        #obj.__dict__.update(self.__dict__)
 
         obj.connected_objects = copy.deepcopy(self.connected_objects)
 
