@@ -5,6 +5,7 @@ from PySide2.QtWidgets import *
 
 from graphic_scene import *
 from connection import *
+import copy
 import sys, random, os
 
 """operations and their inverse:
@@ -21,8 +22,13 @@ class History():
     def __init__(self):
         self.head = None
 
-    def push(self, sym_object, operation):
-        new_node = HistoryNode(sym_object, operation)
+    def push(self, sym_object, operation, isDeepCopy):
+        if isDeepCopy:
+            obj = copy.deepcopy(sym_object)
+        else:
+            obj = sym_object
+
+        new_node = HistoryNode(obj, operation)
         new_node.next = self.head
         self.head = new_node
 

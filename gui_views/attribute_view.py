@@ -10,6 +10,12 @@ import json
 
 
 class AttributeView(): #table view for parameters, as well as the description
+    def __copy__(self):
+        return self
+
+    def __deepcopy(self, memo):
+        return self
+
     def __init__(self, layout, state):
         self.state = state
         #attribute table for an object, is editable
@@ -69,9 +75,6 @@ class AttributeView(): #table view for parameters, as well as the description
     def modifyFields(self, item):
         """ this signal disconnects itself after finishing execution,
          since we only want to trigger it AFTER a double press """
-
-        #regardless of type of param change, persist previous state
-        self.state.history.push(copy.deepcopy(self.state.selected_sym_objects[0]), "change_attr")
 
         # get attributes
         currentColumn = self.attributeTable.column(item)

@@ -8,6 +8,14 @@ from m5_calls import *
 import copy
 
 class SymObject(QGraphicsItemGroup):
+    def __copy__(self):
+        obj = type(self)()
+        obj.__dict__.update(self.__dict__)
+
+    def __deepcopy__(self, memo):
+        obj = type(self)()
+        obj.__dict__.update(self.__dict__)
+        obj.connected_objects = copy.deepcopy(self.connected_objects)
 
     def __init__(self, x, y, width, height, scene, component_name, name,
                     loadingFromFile, state):
@@ -223,7 +231,7 @@ class SymObject(QGraphicsItemGroup):
         object.setAcceptDrops(True)
         object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
-        self.state.history.push(self, "create")
+        self.state.history.push(self, "create", False)
 
     def mousePressEvent(self, event):
         modifiers = QApplication.keyboardModifiers()
@@ -249,11 +257,15 @@ class SymObject(QGraphicsItemGroup):
         # check if mouse press is on delete button
         deletePressed = clicked.deleteButtonPressed(event)
         if deletePressed:
+            #TODO: implement backend removal, possibly in other function
+            self.state.history.push(self, "delete", False)
+            print("delete pressed")
             clicked.delete()
             return
 
         # add clicked to list if not present and update attributes for it
         if not clicked in self.state.selected_sym_objects:
+            self.state.history.push(clicked, "change_attr", True)
             self.state.selected_sym_objects.append(clicked)
         if len(self.state.selected_sym_objects) == 1:
             self.state.mainWindow.populateAttributes(None,
@@ -265,9 +277,6 @@ class SymObject(QGraphicsItemGroup):
 
     def delete(self):
         """remove visual respresentations of object"""
-        #TODO: implement backend removal, possibly in other function
-
-        self.state.history.push(copy.deepcopy(self), "delete")
 
         name = self.name
         self.state.scene.removeItem(self)
