@@ -24,7 +24,7 @@ class AttributeView(): #table view for parameters, as well as the description
         self.attributeLayout.addWidget(self.attributeTable)
 
         layout.addLayout(self.attributeLayout)
-
+        self.attributeTable.setMouseTracking(True)
         #description label
         self.label = QLabel()
         self.label.setFrameStyle(QFrame.Panel | QFrame.Sunken)
@@ -35,7 +35,14 @@ class AttributeView(): #table view for parameters, as well as the description
 
         #handlers
         self.attributeTable.itemDoubleClicked.connect(self.makeEditable)
+        self.attributeTable.cellEntered.connect(self.changeCursor)
 
+
+    def changeCursor(self, row, col):
+        if col == 1:
+            self.attributeTable.setCursor(QCursor(Qt.IBeamCursor))
+        else:
+            self.attributeTable.setCursor(QCursor(Qt.ArrowCursor))
 
     def makeEditable(self, item):
         """ this function feeds into the next one, after the cell is

@@ -9,6 +9,7 @@ from gui_views.button_view import *
 from gui_views.catalog_view import *
 from gui_views.attribute_view import *
 from gui_views.debug_view import *
+from gui_views.toolbar_view import *
 from gui_views.state import *
 from m5_calls import isSimObjectParam
 
@@ -35,6 +36,8 @@ class MainWindow(QMainWindow):
 
         #add button view
         self.buttonView = ButtonView(self.gridLayout, self.state, self)
+        #add toolbar view
+        self.toolbarView = ToolBarView(self.gridLayout, self.state, self)
         #add catalog view
         self.catalogView = CatalogView(self.gridLayout, catalog, self.state)
         #add attributes

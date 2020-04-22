@@ -225,6 +225,9 @@ class SymObject(QGraphicsItemGroup):
 
     def mousePressEvent(self, event):
         '''handle required operations when a sym object is clicked on'''
+        if not self.state.draw_wire_state:
+            self.setCursor(QCursor(Qt.ClosedHandCursor))
+        self.state.object_clicked = 1
         modifiers = QApplication.keyboardModifiers()
         if modifiers != Qt.ShiftModifier:
             # hide button on previously selected object
@@ -286,12 +289,15 @@ class SymObject(QGraphicsItemGroup):
 
     def mouseMoveEvent(self, event):
         '''handle changes when symobject is moved around on canvas'''
-        self.modifyConnections(event, self)
-        self.updateChildrenConnections(event, self)
-        self.state.line_drawer.update()
-        super(SymObject, self).mouseMoveEvent(event)
-        self.state.mostRecentSaved = False
-
+        if self.state.object_clicked:
+            self.modifyConnections(event, self)
+            self.updateChildrenConnections(event, self)
+            self.state.line_drawer.update()
+            super(SymObject, self).mouseMoveEvent(event)
+            self.state.mostRecentSaved = False
+        else:
+            if not self.state.draw_wire_state:
+                self.setCursor(QCursor(Qt.PointingHandCursor))
 
     def modifyConnections(self, event, sym_object):
         '''update connection position information when an object is dragged
@@ -335,7 +341,9 @@ class SymObject(QGraphicsItemGroup):
     def mouseReleaseEvent(self, event):
         """when mouse is release on object, update its position including the case
         where it overlaps and deal with subobject being created"""
-
+        self.state.object_clicked = 0
+        if not self.state.draw_wire_state:
+            self.setCursor(QCursor(Qt.PointingHandCursor))
         super(SymObject, self).mouseReleaseEvent(event)
 
         # if object has not moved
@@ -373,6 +381,15 @@ class SymObject(QGraphicsItemGroup):
         self.detachChildren()
         self.state.line_drawer.update()
         self.state.mostRecentSaved = False
+
+
+    def hoverEnterEvent(self, event):
+        if not self.state.draw_wire_state:
+            self.setCursor(QCursor(Qt.OpenHandCursor))
+
+    def hoverLeaveEvent(self, event):
+        if not self.state.draw_wire_state:
+            self.setCursor(QCursor(Qt.ArrowCursor))
 
     def getClickedObject(self, event):
         """based on mouse click position, return object with highest zscore"""
