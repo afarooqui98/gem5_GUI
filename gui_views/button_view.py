@@ -28,7 +28,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.buildEditTab(mainMenu, window)
         self.buildViewTab(mainMenu, window)
         self.buildRunTab(mainMenu, window)
-        self.buildToolsTab(mainMenu, window)
         self.buildDebugTab(mainMenu, window)
 
 
@@ -109,16 +108,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.simulate = simulateAction
         self.simulate.setEnabled(False)
 
-
-    def buildToolsTab(self, mainMenu, window):
-        """build the tools tab"""
-        wireAction = QAction("Enable Wire", window)
-        wireAction.setShortcut("Ctrl+W")
-        wireAction.triggered.connect(self.wire_button_pressed)
-
-        toolsMenu = mainMenu.addMenu('Tools')
-        toolsMenu.addAction(wireAction)
-
     def buildDebugTab(self, mainMenu, window):
         """build the debug tab"""
         toggleAction = QAction("Show Debug Window", window)
@@ -132,14 +121,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def toggleDebugWindow(self):
         """ Event handler which proxies toggling the debug widget"""
         self.state.mainWindow.toggleDebug()
-
-    def wire_button_pressed(self):
-        """changes gui state to allow for wire drawing and
-            disable object dragging"""
-        self.state.drag_state = not self.state.drag_state
-        self.state.draw_wire_state = not self.state.draw_wire_state
-        self.state.setDragState()
-        self.state.line_drawer.update()
 
     def new_button_pressed(self):
         # check if any changes have been made - to save before closing
@@ -280,6 +261,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         logging.debug("redo button pressed")
 
     def zoom(self, val):
+        """ modifies the window zoom with val"""
         self.state.zoom = val
         self.state.mainWindow.graphics_view.setTransform(QTransform().scale(val,
             val).rotate(0))

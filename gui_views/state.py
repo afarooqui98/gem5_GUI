@@ -25,6 +25,7 @@ class State():
         self.mostRecentSaved = True
         self.zoom = 1
 
+        self.object_clicked = 0
     # sets objects in scene as draggable or not draggable based on drag_state
     def setDragState(self):
         for object in self.sym_objects.values():
