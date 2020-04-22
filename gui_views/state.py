@@ -41,22 +41,24 @@ class State():
 
 
     def drawConnection(self, p, connection, parent_key, parent_name):
+        # remove old line if it exists
         if connection.line:
             self.scene.removeItem(connection.line)
 
-        #connection.line = self.scene.addLine(connection.parent_endpoint.x(), \
-        #connection.parent_endpoint.y(), connection.child_endpoint.x(), \
-        #connection.child_endpoint.y(), pen)
-
+        # instantiate a new line with connection coordinates
         line = QLineF(connection.parent_endpoint.x(), \
                 connection.parent_endpoint.y(), connection.child_endpoint.x(), \
                     connection.child_endpoint.y())
 
+        # create a new wire object so it can register mouse clicks
         wire = Wire(line, p, self)
+
+        # add the wire to the scene
         self.scene.addItem(wire)
 
         connection.line = wire
 
+        # set wire parameters that are needed for deletion
         wire.parent_key = parent_key
         wire.child_key = ("child", parent_name, parent_key[3], parent_key[2])
 
