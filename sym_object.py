@@ -114,7 +114,10 @@ class SymObject(QGraphicsItemGroup):
         """Instantiation and some paramter/port info collection occurs here when
         an object is loaded from a model file """
 
-        self.sim_object_instance = self.sim_object()
+        if self.component_name == "Root":
+            self.sim_object_instance = getRoot()
+        else:
+            self.sim_object_instance = self.sim_object()
         param_dict = self.sim_object_instance._params
         port_dict = self.sim_object_instance._ports
 
@@ -247,7 +250,7 @@ class SymObject(QGraphicsItemGroup):
 
         # show button for current object
         clicked.rect.setBrush(QColor("Green"))
-        
+
         # check if mouse press is on delete button
         deletePressed = clicked.deleteButtonPressed(event)
         if deletePressed:
