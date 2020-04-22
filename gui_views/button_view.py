@@ -451,6 +451,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not filename:
             return
 
+        filename += ".ui"
+        
         savedObjects = self.getOutputData()
 
         # with the selected file write our JSON object
@@ -473,6 +475,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not filename:
             return
 
+        filename += ".ui"
         self.state.fileName = filename
 
         savedObjects = self.getOutputData()

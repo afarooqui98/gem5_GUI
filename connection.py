@@ -1,5 +1,9 @@
-from PySide2.QtGui import QPainter, QColor, QPen
-from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QMessageBox)
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
+from PySide2.QtGui import *
+
+from gui_views.dialogs import *
 
 # holds a parent-child connection between two sym_objects. The parent and child
 # share access to this class object in order to have access to the line

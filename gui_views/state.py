@@ -6,6 +6,7 @@ from PySide2.QtWidgets import *
 from graphic_scene import *
 from connection import *
 from wire import *
+
 import sys, random, os
 
 class State():
