@@ -42,3 +42,22 @@ class saveChangesDialog(QDialog):
         self.layout.addWidget(self.text)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
+
+class deleteWireDialog(QDialog):
+    def __init__(self, dialogText):
+        super(deleteWireDialog, self).__init__()
+
+        self.setWindowTitle("Deleting wire")
+        QBtn = QDialogButtonBox.Yes | QDialogButtonBox.No
+
+        self.text = QLabel(self)
+        self.text.setText(dialogText)
+
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.text)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)

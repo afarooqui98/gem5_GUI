@@ -37,9 +37,11 @@ class LineDrawer(QWidget):
         if self.state.draw_wire_state and self.pos1:
             self.pos2 = event.pos()
             line = self.state.scene.addLine(self.pos1.x(), self.pos1.y(), \
-                        self.pos2.x(), self.pos2.y(), self.pen)
+                         self.pos2.x(), self.pos2.y(), self.pen)
+
             if self.line:
                 self.state.scene.removeItem(self.line)
+
             self.line = line
             self.line.setZValue(1000)
 
