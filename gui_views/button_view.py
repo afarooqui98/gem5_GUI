@@ -451,8 +451,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not filename:
             return
 
-        # add .ui extension by default
-        filename += ".ui"
+        # add .ui extension if filename doesn't contain it
+        if ".ui" not in filename:
+            filename += ".ui"
 
         savedObjects = self.getOutputData()
 
@@ -476,8 +477,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not filename:
             return
 
-        # add .ui extension by default
-        filename += ".ui"
+        # add .ui extension if filename doesn't contain it
+        if ".ui" not in filename:
+            filename += ".ui"
 
         self.state.fileName = filename
 

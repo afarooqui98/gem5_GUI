@@ -15,8 +15,14 @@ class Wire(QGraphicsLineItem):
         self.child_key = None
         self.state = state
 
-    def mousePressEvent(self, event):
+        # line only recieves double click events if it is selectable
+        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+
+    def mouseDoubleClickEvent(self, event):
         """register mouse press events"""
+
+        # remove bounding box 
+        self.setSelected(False)
 
         parent = self.state.sym_objects[self.child_key[1]]
         child = self.state.sym_objects[self.parent_key[1]]
