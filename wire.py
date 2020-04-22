@@ -3,6 +3,7 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 
+from gui_views.dialogs import *
 
 class Wire(QGraphicsLineItem):
     def __init__(self, line, pen, state):
@@ -16,11 +17,13 @@ class Wire(QGraphicsLineItem):
     def mousePressEvent(self, event):
         parent = self.state.sym_objects[self.child_key[1]]
         child = self.state.sym_objects[self.parent_key[1]]
-        print("Delete connection between", parent.name, ".",
-                self.parent_key[2], "and", child.name, ".",
-                self.parent_key[3], "?")
 
-        self.deleteWire()
+        dialog = deleteWireDialog("Delete connection between " + parent.name +
+                                "." + self.parent_key[2] + " and " + child.name
+                                + "." + self.parent_key[3] + "?")
+
+        if dialog.exec_():
+            self.deleteWire()
 
     def deleteWire(self):
         parent = self.state.sym_objects[self.child_key[1]]
