@@ -124,9 +124,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         debugMenu.addAction(importAction)
 
     def importCaches(self):
-        full_path = '/home/parallels/Desktop/gui/ECS193a/caches.py'
-        module_name = 'caches'
-        import_module(module_name)
+        full_path = QFileDialog.getOpenFileName(None, 'Open file',
+            '',"python files (*.py)")[0]
+
+        tokens = full_path.split('/')
+        module_name = tokens[len(tokens) - 1].split('.')[0]
+        print(module_name)
+        import_module(module_name, package=full_path)
         clsmembers = inspect.getmembers(sys.modules[module_name], inspect.isclass)
         logging.debug(clsmembers)
         tree, instances= get_imported_obs(clsmembers, module_name)
