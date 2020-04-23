@@ -9,6 +9,8 @@ import copy
 from gui_views import state
 import json
 import logging
+import inspect
+from importlib import import_module
 
 
 from m5_calls import *
@@ -114,8 +116,24 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         toggleAction.setShortcut("Ctrl+D")
         toggleAction.triggered.connect(self.toggleDebugWindow)
 
+        importAction = QAction("Import", window)
+        importAction.triggered.connect(self.importCaches)
+
         debugMenu = mainMenu.addMenu('Debug')
         debugMenu.addAction(toggleAction)
+        debugMenu.addAction(importAction)
+
+    def importCaches(self):
+        full_path = '/home/parallels/Desktop/gui/ECS193a/caches.py'
+        module_name = 'caches'
+        import_module(module_name)
+        clsmembers = inspect.getmembers(sys.modules[module_name], inspect.isclass)
+        logging.debug(clsmembers)
+        tree, instances= get_imported_obs(clsmembers, module_name)
+
+        # update the gui catalog
+        self.state.updateObjs(tree, instances, module_name)
+
 
 
     def toggleDebugWindow(self):
