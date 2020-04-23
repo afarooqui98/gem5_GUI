@@ -7,7 +7,7 @@ from graphic_scene import *
 from connection import *
 from wire import *
 
-import sys, random, os
+import sys, random, os, logging
 
 class State():
     def __init__(self, instances, catalog):
@@ -70,6 +70,21 @@ class State():
             for sym_object in self.selected_sym_objects:
                 sym_object.rect.setBrush(QColor("White"))
                 sym_object.delete_button.hide()
+
+    def updateObjs(self, imported_catalog, imported_instances, filename):
+        """ Update the catalog and instance tree with new objects. """
+        if filename in self.catalog:
+            logging.debug("already imported file")
+            return
+        #Check if there are any duplicates in the imported objects
+        for name in imported_instances.keys():
+            if name in self.instances:
+                imported_catalog[filename].pop(name, None)
+                imported_instances.pop(name, None)
+        self.catalog.update(imported_catalog)
+        self.instances.update(imported_instances)
+        self.mainWindow.repopulate(imported_catalog)
+
 
 
 #finds the gem5 path

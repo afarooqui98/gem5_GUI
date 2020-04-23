@@ -204,6 +204,19 @@ def traverse_hierarchy_root(sym_catalog, symroot):
         logging.error("Could not create simobject tree due to %s" % e.__name__)
     return symroot.name, simroot
 
+def get_imported_obs(obj_clss, filename):
+    """ A condensed version of get_obj_trees used for simobj classes that
+        are imported from a seperate file"""
+    mini_tree = {filename: {}}
+    instances = {}
+    for name, cls in obj_clss:
+        if name != 'SimObject':
+            port_dict = get_port_info(cls)
+            param_dict = get_param_info(cls)
+            mini_tree[filename][name] = {'params': param_dict, 'ports': port_dict}
+            instances[name] = cls
+    return mini_tree, instances
+
 def get_debug_flags():
     try:
         return m5.debug.flags

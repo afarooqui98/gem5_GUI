@@ -152,6 +152,17 @@ class MainWindow(QMainWindow):
             self.addRow(attribute, str(self.attributes[attribute]["Value"]),
                                                     isTreeWidgetClick, isSim)
 
+    def repopulate(self, imported_catalog):
+        """Adds newly imported sub_objs and updates the catalog"""
+        # Go through every inheritable sym-object
+        for item in sorted(imported_catalog.keys()):
+            tree_item = QTreeWidgetItem([item])
+            # Go through every specialized sym-object
+            for sub_item in sorted(imported_catalog[item].keys()):
+                tree_item.addChild(QTreeWidgetItem([sub_item]))
+            self.catalogView.treeWidget.addTopLevelItem(tree_item)
+        self.catalog.update(imported_catalog)
+
     def populate(self):
         """ This function populates the tree view with sym-objects"""
         # Go through every inheritable sym-object
