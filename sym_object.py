@@ -454,7 +454,7 @@ class SymObject(QGraphicsItemGroup):
         if item.name in self.connected_objects:
             return True
         for child_name in self.connected_objects:
-            return self.isDescendant(self.state.sym_objects[child_name])
+            return self.state.sym_objects[child_name].isDescendant(item)
         return False
 
     def deleteButtonPressed(self, event):

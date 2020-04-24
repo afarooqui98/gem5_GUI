@@ -45,12 +45,18 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         openAction = QAction("Open", window)
         openAction.setShortcut("Ctrl+O")
         openAction.triggered.connect(self.openUI_button_pressed)
+        exportAction = QAction("Export UI Object", window)
+        exportAction.triggered.connect(self.export_object_button_pressed)
+        importAction = QAction("Import UI Object", window)
+        importAction.triggered.connect(self.import_object_button_pressed)
 
         fileMenu = mainMenu.addMenu('File')
         fileMenu.addAction(newAction)
         fileMenu.addAction(saveAction)
         fileMenu.addAction(saveAsAction)
         fileMenu.addAction(openAction)
+        fileMenu.addAction(exportAction)
+        fileMenu.addAction(importAction)
 
     def buildEditTab(self, mainMenu, window):
         """build the edit tab"""
@@ -121,6 +127,82 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def toggleDebugWindow(self):
         """ Event handler which proxies toggling the debug widget"""
         self.state.mainWindow.toggleDebug()
+
+    def export_object_button_pressed(self):
+        # show dialog box to let user create output file
+        filename = QFileDialog.getSaveFileName(None, "",
+                                           "",
+                                           "gem5 UI Object Files (*.obj)")[0]
+        # stop if cancel is pressed
+        if not filename:
+            return
+
+        # add .ui extension if filename doesn't contain it
+        if ".obj" not in filename:
+            filename += ".obj"
+
+        subObjects = []
+        object = self.state.selected_sym_objects[0]
+        self.createChildDict(object, subObjects)
+
+        subObjectsDict = {}
+        subObjectsDict[object.name] = object
+
+        for obj in subObjects:
+            subObjectsDict[obj.name] = obj
+
+        savedObjects = self.getOutputData(subObjectsDict)
+
+        # with the selected file write our JSON object
+        with open(filename, 'w') as outfile:
+            json.dump(savedObjects, outfile, indent=4)
+
+
+    def import_object_button_pressed(self):
+        # show dialog box for user to select a file to open
+        filename = QFileDialog.getOpenFileName(None, 'Open file',
+       '',"gem5 UI Object Files (*.obj)")[0]
+
+       # stop if cancel is pressed or there is an error
+        if not filename:
+            return
+
+        importedObjects = []
+
+        # read data in from the file and load each object
+        with open(filename) as json_file:
+            data = json.load(json_file)
+            dict_z_score = 0
+            new_z_score = 0
+            while str(dict_z_score) not in data:
+                dict_z_score += 1
+
+            while str(dict_z_score) in data:
+                cur_z_array = data[str(dict_z_score)]
+                for object in cur_z_array:
+                    new_object = self.state.scene.loadSavedObject("component",
+                                                    object["name"], object)
+                    new_object.z = new_z_score
+                    importedObjects.append(new_object.name)
+
+                dict_z_score += 1
+                new_z_score += 1
+
+            for object in importedObjects:
+                if self.state.sym_objects[object].parent_name not in importedObjects:
+                    self.state.sym_objects[object].parent_name = None
+
+            self.state.line_drawer.update()
+
+
+    def createChildDict(self, object, subObjects):
+        for child_name in object.connected_objects:
+            child = self.state.sym_objects[child_name]
+            if not child in subObjects:
+                subObjects.append(child)
+                self.createChildDict(child, subObjects)
+
+
 
     def new_button_pressed(self):
         # check if any changes have been made - to save before closing
@@ -334,13 +416,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.mostRecentSaved = True
 
-    def getOutputData(self):
+    def getOutputData(self, objects):
         """build dictionary to export to file"""
         savedObjects = {}
 
         # iterate through the current objects on the scene and create a new JSON
         # object for each one
-        for object in self.state.sym_objects.values():
+        for object in objects.values():
             newObject = {}
             newObject["x"] = object.scenePos().x()
             newObject["y"] = object.scenePos().y()
@@ -437,7 +519,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if ".ui" not in filename:
             filename += ".ui"
 
-        savedObjects = self.getOutputData()
+        savedObjects = self.getOutputData(self.state.sym_objects)
 
         # with the selected file write our JSON object
         with open(filename, 'w') as outfile:
@@ -465,7 +547,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.fileName = filename
 
-        savedObjects = self.getOutputData()
+        savedObjects = self.getOutputData(self.state.sym_objects)
 
         # with the selected file write our JSON object
         with open(filename, 'w') as outfile:
