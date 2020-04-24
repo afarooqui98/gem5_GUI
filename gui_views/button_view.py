@@ -148,10 +148,14 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         subObjectsDict = {}
         subObjectsDict[object.name] = object
 
+
         for obj in subObjects:
             subObjectsDict[obj.name] = obj
 
         savedObjects = self.getOutputData(subObjectsDict)
+        savedObjects["parent"] = object.name
+        savedObjects["parent_pos_x"] = object.scenePos().x()
+        savedObjects["parent_pos_y"] = object.scenePos().y()
 
         # with the selected file write our JSON object
         with open(filename, 'w') as outfile:
@@ -169,17 +173,32 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         importedObjects = []
 
+        parent_name = ""
+        parent_x = ""
+        parent_y = ""
+
+
         # read data in from the file and load each object
         with open(filename) as json_file:
             data = json.load(json_file)
+            parent_name = data["parent"]
+            parent_x = data["parent_pos_x"]
+            parent_y = data["parent_pos_y"]
+
             dict_z_score = 0
             new_z_score = 0
+
             while str(dict_z_score) not in data:
                 dict_z_score += 1
 
             while str(dict_z_score) in data:
                 cur_z_array = data[str(dict_z_score)]
                 for object in cur_z_array:
+                    if object["parent_name"] not in importedObjects:
+                        object["x"] = -1
+                        object["y"] = -1
+                        object["parent_name"] = None
+
                     new_object = self.state.scene.loadSavedObject("component",
                                                     object["name"], object)
                     new_object.z = new_z_score
@@ -188,9 +207,18 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 dict_z_score += 1
                 new_z_score += 1
 
-            for object in importedObjects:
-                if self.state.sym_objects[object].parent_name not in importedObjects:
-                    self.state.sym_objects[object].parent_name = None
+            parent = self.state.sym_objects[parent_name]
+
+            for object_name in importedObjects:
+                object = self.state.sym_objects[object_name]
+                for connection in object.ui_connections.keys():
+                    if connection[1] not in importedObjects:
+                        del object.ui_connections[connection]
+
+                if object_name != parent_name:
+                    x = parent.scenePos().x() + object.x - parent_x
+                    y = parent.scenePos().y() + object.y - parent_y
+                    object.setPos(x, y)
 
             self.state.line_drawer.update()
 
@@ -201,8 +229,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             if not child in subObjects:
                 subObjects.append(child)
                 self.createChildDict(child, subObjects)
-
-
 
     def new_button_pressed(self):
         # check if any changes have been made - to save before closing

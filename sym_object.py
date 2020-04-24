@@ -55,7 +55,7 @@ class SymObject(QGraphicsItemGroup):
         self.initUIObject(self, 0, 0)
         # if we are loading from a file, we dont need to check for overlapping
         # and can set position
-        if loadingFromFile:
+        if loadingFromFile and x != -1:
             self.x = x
             self.y = y
             self.setPos(x, y)
