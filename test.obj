@@ -1,5 +1,5 @@
 {
-    "2": [
+    "1": [
         {
             "parent_name": "sys", 
             "name": "cpu", 
@@ -50,10 +50,10 @@
                         "icache_port", 
                         "slave"
                     ], 
-                    "parent_endpoint_x": 851.0, 
-                    "parent_endpoint_y": 656.0, 
-                    "child_endpoint_y": 461.0, 
-                    "child_endpoint_x": 944.0
+                    "parent_endpoint_x": 425.0, 
+                    "parent_endpoint_y": 414.0, 
+                    "child_endpoint_y": 219.0, 
+                    "child_endpoint_x": 518.0
                 }, 
                 {
                     "child_port_num": 2, 
@@ -64,19 +64,19 @@
                         "dcache_port", 
                         "slave"
                     ], 
-                    "parent_endpoint_x": 843.0, 
-                    "parent_endpoint_y": 548.0, 
-                    "child_endpoint_y": 460.0, 
-                    "child_endpoint_x": 939.0
+                    "parent_endpoint_x": 417.0, 
+                    "parent_endpoint_y": 306.0, 
+                    "child_endpoint_y": 218.0, 
+                    "child_endpoint_x": 513.0
                 }
             ], 
             "width": 300, 
             "connected_objects": [
                 "interrupts"
             ], 
-            "y": 489.0, 
-            "x": 587.0, 
-            "z": 2, 
+            "y": 247.0, 
+            "x": 161.0, 
+            "z": 1, 
             "ports": {
                 "icache_port": {
                     "Value": "membus.slave"
@@ -88,7 +88,7 @@
             "component_name": "TimingSimpleCPU"
         }
     ], 
-    "3": [
+    "2": [
         {
             "parent_name": "cpu", 
             "name": "interrupts", 
@@ -110,10 +110,10 @@
                         "pio", 
                         "master"
                     ], 
-                    "parent_endpoint_x": 960.0, 
-                    "parent_endpoint_y": 442.0, 
-                    "child_endpoint_y": 666.0, 
-                    "child_endpoint_x": 738.0
+                    "parent_endpoint_x": 534.0, 
+                    "parent_endpoint_y": 200.0, 
+                    "child_endpoint_y": 424.0, 
+                    "child_endpoint_x": 312.0
                 }, 
                 {
                     "child_port_num": 1, 
@@ -124,10 +124,10 @@
                         "int_slave", 
                         "master"
                     ], 
-                    "parent_endpoint_x": 954.0, 
-                    "parent_endpoint_y": 442.0, 
-                    "child_endpoint_y": 650.0, 
-                    "child_endpoint_x": 741.0
+                    "parent_endpoint_x": 528.0, 
+                    "parent_endpoint_y": 200.0, 
+                    "child_endpoint_y": 408.0, 
+                    "child_endpoint_x": 315.0
                 }, 
                 {
                     "child_port_num": 2, 
@@ -138,17 +138,17 @@
                         "int_master", 
                         "slave"
                     ], 
-                    "parent_endpoint_x": 742.0, 
-                    "parent_endpoint_y": 632.0, 
-                    "child_endpoint_y": 454.0, 
-                    "child_endpoint_x": 959.0
+                    "parent_endpoint_x": 316.0, 
+                    "parent_endpoint_y": 390.0, 
+                    "child_endpoint_y": 212.0, 
+                    "child_endpoint_x": 533.0
                 }
             ], 
             "width": 150, 
             "connected_objects": [], 
-            "y": 600.0, 
-            "x": 607.0, 
-            "z": 3, 
+            "y": 358.0, 
+            "x": 181.0, 
+            "z": 2, 
             "ports": {
                 "int_slave": {
                     "Value": null
@@ -163,7 +163,7 @@
             "component_name": "X86LocalApic"
         }
     ], 
-    "parent_pos_x": 587.0, 
+    "parent_pos_x": 161.0, 
     "parent": "cpu", 
-    "parent_pos_y": 489.0
+    "parent_pos_y": 247.0
 }

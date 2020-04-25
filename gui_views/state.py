@@ -26,6 +26,7 @@ class State():
         self.copied_objects = []
         self.mostRecentSaved = True
         self.zoom = 1
+        self.importedSymObjects = []
 
         self.object_clicked = 0
     # sets objects in scene as draggable or not draggable based on drag_state
@@ -71,6 +72,8 @@ class State():
                 sym_object.rect.setBrush(QColor("White"))
                 sym_object.delete_button.hide()
 
+    def addObjectToCatalog(self, object):
+        self.mainWindow.addImportedObjectToCatalog(object)
 
 #finds the gem5 path
 def get_path():

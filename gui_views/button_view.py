@@ -208,20 +208,31 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 new_z_score += 1
 
             parent = self.state.sym_objects[parent_name]
+            parent_offset_x = parent.scenePos().x() - parent_x
+            parent_offset_y = parent.scenePos().y() - parent_y
 
             for object_name in importedObjects:
                 object = self.state.sym_objects[object_name]
                 for connection in object.ui_connections.keys():
                     if connection[1] not in importedObjects:
                         del object.ui_connections[connection]
+                    else:
+                        connection_obj = object.ui_connections[connection]
+                        new_parent_endpoint = QPointF(connection_obj.parent_endpoint.x() + parent_offset_x, connection_obj.parent_endpoint.y() + parent_offset_y)
+                        new_child_endpoint = QPointF(connection_obj.child_endpoint.x() + parent_offset_x, connection_obj.child_endpoint.y() + parent_offset_y)
+                        connection_obj.parent_endpoint = new_parent_endpoint
+                        connection_obj.child_endpoint = new_child_endpoint
 
                 if object_name != parent_name:
                     x = parent.scenePos().x() + object.x - parent_x
                     y = parent.scenePos().y() + object.y - parent_y
                     object.setPos(x, y)
 
-            self.state.line_drawer.update()
+                if object_name not in self.state.importedSymObjects:
+                    self.state.importedSymObjects.append(object_name)
 
+            self.state.line_drawer.update()
+            self.state.addObjectToCatalog(parent)
 
     def createChildDict(self, object, subObjects):
         for child_name in object.connected_objects:
