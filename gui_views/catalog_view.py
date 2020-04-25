@@ -42,12 +42,19 @@ class CatalogView(): #dropdown and search bar
             return
 
         if item.text(0) in self.state.importedSymObjects:
-            del self.state.selected_sym_objects[:]
-            self.state.selected_sym_objects.append(self.state.sym_objects[item.text(0)])
-            self.state.mainWindow.buttonView.copy_button_pressed()
-            self.state.mainWindow.buttonView.paste_button_pressed()
-            del self.state.selected_sym_objects[:]
-            return
+            if item.text(0) in self.state.sym_objects:
+                del self.state.selected_sym_objects[:]
+                self.state.selected_sym_objects.append(self.state.sym_objects[item.text(0)])
+                self.state.mainWindow.buttonView.copy_button_pressed()
+                self.state.mainWindow.buttonView.paste_button_pressed()
+                del self.state.selected_sym_objects[:]
+                return
+            else:
+                filename = self.state.importedSymObjects[item.text(0)]
+                self.state.mainWindow.buttonView.importFromFile(filename)
+                return
+
+
 
 
         name, ok = QInputDialog.getText(self.state.mainWindow, "Alert", \

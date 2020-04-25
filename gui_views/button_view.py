@@ -171,6 +171,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not filename:
             return
 
+        self.importFromFile(filename)
+
+    def importFromFile(self, filename):
         importedObjects = []
 
         parent_name = ""
@@ -200,7 +203,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                         object["parent_name"] = None
 
                     new_object = self.state.scene.loadSavedObject("component",
-                                                    object["name"], object)
+                                                    str(object["name"]), object)
                     new_object.z = new_z_score
                     importedObjects.append(new_object.name)
 
@@ -228,11 +231,10 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     y = parent.scenePos().y() + object.y - parent_y
                     object.setPos(x, y)
 
-                if object_name not in self.state.importedSymObjects:
-                    self.state.importedSymObjects.append(object_name)
 
-            self.state.line_drawer.update()
-            self.state.addObjectToCatalog(parent)
+            if parent_name not in self.state.importedSymObjects:
+                self.state.importedSymObjects[parent_name] = filename
+                self.state.addObjectToCatalog(parent)
 
     def createChildDict(self, object, subObjects):
         for child_name in object.connected_objects:
@@ -306,7 +308,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 parent = self.state.sym_objects[parent_name]
                 parent.addSubObject(new_object)
                 new_object.parent_name = parent_name
-                parent.connected_objects.append(new_object.name)
+                #parent.connected_objects.append(new_object.name)
 
         #copy backend info
         new_object.instance_ports = copy.deepcopy(selectedObject.instance_ports)
