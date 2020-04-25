@@ -73,6 +73,7 @@ class State():
                 sym_object.delete_button.hide()
 
     def addObjectToCatalog(self, object):
+        """add the passed in imported object to the catalog"""
         self.mainWindow.addImportedObjectToCatalog(object)
 
 #finds the gem5 path

@@ -54,7 +54,7 @@ class SymObject(QGraphicsItemGroup):
         #constructing the baseline ui elements
         self.initUIObject(self, 0, 0)
         # if we are loading from a file, we dont need to check for overlapping
-        # and can set position
+        # and can set position. If x == -1, we are importing an object
         if loadingFromFile and x != -1:
             self.x = x
             self.y = y
@@ -281,21 +281,27 @@ class SymObject(QGraphicsItemGroup):
                 self.resizeUIObject(parent, 1, 120 - parent.width)
 
         for child_name in self.connected_objects:
+            # delete any connections from/to child
             for key in self.state.sym_objects[child_name].ui_connections.keys():
                 if key[0] == "parent":
-                    connection = self.state.sym_objects[child_name].ui_connections[key]
+                    connection = self.state.sym_objects[child_name].\
+                                                            ui_connections[key]
                     del self.state.sym_objects[child_name].ui_connections[key]
                 else:
                     parent_key = ("parent", str(child_name), key[3], key[2])
-                    connection = self.state.sym_objects[key[1]].ui_connections[parent_key]
+                    connection = self.state.sym_objects[key[1]].\
+                                                    ui_connections[parent_key]
                     del self.state.sym_objects[key[1]].ui_connections[parent_key]
 
                 if connection.line:
                     self.state.scene.removeItem(connection.line)
 
             self.state.sym_objects[child_name].ui_connections.clear()
+
+            # remove child
             del self.state.sym_objects[child_name]
 
+        # delete any connections from the object being deleted
         for key in self.ui_connections:
             connection = self.ui_connections[key]
             if connection.line:
@@ -381,9 +387,11 @@ class SymObject(QGraphicsItemGroup):
             self.resizeUIObject(parent, 1, self.width)
             self.parent_name = parent.name # add new parent
             self.z = parent.z + 1 # update z index
+
+            # update child z indices
             for child in self.connected_objects:
                 self.state.sym_objects[child].z = self.z + 1
-                
+
             if not self.name in parent.connected_objects:
                 parent.connected_objects.append(self.name) # add new child
         else:

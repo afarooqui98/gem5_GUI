@@ -129,6 +129,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.mainWindow.toggleDebug()
 
     def export_object_button_pressed(self):
+        """export details of selected object and its children"""
+
+        if len(self.state.selected_sym_objects) != 1:
+            return
+
         # show dialog box to let user create output file
         filename = QFileDialog.getSaveFileName(None, "",
                                            "",
@@ -141,18 +146,20 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if ".obj" not in filename:
             filename += ".obj"
 
+        # create list of objects to export
         subObjects = []
         object = self.state.selected_sym_objects[0]
-        self.createChildDict(object, subObjects)
+        self.createChildList(object, subObjects)
 
+        # using list of objects, create dictionary to convert to json
         subObjectsDict = {}
         subObjectsDict[object.name] = object
-
 
         for obj in subObjects:
             subObjectsDict[obj.name] = obj
 
         savedObjects = self.getOutputData(subObjectsDict)
+
         savedObjects["parent"] = object.name
         savedObjects["parent_pos_x"] = object.scenePos().x()
         savedObjects["parent_pos_y"] = object.scenePos().y()
@@ -163,6 +170,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
 
     def import_object_button_pressed(self):
+        """let user select file and import object"""
         # show dialog box for user to select a file to open
         filename = QFileDialog.getOpenFileName(None, 'Open file',
        '',"gem5 UI Object Files (*.obj)")[0]
@@ -174,12 +182,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.importFromFile(filename)
 
     def importFromFile(self, filename):
+        """import an object given a filename"""
         importedObjects = []
 
         parent_name = ""
         parent_x = ""
         parent_y = ""
-
 
         # read data in from the file and load each object
         with open(filename) as json_file:
@@ -210,6 +218,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 dict_z_score += 1
                 new_z_score += 1
 
+            # use parent's position from previous session to position each child
+            # relative to parent
             parent = self.state.sym_objects[parent_name]
             parent_offset_x = parent.scenePos().x() - parent_x
             parent_offset_y = parent.scenePos().y() - parent_y
@@ -217,31 +227,43 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             for object_name in importedObjects:
                 object = self.state.sym_objects[object_name]
                 for connection in object.ui_connections.keys():
+                    # if an object required for a connection has not been
+                    # imported, delete the connection
                     if connection[1] not in importedObjects:
                         del object.ui_connections[connection]
                     else:
                         connection_obj = object.ui_connections[connection]
-                        new_parent_endpoint = QPointF(connection_obj.parent_endpoint.x() + parent_offset_x, connection_obj.parent_endpoint.y() + parent_offset_y)
-                        new_child_endpoint = QPointF(connection_obj.child_endpoint.x() + parent_offset_x, connection_obj.child_endpoint.y() + parent_offset_y)
+                        # set new position's for each connection based on
+                        # parent's posiiton
+                        new_parent_endpoint = \
+                        QPointF(connection_obj.parent_endpoint.x() + \
+                        parent_offset_x, connection_obj.parent_endpoint.y() + \
+                                parent_offset_y)
+                        new_child_endpoint = \
+                        QPointF(connection_obj.child_endpoint.x() + \
+                        parent_offset_x, connection_obj.child_endpoint.y() + \
+                        parent_offset_y)
                         connection_obj.parent_endpoint = new_parent_endpoint
                         connection_obj.child_endpoint = new_child_endpoint
 
+                # set new position's for each object based on parent's posiiton
                 if object_name != parent_name:
                     x = parent.scenePos().x() + object.x - parent_x
                     y = parent.scenePos().y() + object.y - parent_y
                     object.setPos(x, y)
 
-
+            # add parent to list of imported Objects and add object to catalog
             if parent_name not in self.state.importedSymObjects:
                 self.state.importedSymObjects[parent_name] = filename
                 self.state.addObjectToCatalog(parent)
 
-    def createChildDict(self, object, subObjects):
+    def createChildList(self, object, subObjects):
+        """create list of children given a parent"""
         for child_name in object.connected_objects:
             child = self.state.sym_objects[child_name]
             if not child in subObjects:
                 subObjects.append(child)
-                self.createChildDict(child, subObjects)
+                self.createChildList(child, subObjects)
 
     def new_button_pressed(self):
         # check if any changes have been made - to save before closing
@@ -308,7 +330,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 parent = self.state.sym_objects[parent_name]
                 parent.addSubObject(new_object)
                 new_object.parent_name = parent_name
-                #parent.connected_objects.append(new_object.name)
 
         #copy backend info
         new_object.instance_ports = copy.deepcopy(selectedObject.instance_ports)

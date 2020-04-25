@@ -129,7 +129,8 @@ class MainWindow(QMainWindow):
                         ", ".join(cur_object.connected_objects),
                         isTreeWidgetClick, False)
         if item:
-            if item.parent() is None or item.text(0) in self.state.importedSymObjects:
+            if item.parent() is None or item.text(0) in \
+                                                self.state.importedSymObjects:
                 return
             self.attributes = \
                 self.catalog[item.parent().text(0)][item.text(0)]['params']
@@ -163,6 +164,7 @@ class MainWindow(QMainWindow):
             self.catalogView.treeWidget.addTopLevelItem(tree_item)
 
     def addImportedObjectToCatalog(self, object):
+        """create new entry in catalog for imported objects"""
         parent_item = self.catalogView.treeWidget.findItems("Imported Objects", Qt.MatchContains)
 
         if not parent_item:
