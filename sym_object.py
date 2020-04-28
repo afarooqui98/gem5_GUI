@@ -380,7 +380,6 @@ class SymObject(QGraphicsItemGroup):
         #iterate through all sym objects on the screen and check if the object's
         # current position overlaps with any of them
         parent = self.getFrontmostOverLappingObject()
-
         # if an overlapping object is found -> resize, update parent name AND
         # add self to the parent's list of children
         if parent:
@@ -446,8 +445,8 @@ class SymObject(QGraphicsItemGroup):
         for key in self.state.sym_objects:
             object = self.state.sym_objects[key]
             #if two objects are related
-            if self != object and not self.isAncestor(object) and \
-                not self.isDescendant(object):
+            if self != object and not self.isAncestor(object) and not\
+                self.isDescendant(object):
                 if self.doesOverlap(object):
                     if object.z > highest_zscore:
                         highest_zscore = object.z
@@ -483,7 +482,8 @@ class SymObject(QGraphicsItemGroup):
         if item.name in self.connected_objects:
             return True
         for child_name in self.connected_objects:
-            return self.state.sym_objects[child_name].isDescendant(item)
+            if self.state.sym_objects[child_name].isDescendant(item):
+                return True
         return False
 
     def deleteButtonPressed(self, event):
