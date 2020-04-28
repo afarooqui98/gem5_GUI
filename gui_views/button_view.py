@@ -336,6 +336,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         object_name = selectedObject.name + "_copy"
         new_object = self.state.scene.addObjectToScene("component",
                                 selectedObject.component_name, object_name)
+
+        # delete the random generated string name entry to maintain parent-child
+        # relationships. Update the backend name and create new entry
+        del self.state.sym_objects[new_object.name]
+        new_object.name = object_name
+        self.state.sym_objects[object_name] = new_object
+
         #copy over parent - child relationship info
         if selectedObject.parent_name:
             parent_name = selectedObject.parent_name + "_copy"
@@ -361,7 +368,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         new_object.initPorts()
 
         new_object.instantiateSimObject()
-        self.state.sym_objects[object_name] = new_object
+
+        # update display name to match that of object it was copied from
+        new_object.updateName(selectedObject.display_name)
 
     def copyConnection(self, selectedObject):
         object_name = selectedObject.name + "_copy"
