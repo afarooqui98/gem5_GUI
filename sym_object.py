@@ -413,15 +413,6 @@ class SymObject(QGraphicsItemGroup):
         self.state.line_drawer.update()
         self.state.mostRecentSaved = False
 
-
-    def hoverEnterEvent(self, event):
-        if not self.state.draw_wire_state:
-            self.setCursor(QCursor(Qt.OpenHandCursor))
-
-    def hoverLeaveEvent(self, event):
-        if not self.state.draw_wire_state:
-            self.setCursor(QCursor(Qt.ArrowCursor))
-
     def getClickedObject(self, event):
         """based on mouse click position, return object with highest zscore"""
         frontmost_object = None
