@@ -325,6 +325,8 @@ class SymObject(QGraphicsItemGroup):
         else:
             if not self.state.draw_wire_state:
                 self.setCursor(QCursor(Qt.PointingHandCursor))
+            else:
+                self.setCursor(QCursor(Qt.CrossCursor))
 
     def modifyConnections(self, event, sym_object):
         '''update connection position information when an object is dragged
