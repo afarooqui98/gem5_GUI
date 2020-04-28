@@ -10,7 +10,7 @@ import copy
 class SymObject(QGraphicsItemGroup):
 
     def __init__(self, x, y, width, height, scene, component_name, name,
-                    loadingFromFile, state):
+                    loadingFromFile, state, display_name):
         super(SymObject, self).__init__()
 
         #common variables
@@ -44,6 +44,7 @@ class SymObject(QGraphicsItemGroup):
         self.width = width
         self.height = height
         self.name = name
+        self.display_name = display_name
         self.rect = None
         self.rect_text = None
         self.delete_button = None
@@ -203,7 +204,7 @@ class SymObject(QGraphicsItemGroup):
         object.rect.setBrush(QColor("White"))
 
         # textbox to display symObject name
-        object.rect_text = QGraphicsTextItem(object.name + "::" +
+        object.rect_text = QGraphicsTextItem(object.display_name + "::" +
                                                         object.component_name)
         object.rect_text.setPos(object.rect.boundingRect().topLeft())
 
@@ -642,7 +643,7 @@ class SymObject(QGraphicsItemGroup):
                     connected_object.ui_connections[new_key] = value
 
         # update member variable
-        self.name = newName
+        self.display_name = newName
 
 
     def addSubObject(self, child):
@@ -682,3 +683,11 @@ class SymObject(QGraphicsItemGroup):
             self.state.scene.removeItem(port_box)
             self.removeFromGroup(port_name)
             self.state.scene.removeItem(port_name)
+
+    def getDisplayNames(self, sym_object_ids):
+        """convert list of backend sym object ids to their display names"""
+        names = []
+        for id in sym_object_ids:
+            names.append(self.state.sym_objects[id].display_name)
+
+        return names

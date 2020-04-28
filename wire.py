@@ -21,16 +21,17 @@ class Wire(QGraphicsLineItem):
     def mouseDoubleClickEvent(self, event):
         """register mouse press events"""
 
-        # remove bounding box 
+        # remove bounding box
         self.setSelected(False)
 
         parent = self.state.sym_objects[self.child_key[1]]
         child = self.state.sym_objects[self.parent_key[1]]
 
         # confirm deletion
-        dialog = deleteWireDialog("Delete connection between " + parent.name +
-                                "." + self.parent_key[2] + " and " + child.name
-                                + "." + self.parent_key[3] + "?")
+        dialog = deleteWireDialog("Delete connection between " +
+                                parent.display_name + "." + self.parent_key[2]
+                                + " and " + child.display_name + "." +
+                                self.parent_key[3] + "?")
 
         # if yes, delete
         if dialog.exec_():

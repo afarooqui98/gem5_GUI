@@ -41,7 +41,7 @@ class GraphicsScene(QGraphicsScene):
 
         self.addWidget(self.state.line_drawer)
 
-    def loadSavedObject(self, type, name, newObject):
+    def loadSavedObject(self, type, name, display_name, newObject):
         """load object from saved UI file"""
         x = newObject["x"]
         y = newObject["y"]
@@ -55,7 +55,8 @@ class GraphicsScene(QGraphicsScene):
         connections = convert(newObject["connections"])
 
         new_object = SymObject(x, y, width, height, self, component_name, name,
-            True, self.state)
+            True, self.state, display_name)
+
         new_object.instance_params = parameters
         new_object.connected_objects = connected_objects
         new_object.parent_name = parent
@@ -93,16 +94,15 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(new_object)
         return new_object
 
-    def addObjectToScene(self, type, component_name, name):
+    def addObjectToScene(self, type, component_name, display_name):
         """Creates symobject representation of object and adds to the scene"""
         # generate random string name for object
-        if not name:
-            name = ''.join(random.choice(string.ascii_lowercase)
+        name = ''.join(random.choice(string.ascii_lowercase)
                             for i in range(7))
 
         # add object rectangle to scene
         new_object = SymObject(0, 0, 150, 75, self, component_name, name,
-                                False, self.state)
+                                False, self.state, display_name)
 
         self.state.sym_objects[name] = new_object
 

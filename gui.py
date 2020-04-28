@@ -123,10 +123,11 @@ class MainWindow(QMainWindow):
         #   connected objects as well
         if len(self.state.selected_sym_objects) == 1:
             cur_object = self.state.selected_sym_objects[0]
-            self.addRow("Name", cur_object.name,
+            self.addRow("Name", cur_object.display_name,
                         isTreeWidgetClick, False)
+            display_names = cur_object.getDisplayNames(cur_object.connected_objects)
             self.addRow("Child Objects",
-                        ", ".join(cur_object.connected_objects),
+                        ", ".join(display_names),
                         isTreeWidgetClick, False)
         if item:
             if item.parent() is None or item.text(0) in \
@@ -163,18 +164,18 @@ class MainWindow(QMainWindow):
                 tree_item.addChild(QTreeWidgetItem([sub_item]))
             self.catalogView.treeWidget.addTopLevelItem(tree_item)
 
-    def addImportedObjectToCatalog(self, object):
+    def addImportedObjectToCatalog(self, object, object_name):
         """create new entry in catalog for imported objects"""
         parent_item = self.catalogView.treeWidget.findItems("Imported Objects", Qt.MatchContains)
 
         if not parent_item:
             self.catalog["Imported Objects"] = {}
             tree_item = QTreeWidgetItem(["Imported Objects"])
-            self.catalog["Imported Objects"][object.name] = object
-            tree_item.addChild(QTreeWidgetItem([object.name]))
+            self.catalog["Imported Objects"][object_name] = object
+            tree_item.addChild(QTreeWidgetItem([object_name]))
             self.catalogView.treeWidget.addTopLevelItem(tree_item)
         else:
-            parent_item[0].addChild(QTreeWidgetItem([object.name]))
+            parent_item[0].addChild(QTreeWidgetItem([object_name]))
 
     def closeEvent(self, event):
         """When user tries to exit, check if changes need to be saved

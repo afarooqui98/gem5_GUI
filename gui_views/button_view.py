@@ -134,6 +134,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if len(self.state.selected_sym_objects) != 1:
             return
 
+        name, ok = QInputDialog.getText(self.state.mainWindow, "Alert", \
+                                        "Export object as:")
+        if not ok:
+            return
+
         # show dialog box to let user create output file
         filename = QFileDialog.getSaveFileName(None, "",
                                            "",
@@ -160,6 +165,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         savedObjects = self.getOutputData(subObjectsDict)
 
+        savedObjects["object_name"] = name
         savedObjects["parent"] = object.name
         savedObjects["parent_pos_x"] = object.scenePos().x()
         savedObjects["parent_pos_y"] = object.scenePos().y()
@@ -188,6 +194,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         parent_name = ""
         parent_x = ""
         parent_y = ""
+        import_object_name = ""
 
         # read data in from the file and load each object
         with open(filename) as json_file:
@@ -195,6 +202,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             parent_name = data["parent"]
             parent_x = data["parent_pos_x"]
             parent_y = data["parent_pos_y"]
+            import_object_name = data["object_name"]
 
             dict_z_score = 0
             new_z_score = 0
@@ -211,7 +219,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                         object["parent_name"] = None
 
                     new_object = self.state.scene.loadSavedObject("component",
-                                                    str(object["name"]), object)
+                                                            str(object["name"]),
+                                                        object["display_name"],
+                                                                        object)
                     new_object.z = new_z_score
                     importedObjects.append(new_object.name)
 
@@ -252,10 +262,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     y = parent.scenePos().y() + object.y - parent_y
                     object.setPos(x, y)
 
+            self.state.line_drawer.update()
+
             # add parent to list of imported Objects and add object to catalog
-            if parent_name not in self.state.importedSymObjects:
-                self.state.importedSymObjects[parent_name] = filename
-                self.state.addObjectToCatalog(parent)
+            if import_object_name not in self.state.importedSymObjects:
+                value = {"file": filename, "parent": parent}
+                self.state.importedSymObjects[import_object_name] = value
+                self.state.addObjectToCatalog(parent, import_object_name)
 
     def createChildList(self, object, subObjects):
         """create list of children given a parent"""
@@ -468,7 +481,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 cur_z_array = data[str(z_score)]
                 for object in cur_z_array:
                     self.state.scene.loadSavedObject("component",
-                                                    object["name"], object)
+                                object["name"], object["display_name"], object)
 
                 z_score += 1
 
@@ -492,6 +505,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             newObject["component_name"] = object.component_name
             newObject["name"] = object.name
             newObject["parent_name"] = object.parent_name
+            newObject["display_name"] = object.display_name
 
             params = {}
             #Storing the parameters

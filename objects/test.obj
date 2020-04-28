@@ -1,8 +1,9 @@
 {
-    "1": [
+    "2": [
         {
-            "parent_name": "sys", 
-            "name": "cpu", 
+            "parent_name": "afzfxhw", 
+            "display_name": "cpu", 
+            "name": "ttobmld", 
             "parameters": {
                 "do_statistics_insts": {}, 
                 "numThreads": {}, 
@@ -46,52 +47,53 @@
                     "parent_port_num": 1, 
                     "key": [
                         "parent", 
-                        "membus", 
+                        "fexglph", 
                         "icache_port", 
                         "slave"
                     ], 
-                    "parent_endpoint_x": 425.0, 
-                    "parent_endpoint_y": 414.0, 
-                    "child_endpoint_y": 219.0, 
-                    "child_endpoint_x": 518.0
+                    "parent_endpoint_x": 1012.0, 
+                    "parent_endpoint_y": 967.0, 
+                    "child_endpoint_y": 956.5, 
+                    "child_endpoint_x": 1219.0
                 }, 
                 {
                     "child_port_num": 2, 
                     "parent_port_num": 0, 
                     "key": [
                         "parent", 
-                        "membus", 
+                        "fexglph", 
                         "dcache_port", 
                         "slave"
                     ], 
-                    "parent_endpoint_x": 417.0, 
-                    "parent_endpoint_y": 306.0, 
-                    "child_endpoint_y": 218.0, 
-                    "child_endpoint_x": 513.0
+                    "parent_endpoint_x": 1012.0, 
+                    "parent_endpoint_y": 867.0, 
+                    "child_endpoint_y": 956.5, 
+                    "child_endpoint_x": 1219.0
                 }
             ], 
             "width": 300, 
             "connected_objects": [
-                "interrupts"
+                "olxbqhm"
             ], 
-            "y": 247.0, 
-            "x": 161.0, 
-            "z": 1, 
+            "y": 818.0, 
+            "x": 750.0, 
+            "z": 2, 
             "ports": {
                 "icache_port": {
-                    "Value": "membus.slave"
+                    "Value": "fexglph.slave"
                 }, 
                 "dcache_port": {
-                    "Value": "membus.slave"
+                    "Value": "fexglph.slave"
                 }
             }, 
             "component_name": "TimingSimpleCPU"
         }
     ], 
-    "2": [
+    "3": [
         {
-            "parent_name": "cpu", 
-            "name": "interrupts", 
+            "parent_name": "ttobmld", 
+            "display_name": "interrupts", 
+            "name": "olxbqhm", 
             "parameters": {
                 "eventq_index": {}, 
                 "int_latency": {}, 
@@ -103,58 +105,58 @@
             "connections": [
                 {
                     "child_port_num": 2, 
+                    "parent_port_num": 0, 
+                    "key": [
+                        "parent", 
+                        "fexglph", 
+                        "int_master", 
+                        "slave"
+                    ], 
+                    "parent_endpoint_x": 881.0, 
+                    "parent_endpoint_y": 996.1666666666666, 
+                    "child_endpoint_y": 956.5, 
+                    "child_endpoint_x": 1219.0
+                }, 
+                {
+                    "child_port_num": 2, 
                     "parent_port_num": 1, 
                     "key": [
                         "child", 
-                        "membus", 
+                        "fexglph", 
                         "pio", 
                         "master"
                     ], 
-                    "parent_endpoint_x": 534.0, 
-                    "parent_endpoint_y": 200.0, 
-                    "child_endpoint_y": 424.0, 
-                    "child_endpoint_x": 312.0
+                    "parent_endpoint_x": 1219.0, 
+                    "parent_endpoint_y": 939.8333333333333, 
+                    "child_endpoint_y": 1029.5, 
+                    "child_endpoint_x": 881.0
                 }, 
                 {
                     "child_port_num": 1, 
                     "parent_port_num": 1, 
                     "key": [
                         "child", 
-                        "membus", 
+                        "fexglph", 
                         "int_slave", 
                         "master"
                     ], 
-                    "parent_endpoint_x": 528.0, 
-                    "parent_endpoint_y": 200.0, 
-                    "child_endpoint_y": 408.0, 
-                    "child_endpoint_x": 315.0
-                }, 
-                {
-                    "child_port_num": 2, 
-                    "parent_port_num": 0, 
-                    "key": [
-                        "parent", 
-                        "membus", 
-                        "int_master", 
-                        "slave"
-                    ], 
-                    "parent_endpoint_x": 316.0, 
-                    "parent_endpoint_y": 390.0, 
-                    "child_endpoint_y": 212.0, 
-                    "child_endpoint_x": 533.0
+                    "parent_endpoint_x": 1219.0, 
+                    "parent_endpoint_y": 939.8333333333333, 
+                    "child_endpoint_y": 1012.8333333333333, 
+                    "child_endpoint_x": 881.0
                 }
             ], 
             "width": 150, 
             "connected_objects": [], 
-            "y": 358.0, 
-            "x": 181.0, 
-            "z": 2, 
+            "y": 968.0, 
+            "x": 750.0, 
+            "z": 3, 
             "ports": {
                 "int_slave": {
                     "Value": null
                 }, 
                 "int_master": {
-                    "Value": "membus.slave"
+                    "Value": "fexglph.slave"
                 }, 
                 "pio": {
                     "Value": null
@@ -163,7 +165,8 @@
             "component_name": "X86LocalApic"
         }
     ], 
-    "parent_pos_x": 161.0, 
-    "parent": "cpu", 
-    "parent_pos_y": 247.0
+    "parent": "ttobmld", 
+    "parent_pos_x": 750.0, 
+    "parent_pos_y": 818.0, 
+    "object_name": "nocache_subobjects"
 }

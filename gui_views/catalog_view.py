@@ -41,32 +41,15 @@ class CatalogView(): #dropdown and search bar
         if item.parent() is None:
             return
 
-        # if selecting an imported object from catalog, copy paste from existing
-        # object on catalog or re-import from file if it doesn't exist
+        # if selecting an imported object from catalog
         if item.text(0) in self.state.importedSymObjects:
-            if item.text(0) in self.state.sym_objects:
-                del self.state.selected_sym_objects[:]
-                self.state.selected_sym_objects.append(\
-                                        self.state.sym_objects[item.text(0)])
-                self.state.mainWindow.buttonView.copy_button_pressed()
-                self.state.mainWindow.buttonView.paste_button_pressed()
-                del self.state.selected_sym_objects[:]
-                return
-            else:
-                filename = self.state.importedSymObjects[item.text(0)]
-                self.state.mainWindow.buttonView.importFromFile(filename)
-                return
+            filename = self.state.importedSymObjects[item.text(0)]["file"]
+            self.state.mainWindow.buttonView.importFromFile(filename)
+            return
 
         name, ok = QInputDialog.getText(self.state.mainWindow, "Alert", \
                                         "New SimObject name:")
         if not ok:
-            return
-
-        if name in self.state.sym_objects:
-            ok = QMessageBox.about(self.state.mainWindow, "Alert", \
-                            "SimObject with name: " + name + " already exists!")
-            if not ok:
-                pass
             return
 
         new_parent = None
