@@ -499,7 +499,7 @@ class SymObject(QGraphicsItemGroup):
         self.handleSelected = None
         self.mousePressPos = None
         self.mousePressRect = None
-        self.update()
+        #self.update()
 
 
     def getClickedObject(self, event):
@@ -621,7 +621,7 @@ class SymObject(QGraphicsItemGroup):
             self.y = self.scenePos().y()
             item.updateHandlesPos()
             #item.rect.setRect(QRectF(item.x, item.y, item.width, item.height))
-            self.update()
+            #self.update()
 
         # get rightmost and lowest child for dynamic resizing in case a child
         # if not within bounds of parent
@@ -921,7 +921,6 @@ class SymObject(QGraphicsItemGroup):
         """
         Paint the node in the graphic view.
         """
-
         #painter.setBrush(QBrush(QColor(255, 0, 0, 100)))
         painter.setPen(QPen(QColor(0, 0, 0), 1.0, Qt.SolidLine))
         #painter.drawRect(self.rect.rect())
@@ -932,7 +931,6 @@ class SymObject(QGraphicsItemGroup):
             if self.handleSelected is None or handle == self.handleSelected:
                 if self in self.state.selected_sym_objects:
                     painter.drawEllipse(rect)
-
         self.modifyConnections(self, self)
         self.updateChildrenConnections(self, self)
-        self.state.line_drawer.update()
+        #self.state.line_drawer.update()
