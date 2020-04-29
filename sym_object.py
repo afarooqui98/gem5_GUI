@@ -323,7 +323,6 @@ class SymObject(QGraphicsItemGroup):
 
         if not clicked:
             clicked = self
-
         clicked.attachChildren()
         super(SymObject, clicked).mousePressEvent(event)
 
@@ -405,11 +404,6 @@ class SymObject(QGraphicsItemGroup):
             self.state.line_drawer.update()
             super(SymObject, self).mouseMoveEvent(event)
             self.state.mostRecentSaved = False
-        # else:
-        #     if not self.state.draw_wire_state:
-        #         self.setCursor(QCursor(Qt.PointingHandCursor))
-        #     else:
-        #         self.setCursor(QCursor(Qt.CrossCursor))
 
     def modifyConnections(self, event, sym_object):
         '''update connection position information when an object is dragged
@@ -583,7 +577,7 @@ class SymObject(QGraphicsItemGroup):
         # true
         if (click_x > delete_button_x and click_x < delete_button_x + \
             delete_button_width and click_y > delete_button_y and click_y < \
-            delete_button_y + delete_button_width):
+            delete_button_y + delete_button_width) and self in self.state.selected_sym_objects:
             return True
 
         return False
@@ -591,14 +585,14 @@ class SymObject(QGraphicsItemGroup):
     def doesOverlap(self, item):
         """checks if two objects overlap"""
 
-        l1_x = self.scenePos().x()
-        l1_y = self.scenePos().y()
-        r1_x = self.scenePos().x() + self.width
-        r1_y = self.scenePos().y() + self.height
-        l2_x = item.scenePos().x()
-        l2_y = item.scenePos().y()
-        r2_x = item.scenePos().x() + item.width
-        r2_y = item.scenePos().y() + item.height
+        l1_x = self.mapToScene(self.rect.rect()).boundingRect().left()
+        l1_y = self.mapToScene(self.rect.rect()).boundingRect().top()
+        r1_x = self.mapToScene(self.rect.rect()).boundingRect().right()
+        r1_y = self.mapToScene(self.rect.rect()).boundingRect().bottom()
+        l2_x = item.mapToScene(item.rect.rect()).boundingRect().left()
+        l2_y = item.mapToScene(item.rect.rect()).boundingRect().top()
+        r2_x = item.mapToScene(item.rect.rect()).boundingRect().right()
+        r2_y = item.mapToScene(item.rect.rect()).boundingRect().bottom()
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap
 
@@ -613,11 +607,12 @@ class SymObject(QGraphicsItemGroup):
             item.width += self.width
             item.height += self.width
             new_rect = item.rect.rect()
-            new_rect.setWidth(item.width)
-            new_rect.setHeight(item.height)
+            new_rect.setWidth(new_rect.width() + self.rect.rect().width())
+            new_rect.setHeight(new_rect.height() + self.rect.rect().height())
             item.rect.setRect(new_rect)
+
             self.setPos(item.scenePos().x(),
-                        item.scenePos().y() + item.height - self.height)
+                        item.scenePos().y() + new_rect.height() - self.rect.rect().height())
             self.x = self.scenePos().x()
             self.y = self.scenePos().y()
             item.updateHandlesPos()
@@ -638,10 +633,10 @@ class SymObject(QGraphicsItemGroup):
             new_rect = item.rect.rect()
             if x_diff < size:
                 item.width += size
-                new_rect.setWidth(item.width)
+                new_rect.setWidth(new_rect.width() + size)
             if y_diff > 0:
                 item.height += y_diff
-                new_rect.setHeight(item.height)
+                new_rect.setHeight(new_rect.height() + y_diff)
             item.rect.setRect(new_rect)
             item.updateHandlesPos()
             # place first child at x coordinate of parent
@@ -750,11 +745,19 @@ class SymObject(QGraphicsItemGroup):
 
     def resizeParent(self, child):
         '''reduce the size of the parent if it has one child'''
-        #self.removeUIObjects()
 
         if len(self.connected_objects) == 1:
             self.width -= child.width
             self.height -= child.width
+            new_rect = self.rect.rect()
+            new_rect.setWidth(new_rect.width() - child.rect.rect().width())
+            new_rect.setHeight(new_rect.height() - child.rect.rect().height())
+            self.rect.setRect(new_rect)
+            # self.setPos(item.scenePos().x(),
+            #             item.scenePos().y() + item.height - self.height)
+            self.x = self.scenePos().x()
+            self.y = self.scenePos().y()
+            self.updateHandlesPos()
 
         self.moveUIObject()
         self.movePorts()
@@ -923,7 +926,7 @@ class SymObject(QGraphicsItemGroup):
         Paint the node in the graphic view.
         """
         #painter.setBrush(QBrush(QColor(255, 0, 0, 100)))
-        painter.setPen(QPen(QColor(0, 0, 0), 1.0, Qt.SolidLine))
+        #painter.setPen(QPen(QColor(255, 0, 0), 1.0, Qt.SolidLine))
         #painter.drawRect(self.rect.rect())
         painter.setRenderHint(QPainter.Antialiasing)
         #painter.setBrush(QBrush(QColor(255, 0, 0, 255)))
