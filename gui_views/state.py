@@ -33,6 +33,11 @@ class State():
     def setDragState(self):
         for object in self.sym_objects.values():
             object.setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
+            object.setFlag(QGraphicsItem.ItemIsSelectable, self.drag_state)
+            object.setFlag(QGraphicsItem.ItemIsFocusable, self.drag_state)
+            object.setAcceptHoverEvents(self.drag_state)
+            object.rect.setAcceptHoverEvents(self.drag_state)
+
 
     # draws each line in lines using the QPen p
     def drawLines(self, p):

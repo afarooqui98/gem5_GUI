@@ -256,8 +256,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
                 # set new position's for each object based on parent's posiiton
                 if object_name != parent_name:
-                    x = parent.scenePos().x() + object.x - parent_x
-                    y = parent.scenePos().y() + object.y - parent_y
+                    x = parent.scenePos().x() + object.scenePos().x() - parent_x
+                    y = parent.scenePos().y() + object.scenePos().y() - parent_y
                     object.setPos(x, y)
 
             self.state.line_drawer.update()

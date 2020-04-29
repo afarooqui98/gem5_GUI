@@ -79,8 +79,11 @@ class AttributeView(): #table view for parameters, as well as the description
         # get attributes
         currentColumn = self.attributeTable.column(item)
         currentRow = self.attributeTable.row(item)
-        currentAttribute = self.attributeTable.item(currentRow,
+        try:
+            currentAttribute = self.attributeTable.item(currentRow,
                                                     currentColumn - 1).text()
+        except AttributeError:
+            return
         currentValue = item.text()
 
         # if the value is name or connected objects, set the param instead of
@@ -92,10 +95,10 @@ class AttributeView(): #table view for parameters, as well as the description
             current_name = self.state.selected_sym_objects[0].name
 
             self.state.sym_objects[current_name] = self.state.selected_sym_objects[0]
-        elif currentAttribute == "Child Objects":
-            self.state.selected_sym_objects[0].connected_objects = currentValue
-            self.state.line_drawer.connectSubObject(self.state.selected_sym_objects[0].name,
-                                                currentValue)
+        # elif currentAttribute == "Child Objects":
+        #     self.state.selected_sym_objects[0].connected_objects = currentValue
+        #     self.state.line_drawer.connectSubObject(self.state.selected_sym_objects[0].name,
+        #                                         currentValue)
         else:
             self.modifyParam(currentAttribute, currentValue)
 
