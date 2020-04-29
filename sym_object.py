@@ -207,12 +207,12 @@ class SymObject(QGraphicsItemGroup):
         """Create the display for the ports on the symobjects"""
 
         del self.ui_ports[:]
-        x = self.mapToScene(self.boundingRect()).boundingRect().left() + self.rect.boundingRect().width() * 3 / 4
+        x = self.sceneCoords().left() + self.rect.boundingRect().width() * 3 / 4
         num_ports = len(self.instance_ports)
         delete_button_height = self.delete_button.boundingRect().height()
         next_y = delete_button_height
         for sim_object_instance_port in sorted(self.instance_ports):
-            y = self.mapToScene(self.boundingRect()).boundingRect().top() + next_y
+            y = self.sceneCoords().top() + next_y
             port_box = QGraphicsRectItem(x, y, self.rect.boundingRect().width() / 4, (self.rect.boundingRect().height() - \
                 delete_button_height) / num_ports)
             self.addToGroup(port_box)
@@ -415,12 +415,12 @@ class SymObject(QGraphicsItemGroup):
 
         delete_button_height = sym_object.delete_button.boundingRect().height()
         y_offset = (sym_object.rect.boundingRect().height() - delete_button_height) / num_ports
-        new_x = sym_object.mapToScene(sym_object.boundingRect()).boundingRect().left() + sym_object.rect.boundingRect().width() * 7 / 8
+        new_x = sym_object.sceneCoords().left() + sym_object.rect.boundingRect().width() * 7 / 8
 
         for name, connection in sym_object.ui_connections.items():
             new_y = delete_button_height
             if name[0] == "parent":
-                new_y += sym_object.mapToScene(sym_object.boundingRect()).boundingRect().top() + connection.parent_port_num\
+                new_y += sym_object.sceneCoords().top() + connection.parent_port_num\
                     * y_offset + y_offset / 2
                 new_coords = QPointF(new_x, new_y)
                 key = ("child", sym_object.name, name[3], name[2])
@@ -428,7 +428,7 @@ class SymObject(QGraphicsItemGroup):
                 self.state.sym_objects[name[1]].ui_connections[key].setEndpoints(\
                                                             new_coords, None)
             else:
-                new_y += sym_object.mapToScene(sym_object.boundingRect()).boundingRect().top() + connection.child_port_num \
+                new_y += sym_object.sceneCoords().top() + connection.child_port_num \
                     * y_offset + y_offset / 2
                 new_coords = QPointF(new_x, new_y)
                 key = ("parent", sym_object.name, name[3], name[2])
@@ -575,7 +575,6 @@ class SymObject(QGraphicsItemGroup):
 
         # if the click position is within the text item's bounding box, return
         # true
-        print(self.delete_button.isVisible())
         if (click_x > delete_button_x and click_x < delete_button_x + \
             delete_button_width and click_y > delete_button_y and click_y < \
             delete_button_y + delete_button_width) and self.delete_button.isVisible():
@@ -586,16 +585,21 @@ class SymObject(QGraphicsItemGroup):
     def doesOverlap(self, item):
         """checks if two objects overlap"""
 
-        l1_x = self.mapToScene(self.rect.rect()).boundingRect().left()
-        l1_y = self.mapToScene(self.rect.rect()).boundingRect().top()
-        r1_x = self.mapToScene(self.rect.rect()).boundingRect().right()
-        r1_y = self.mapToScene(self.rect.rect()).boundingRect().bottom()
-        l2_x = item.mapToScene(item.rect.rect()).boundingRect().left()
-        l2_y = item.mapToScene(item.rect.rect()).boundingRect().top()
-        r2_x = item.mapToScene(item.rect.rect()).boundingRect().right()
-        r2_y = item.mapToScene(item.rect.rect()).boundingRect().bottom()
+        l1_x = self.sceneCoords().left()
+        l1_y = self.sceneCoords().top()
+        r1_x = self.sceneCoords().right()
+        r1_y = self.sceneCoords().bottom()
+        l2_x = item.sceneCoords().left()
+        l2_y = item.sceneCoords().top()
+        r2_x = item.sceneCoords().right()
+        r2_y = item.sceneCoords().bottom()
         notoverlap = l1_x > r2_x or l2_x > r1_x or l1_y > r2_y or l2_y > r1_y
         return not notoverlap
+
+
+    def sceneCoords(self):
+        """converts the sym_object rectangle coords into scene coords"""
+        return self.mapToScene(self.boundingRect()).boundingRect()
 
     def resizeUIObject(self, item, force_resize, size):
         """resizes a sym_object when another object is placed in it"""
@@ -803,8 +807,8 @@ class SymObject(QGraphicsItemGroup):
 
         self.width = b.width()
         self.height = b.height()
-        self.x = self.mapToScene(b).boundingRect().left()
-        self.y = self.mapToScene(b).boundingRect().bottom()
+        self.x = self.sceneCoords().left()
+        self.y = self.sceneCoords().bottom()
 
     def interactiveResize(self, mousePos, scenePos):
         """
