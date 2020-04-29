@@ -1,5 +1,4 @@
 from lineDrawer import *
-from graphics_rect_item import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
@@ -81,10 +80,9 @@ class SymObject(QGraphicsItemGroup):
         self.mousePressPos = None
         self.mousePressRect = None
         self.setAcceptHoverEvents(True)
-        #self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
-        #self.setFlag(QGraphicsItem.ItemIsFocusable, True)
+        self.setFlag(QGraphicsItem.ItemIsFocusable, True)
 
         #constructing the baseline ui elements
         self.initUIObject(self, 0, 0)
@@ -289,7 +287,7 @@ class SymObject(QGraphicsItemGroup):
         """
         if self.isSelected() and not self.state.draw_wire_state:
             handle = self.handleAt(moveEvent.pos())
-            cursor = Qt.ArrowCursor if handle is None else self.handleCursors[handle]
+            cursor = Qt.OpenHandCursor if handle is None else self.handleCursors[handle]
             self.setCursor(cursor)
 
     def hoverLeaveEvent(self, moveEvent):
@@ -406,11 +404,11 @@ class SymObject(QGraphicsItemGroup):
             self.state.line_drawer.update()
             super(SymObject, self).mouseMoveEvent(event)
             self.state.mostRecentSaved = False
-        else:
-            if not self.state.draw_wire_state:
-                self.setCursor(QCursor(Qt.PointingHandCursor))
-            else:
-                self.setCursor(QCursor(Qt.CrossCursor))
+        # else:
+        #     if not self.state.draw_wire_state:
+        #         self.setCursor(QCursor(Qt.PointingHandCursor))
+        #     else:
+        #         self.setCursor(QCursor(Qt.CrossCursor))
 
     def modifyConnections(self, event, sym_object):
         '''update connection position information when an object is dragged
@@ -932,8 +930,8 @@ class SymObject(QGraphicsItemGroup):
         painter.setPen(QPen(QColor(0, 0, 0, 255), 1.0, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
         for handle, rect in self.handles.items():
             if self.handleSelected is None or handle == self.handleSelected:
-                painter.drawEllipse(rect)
-                #pass
+                if self in self.state.selected_sym_objects:
+                    painter.drawEllipse(rect)
 
         self.modifyConnections(self, self)
         self.updateChildrenConnections(self, self)

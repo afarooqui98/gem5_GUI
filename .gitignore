@@ -58,3 +58,5 @@ target/
 
 # gem5-specific
 m5out/
+
+graphics_rect_item.py
