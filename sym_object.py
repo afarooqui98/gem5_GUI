@@ -310,11 +310,6 @@ class SymObject(QGraphicsItemGroup):
         if not self.state.draw_wire_state:
             self.setCursor(QCursor(Qt.ClosedHandCursor))
         self.state.object_clicked = 1
-        modifiers = QApplication.keyboardModifiers()
-        if modifiers != Qt.ShiftModifier:
-            # hide button on previously selected object
-            self.state.removeHighlight()
-            del self.state.selected_sym_objects[:]
         # get object that was clicked on (since multiple objects can be stacked
         # on top of each other)
         clicked = self.getClickedObject(event)
@@ -323,17 +318,22 @@ class SymObject(QGraphicsItemGroup):
 
         if not clicked:
             clicked = self
-        clicked.attachChildren()
-        super(SymObject, clicked).mousePressEvent(event)
-
-        # show button for current object
-        clicked.rect.setBrush(QColor("Green"))
-
         # check if mouse press is on delete button
         deletePressed = clicked.deleteButtonPressed(event)
         if deletePressed:
             clicked.delete()
             return
+
+        clicked.attachChildren()
+        super(SymObject, clicked).mousePressEvent(event)
+        modifiers = QApplication.keyboardModifiers()
+        if modifiers != Qt.ShiftModifier:
+            # hide button on previously selected object
+            self.state.removeHighlight()
+            del self.state.selected_sym_objects[:]
+
+        # show button for current object
+        clicked.rect.setBrush(QColor("Green"))
 
         # add clicked to list if not present and update attributes for it
         if not clicked in self.state.selected_sym_objects:
@@ -575,9 +575,10 @@ class SymObject(QGraphicsItemGroup):
 
         # if the click position is within the text item's bounding box, return
         # true
+        print(self.delete_button.isVisible())
         if (click_x > delete_button_x and click_x < delete_button_x + \
             delete_button_width and click_y > delete_button_y and click_y < \
-            delete_button_y + delete_button_width) and self in self.state.selected_sym_objects:
+            delete_button_y + delete_button_width) and self.delete_button.isVisible():
             return True
 
         return False
