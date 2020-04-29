@@ -1,4 +1,5 @@
 from lineDrawer import *
+from graphics_rect_item import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
@@ -8,6 +9,30 @@ from m5_calls import *
 import copy
 
 class SymObject(QGraphicsItemGroup):
+
+    handleTopLeft = 1
+    handleTopMiddle = 2
+    handleTopRight = 3
+    handleMiddleLeft = 4
+    handleMiddleRight = 5
+    handleBottomLeft = 6
+    handleBottomMiddle = 7
+    handleBottomRight = 8
+
+    handleSize = +10.0
+    handleSpace = -4.0
+
+    handleCursors = {
+        handleTopLeft: Qt.SizeFDiagCursor,
+        handleTopMiddle: Qt.SizeVerCursor,
+        handleTopRight: Qt.SizeBDiagCursor,
+        handleMiddleLeft: Qt.SizeHorCursor,
+        handleMiddleRight: Qt.SizeHorCursor,
+        handleBottomLeft: Qt.SizeBDiagCursor,
+        handleBottomMiddle: Qt.SizeVerCursor,
+        handleBottomRight: Qt.SizeFDiagCursor,
+    }
+
 
     def __init__(self, x, y, width, height, scene, component_name, name,
                     loadingFromFile, state):
@@ -51,6 +76,16 @@ class SymObject(QGraphicsItemGroup):
         self.ui_ports = []
         self.ui_connections = {}
 
+        self.handles = {}
+        self.handleSelected = None
+        self.mousePressPos = None
+        self.mousePressRect = None
+        self.setAcceptHoverEvents(True)
+        #self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
+        #self.setFlag(QGraphicsItem.ItemIsFocusable, True)
+
         #constructing the baseline ui elements
         self.initUIObject(self, 0, 0)
         # if we are loading from a file, we dont need to check for overlapping
@@ -79,6 +114,8 @@ class SymObject(QGraphicsItemGroup):
         self.state.removeHighlight()
         del self.state.selected_sym_objects[:]
         self.state.selected_sym_objects.append(self)
+        self.updateHandlesPos()
+
 
     def get_param_info(self):
         """Get additional info on params such as default values  after
@@ -171,16 +208,13 @@ class SymObject(QGraphicsItemGroup):
         """Create the display for the ports on the symobjects"""
 
         del self.ui_ports[:]
-        x = self.scenePos().x() + self.width * 3 / 4
+        x = self.mapToScene(self.boundingRect()).boundingRect().left() + self.rect.boundingRect().width() * 3 / 4
         num_ports = len(self.instance_ports)
         delete_button_height = self.delete_button.boundingRect().height()
         next_y = delete_button_height
         for sim_object_instance_port in sorted(self.instance_ports):
-            #port = QGraphicsItemGroup()
-            # size of port is 25 x 10
-            # y + 25 is the y we want to add the port at
-            y = self.scenePos().y() + next_y
-            port_box = QGraphicsRectItem(x, y, self.width / 4, (self.height - \
+            y = self.mapToScene(self.boundingRect()).boundingRect().top() + next_y
+            port_box = QGraphicsRectItem(x, y, self.rect.boundingRect().width() / 4, (self.rect.boundingRect().height() - \
                 delete_button_height) / num_ports)
             self.addToGroup(port_box)
             port_name = QGraphicsTextItem(sim_object_instance_port)
@@ -191,9 +225,17 @@ class SymObject(QGraphicsItemGroup):
                 port_name.boundingRect().center())
             self.addToGroup(port_name)
             self.ui_ports.append((sim_object_instance_port, port_box, port_name))
-            next_y += (self.height - delete_button_height) / num_ports
+            next_y += (self.rect.boundingRect().height() - delete_button_height) / num_ports
 
-            #self.addToGroup(port)
+    def movePorts(self):
+        for port in self.ui_ports:
+            port_box = port[1]
+            port_name = port[2]
+            self.removeFromGroup(port_box)
+            self.state.scene.removeItem(port_box)
+            self.removeFromGroup(port_name)
+            self.state.scene.removeItem(port_name)
+        self.initPorts()
 
     def initUIObject(self, object, x, y):
         """creates the QGraphicsItem that shows up in the scene"""
@@ -226,7 +268,45 @@ class SymObject(QGraphicsItemGroup):
         object.setAcceptDrops(True)
         object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
+    def moveUIObject(self):
+        self.rect_text.setPos(self.rect.boundingRect().topLeft())
+        self.delete_button.setPos(self.rect.boundingRect().topRight() -
+                                self.delete_button.boundingRect().topRight())
+        self.rect_text.setTextWidth(self.rect.boundingRect().width() - 20)
+
+    def handleAt(self, point):
+        """
+        Returns the resize handle below the given point.
+        """
+        for k, v, in self.handles.items():
+            if v.contains(point):
+                return k
+        return None
+
+    def hoverMoveEvent(self, moveEvent):
+        """
+        Executed when the mouse moves over the shape (NOT PRESSED).
+        """
+        if self.isSelected() and not self.state.draw_wire_state:
+            handle = self.handleAt(moveEvent.pos())
+            cursor = Qt.ArrowCursor if handle is None else self.handleCursors[handle]
+            self.setCursor(cursor)
+
+    def hoverLeaveEvent(self, moveEvent):
+        """
+        Executed when the mouse leaves the shape (NOT PRESSED).
+        """
+        if not self.state.draw_wire_state:
+            self.setCursor(Qt.ArrowCursor)
+
     def mousePressEvent(self, event):
+
+        self.handleSelected = self.handleAt(event.pos())
+        if self.handleSelected and not self.state.draw_wire_state:
+            self.mousePressPos = event.pos()
+            self.mousePressRect = self.rect.boundingRect()
+            return
+
         '''handle required operations when a sym object is clicked on'''
         if not self.state.draw_wire_state:
             self.setCursor(QCursor(Qt.ClosedHandCursor))
@@ -316,6 +396,10 @@ class SymObject(QGraphicsItemGroup):
 
     def mouseMoveEvent(self, event):
         '''handle changes when symobject is moved around on canvas'''
+
+        if self.handleSelected is not None and not self.state.draw_wire_state:
+            self.interactiveResize(event.pos(), event.scenePos())
+
         if self.state.object_clicked:
             self.modifyConnections(event, self)
             self.updateChildrenConnections(event, self)
@@ -412,8 +496,13 @@ class SymObject(QGraphicsItemGroup):
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
         self.detachChildren()
-        self.state.line_drawer.update()
+        #self.state.line_drawer.update()
         self.state.mostRecentSaved = False
+        self.handleSelected = None
+        self.mousePressPos = None
+        self.mousePressRect = None
+        self.update()
+
 
     def getClickedObject(self, event):
         """based on mouse click position, return object with highest zscore"""
@@ -516,8 +605,7 @@ class SymObject(QGraphicsItemGroup):
 
     def resizeUIObject(self, item, force_resize, size):
         """resizes a sym_object when another object is placed in it"""
-        item.removeUIObjects()
-
+        #item.removeUIObjects()
         item.x = item.scenePos().x()
         item.y = item.scenePos().y()
 
@@ -525,11 +613,17 @@ class SymObject(QGraphicsItemGroup):
         if not item.connected_objects: # or force_resize:
             item.width += self.width
             item.height += self.width
-
+            new_rect = item.rect.rect()
+            new_rect.setWidth(item.width)
+            new_rect.setHeight(item.height)
+            item.rect.setRect(new_rect)
             self.setPos(item.scenePos().x(),
                         item.scenePos().y() + item.height - self.height)
             self.x = self.scenePos().x()
             self.y = self.scenePos().y()
+            item.updateHandlesPos()
+            #item.rect.setRect(QRectF(item.x, item.y, item.width, item.height))
+            self.update()
 
         # get rightmost and lowest child for dynamic resizing in case a child
         # if not within bounds of parent
@@ -542,11 +636,15 @@ class SymObject(QGraphicsItemGroup):
                         rightmost_object.scenePos().x() - rightmost_object.width
 
         if item.connected_objects:
+            new_rect = item.rect.rect()
             if x_diff < size:
                 item.width += size
+                new_rect.setWidth(item.width)
             if y_diff > 0:
                 item.height += y_diff
-
+                new_rect.setHeight(item.height)
+            item.rect.setRect(new_rect)
+            item.updateHandlesPos()
             # place first child at x coordinate of parent
             next_x = item.scenePos().x()
 
@@ -556,11 +654,13 @@ class SymObject(QGraphicsItemGroup):
             item.resizeUIObject(self.state.sym_objects[item.parent_name], \
             1, size)
 
-        self.initUIObject(item, item.x, item.y)
-        item.initPorts()
+        self.moveUIObject()
+        self.movePorts()
+        item.moveUIObject()
+        item.movePorts()
         self.modifyConnections(item, item)
         self.updateChildrenConnections(item, item)
-        self.state.line_drawer.update()
+        #self.update()
 
     def lowestChild(self, item):
         """finds a parent's lowest child"""
@@ -651,14 +751,14 @@ class SymObject(QGraphicsItemGroup):
 
     def resizeParent(self, child):
         '''reduce the size of the parent if it has one child'''
-        self.removeUIObjects()
+        #self.removeUIObjects()
 
         if len(self.connected_objects) == 1:
             self.width -= child.width
             self.height -= child.width
 
-        self.initUIObject(self, self.x, self.y)
-        self.initPorts()
+        self.moveUIObject()
+        self.movePorts()
 
     def removeUIObjects(self):
         '''disconnect all the symobjects components before it is resized'''
@@ -675,3 +775,166 @@ class SymObject(QGraphicsItemGroup):
             self.state.scene.removeItem(port_box)
             self.removeFromGroup(port_name)
             self.state.scene.removeItem(port_name)
+
+    def boundingRect(self):
+        """
+        Returns the bounding rect of the shape (including the resize handles).
+        """
+        o = self.handleSize + self.handleSpace
+        return self.rect.rect().adjusted(-o, -o, o, o)
+
+    def updateHandlesPos(self):
+        """
+        Update current resize handles according to the shape size and position.
+        """
+        s = self.handleSize
+        b = self.boundingRect()
+        self.handles[self.handleTopLeft] = QRectF(b.left(), b.top(), s, s)
+        self.handles[self.handleTopMiddle] = QRectF(b.center().x() - s / 2, b.top(), s, s)
+        self.handles[self.handleTopRight] = QRectF(b.right() - s, b.top(), s, s)
+        self.handles[self.handleMiddleLeft] = QRectF(b.left(), b.center().y() - s / 2, s, s)
+        self.handles[self.handleMiddleRight] = QRectF(b.right() - s, b.center().y() - s / 2, s, s)
+        self.handles[self.handleBottomLeft] = QRectF(b.left(), b.bottom() - s, s, s)
+        self.handles[self.handleBottomMiddle] = QRectF(b.center().x() - s / 2, b.bottom() - s, s, s)
+        self.handles[self.handleBottomRight] = QRectF(b.right() - s, b.bottom() - s, s, s)
+
+        self.width = b.width()
+        self.height = b.height()
+        self.x = self.mapToScene(b).boundingRect().left()
+        self.y = self.mapToScene(b).boundingRect().bottom()
+
+    def interactiveResize(self, mousePos, scenePos):
+        """
+        Perform shape interactive resize.
+        """
+        offset = self.handleSize + self.handleSpace
+        boundingRect = self.boundingRect()
+        rect = self.rect.rect()
+        diff = QPointF(0, 0)
+        self.prepareGeometryChange()
+
+        if self.handleSelected == self.handleTopLeft:
+
+            fromX = self.mousePressRect.left()
+            fromY = self.mousePressRect.top()
+            toX = fromX + mousePos.x() - self.mousePressPos.x()
+            toY = fromY + mousePos.y() - self.mousePressPos.y()
+            diff.setX(toX - fromX)
+            diff.setY(toY - fromY)
+            boundingRect.setLeft(toX)
+            boundingRect.setTop(toY)
+            rect.setLeft(boundingRect.left() + offset)
+            rect.setTop(boundingRect.top() + offset)
+            self.rect.setRect(rect)
+
+        elif self.handleSelected == self.handleTopMiddle:
+
+            fromY = self.mousePressRect.top()
+            toY = fromY + mousePos.y() - self.mousePressPos.y()
+            diff.setY(toY - fromY)
+            boundingRect.setTop(toY)
+            rect.setTop(boundingRect.top() + offset)
+            self.rect.setRect(rect)
+
+        elif self.handleSelected == self.handleTopRight:
+
+            fromX = self.mousePressRect.right()
+            fromY = self.mousePressRect.top()
+            toX = fromX + mousePos.x() - self.mousePressPos.x()
+            toY = fromY + mousePos.y() - self.mousePressPos.y()
+            diff.setX(toX - fromX)
+            diff.setY(toY - fromY)
+            boundingRect.setRight(toX)
+            boundingRect.setTop(toY)
+            rect.setRight(boundingRect.right() - offset)
+            rect.setTop(boundingRect.top() + offset)
+            self.rect.setRect(rect)
+
+        elif self.handleSelected == self.handleMiddleLeft:
+
+            fromX = self.mousePressRect.left()
+            toX = fromX + mousePos.x() - self.mousePressPos.x()
+            diff.setX(toX - fromX)
+            boundingRect.setLeft(toX)
+            rect.setLeft(boundingRect.left() + offset)
+            self.rect.setRect(rect)
+
+        elif self.handleSelected == self.handleMiddleRight:
+            fromX = self.mousePressRect.right()
+            toX = fromX + mousePos.x() - self.mousePressPos.x()
+            diff.setX(toX - fromX)
+            boundingRect.setRight(toX)
+            rect.setRight(boundingRect.right() - offset)
+            self.rect.setRect(rect)
+
+        elif self.handleSelected == self.handleBottomLeft:
+
+            fromX = self.mousePressRect.left()
+            fromY = self.mousePressRect.bottom()
+            toX = fromX + mousePos.x() - self.mousePressPos.x()
+            toY = fromY + mousePos.y() - self.mousePressPos.y()
+            diff.setX(toX - fromX)
+            diff.setY(toY - fromY)
+            boundingRect.setLeft(toX)
+            boundingRect.setBottom(toY)
+            rect.setLeft(boundingRect.left() + offset)
+            rect.setBottom(boundingRect.bottom() - offset)
+            self.rect.setRect(rect)
+
+        elif self.handleSelected == self.handleBottomMiddle:
+
+            fromY = self.mousePressRect.bottom()
+            toY = fromY + mousePos.y() - self.mousePressPos.y()
+            diff.setY(toY - fromY)
+            boundingRect.setBottom(toY)
+            rect.setBottom(boundingRect.bottom() - offset)
+            self.rect.setRect(rect)
+
+        elif self.handleSelected == self.handleBottomRight:
+
+            fromX = self.mousePressRect.right()
+            fromY = self.mousePressRect.bottom()
+            toX = fromX + mousePos.x() - self.mousePressPos.x()
+            toY = fromY + mousePos.y() - self.mousePressPos.y()
+            diff.setX(toX - fromX)
+            diff.setY(toY - fromY)
+            boundingRect.setRight(toX)
+            boundingRect.setBottom(toY)
+            rect.setRight(boundingRect.right() - offset)
+            rect.setBottom(boundingRect.bottom() - offset)
+            self.rect.setRect(rect)
+
+        self.updateHandlesPos()
+        self.moveUIObject()
+        self.movePorts()
+
+    def shape(self):
+        """
+        Returns the shape of this item as a QPainterPath in local coordinates.
+        """
+        path = QPainterPath()
+        path.addRect(self.rect.rect())
+        if self.isSelected():
+            for shape in self.handles.values():
+                path.addEllipse(shape)
+        return path
+
+    def paint(self, painter, option, widget=None):
+        """
+        Paint the node in the graphic view.
+        """
+
+        #painter.setBrush(QBrush(QColor(255, 0, 0, 100)))
+        painter.setPen(QPen(QColor(0, 0, 0), 1.0, Qt.SolidLine))
+        #painter.drawRect(self.rect.rect())
+        painter.setRenderHint(QPainter.Antialiasing)
+        #painter.setBrush(QBrush(QColor(255, 0, 0, 255)))
+        painter.setPen(QPen(QColor(0, 0, 0, 255), 1.0, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        for handle, rect in self.handles.items():
+            if self.handleSelected is None or handle == self.handleSelected:
+                painter.drawEllipse(rect)
+                #pass
+
+        self.modifyConnections(self, self)
+        self.updateChildrenConnections(self, self)
+        self.state.line_drawer.update()
