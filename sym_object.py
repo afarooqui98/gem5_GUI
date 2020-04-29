@@ -419,22 +419,22 @@ class SymObject(QGraphicsItemGroup):
             return
 
         delete_button_height = sym_object.delete_button.boundingRect().height()
-        y_offset = (sym_object.height - delete_button_height) / num_ports
-        new_x = sym_object.scenePos().x() + sym_object.width * 7 / 8
+        y_offset = (sym_object.rect.boundingRect().height() - delete_button_height) / num_ports
+        new_x = sym_object.mapToScene(sym_object.boundingRect()).boundingRect().left() + sym_object.rect.boundingRect().width() * 7 / 8
 
         for name, connection in sym_object.ui_connections.items():
             new_y = delete_button_height
             if name[0] == "parent":
-                new_y += sym_object.scenePos().y() + connection.parent_port_num\
-                    * y_offset + y_offset / 4
+                new_y += sym_object.mapToScene(sym_object.boundingRect()).boundingRect().top() + connection.parent_port_num\
+                    * y_offset + y_offset / 2
                 new_coords = QPointF(new_x, new_y)
                 key = ("child", sym_object.name, name[3], name[2])
                 connection.setEndpoints(new_coords, None)
                 self.state.sym_objects[name[1]].ui_connections[key].setEndpoints(\
                                                             new_coords, None)
             else:
-                new_y += sym_object.scenePos().y() + connection.child_port_num \
-                    * y_offset + y_offset / 4
+                new_y += sym_object.mapToScene(sym_object.boundingRect()).boundingRect().top() + connection.child_port_num \
+                    * y_offset + y_offset / 2
                 new_coords = QPointF(new_x, new_y)
                 key = ("parent", sym_object.name, name[3], name[2])
                 connection.setEndpoints(None, new_coords)
