@@ -92,6 +92,7 @@ class SymObject(QGraphicsItemGroup):
             self.x = x
             self.y = y
             self.setPos(x, y)
+            self.updateHandlesPos()
             return
 
         # set initial position to center of scene
