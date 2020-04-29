@@ -5,8 +5,6 @@ from PySide2.QtGui import *
 
 from gui_views.dialogs import *
 
-import math
-
 class Wire(QGraphicsItemGroup):
     def __init__(self, line, pen, state):
         super(Wire, self).__init__()
