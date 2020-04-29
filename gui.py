@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
         """When user tries to exit, check if changes need to be saved
             before closing"""
         if not self.state.mostRecentSaved:
-            self.dialog = saveChangesDialog("closing")
+            self.dialog = saveChangesDialog("closing", self.state)
             if self.dialog.exec_():
                 self.buttonView.save_button_pressed()
 
