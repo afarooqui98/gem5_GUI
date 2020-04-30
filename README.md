@@ -38,8 +38,3 @@ You may need to specify the gem5 root directory if the above yields import error
 
     GEM5_HOME=<path to gem5>
     
-## Importing objects from config scripts
-You can import custom made simobjects from python scripts into the gui. However before doing so you need to include the following code snippet in your script. 
-
-    import sys, os
-    sys.path.append(os.getenv('gem5_path'))
