@@ -441,7 +441,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         """loads .ui file into gui"""
         # check if any changes have been made - to save before closing
         if not self.state.mostRecentSaved:
-            dialog = saveChangesDialog("opening a new file")
+            dialog = saveChangesDialog("opening a new file", self.state)
             if dialog.exec_():
                 self.save_button_pressed()
 
