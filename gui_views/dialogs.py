@@ -5,8 +5,8 @@ from graphic_scene import *
 import sys
 
 class instantiateDialog(QDialog):
-    def __init__(self):
-        super(instantiateDialog, self).__init__()
+    def __init__(self, state):
+        super(instantiateDialog, self).__init__(state.mainWindow.main)
 
         self.setWindowTitle("Entering Instantiate Mode")
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel

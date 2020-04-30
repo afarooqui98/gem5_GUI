@@ -445,7 +445,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
-        dlg = instantiateDialog()
+        dlg = instantiateDialog(self.state)
         if dlg.exec_():
             logging.debug("Export Success!")
             self.instantiate.setEnabled(False)
