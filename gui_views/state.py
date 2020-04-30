@@ -30,12 +30,18 @@ class State():
         self.imported_code = {}
         self.imported_code['headers'] = \
             "import m5, sys, os\nfrom m5.objects import Cache, SimObject\nfrom common import SimpleOpts"
+        self.importedSymObjects = {}
 
         self.object_clicked = 0
     # sets objects in scene as draggable or not draggable based on drag_state
     def setDragState(self):
         for object in self.sym_objects.values():
             object.setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
+            object.setFlag(QGraphicsItem.ItemIsSelectable, self.drag_state)
+            object.setFlag(QGraphicsItem.ItemIsFocusable, self.drag_state)
+            object.setAcceptHoverEvents(self.drag_state)
+            object.rect.setAcceptHoverEvents(self.drag_state)
+
 
     # draws each line in lines using the QPen p
     def drawLines(self, p):
@@ -94,6 +100,9 @@ class State():
         self.mainWindow.repopulate(imported_catalog)
 
 
+    def addObjectToCatalog(self, object, object_name):
+        """add the passed in imported object to the catalog"""
+        self.mainWindow.addImportedObjectToCatalog(object, object_name)
 
 #finds the gem5 path
 def get_path():

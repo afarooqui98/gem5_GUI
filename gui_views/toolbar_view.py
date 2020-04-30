@@ -36,7 +36,10 @@ class ToolBarView():
         QCursor.setPos(0, 0)
         QCursor.setPos(pos)
         if self.state.draw_wire_state:
-            self.state.line_drawer.setCursor(QCursor(Qt.CrossCursor))
+            QGuiApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
+            self.draw_wire.setIcon(QIcon("images/wire_pressed.png"))
         else:
-            self.state.line_drawer.setCursor(QCursor(Qt.ArrowCursor))
+            QGuiApplication.restoreOverrideCursor()
+            self.draw_wire.setIcon(QIcon("images/draw_wire.png"))
+            self.state.line_drawer.pos1 = None
         self.state.line_drawer.update()

@@ -25,8 +25,8 @@ any values. As such, we will save before continuing.""")
         self.setLayout(self.layout)
 
 class saveChangesDialog(QDialog):
-    def __init__(self, reason):
-        super(saveChangesDialog, self).__init__()
+    def __init__(self, reason, state):
+        super(saveChangesDialog, self).__init__(state.mainWindow.main)
 
         self.setWindowTitle("Save Changes")
         QBtn = QDialogButtonBox.Yes | QDialogButtonBox.No
