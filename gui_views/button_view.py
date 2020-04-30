@@ -4,7 +4,7 @@ from PySide2.QtGui import *
 from graphic_scene import *
 from dialogs import *
 
-import sys, random
+import sys, random, imp
 import copy
 from gui_views import state
 import json
@@ -122,6 +122,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         importAction = mainMenu.addAction('Import')
         importAction.triggered.connect(self.importObjs)
 
+    def updateState(self, clsmembers, name):
+        tree, instances= get_imported_obs(clsmembers, name)
+        # update the gui catalog
+        self.state.updateObjs(tree, instances, name)
+
     def importObjs(self):
         try:
             # Open file path dialog
@@ -134,13 +139,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             clsmembers = inspect.getmembers(sys.modules[module_name], \
                 inspect.isclass)
             logging.debug(clsmembers)
-            tree, instances= get_imported_obs(clsmembers, module_name)
-
-            # update the gui catalog
-            self.state.updateObjs(tree, instances, module_name)
+            self.updateState(clsmembers, module_name)
         except ValueError:
             logging.info("Did not select file to import")
-
+        except:
+            e = sys.exc_info()[0]
+            logging.error(e.__name__)
 
     def toggleDebugWindow(self):
         """ Event handler which proxies toggling the debug widget"""
@@ -345,6 +349,18 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # read data in from the file and load each object
         with open(filename) as json_file:
             data = json.load(json_file)
+
+            # load the saved imported code and dump into a module
+            imp_code = data['code']
+            if len(imp_code) > 1:
+                mymodule = imp.new_module('imported_objects')
+                sys.modules['imported_objects'] = mymodule
+                clsmembers = execCode(imp_code, mymodule)
+                # add imported code to state
+                for key in sorted(imp_code.keys()):
+                    self.state.imported_code[key] = imp_code[key]
+                self.updateState(clsmembers, 'imported_objects')
+
             z_score = 0
             while str(z_score) in data:
                 cur_z_array = data[str(z_score)]
@@ -439,6 +455,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 savedObjects[object.z] = []
 
             savedObjects[object.z].append(newObject)
+            savedObjects['code'] = self.state.imported_code
 
         return savedObjects
 

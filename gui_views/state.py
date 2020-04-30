@@ -7,7 +7,7 @@ from graphic_scene import *
 from connection import *
 from wire import *
 
-import sys, random, os, logging
+import sys, random, os, logging, inspect
 
 class State():
     def __init__(self, instances, catalog):
@@ -26,6 +26,10 @@ class State():
         self.copied_objects = []
         self.mostRecentSaved = True
         self.zoom = 1
+        # Store imported code in state
+        self.imported_code = {}
+        self.imported_code['headers'] = \
+            "import m5, sys, os\nfrom m5.objects import Cache, SimObject\nfrom common import SimpleOpts"
 
         self.object_clicked = 0
     # sets objects in scene as draggable or not draggable based on drag_state
@@ -81,6 +85,10 @@ class State():
             if name in self.instances:
                 imported_catalog[filename].pop(name, None)
                 imported_instances.pop(name, None)
+            #FIXME: generalize this
+            elif name not in self.imported_code: #Store the src code in state
+                src_code = inspect.getsource(imported_instances[name])
+                self.imported_code[name] = src_code
         self.catalog.update(imported_catalog)
         self.instances.update(imported_instances)
         self.mainWindow.repopulate(imported_catalog)
