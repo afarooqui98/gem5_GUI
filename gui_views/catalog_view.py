@@ -41,6 +41,12 @@ class CatalogView(): #dropdown and search bar
         if item.parent() is None:
             return
 
+        # if selecting an imported object from catalog
+        if item.text(0) in self.state.importedSymObjects:
+            filename = self.state.importedSymObjects[item.text(0)]["file"]
+            self.state.mainWindow.buttonView.importFromFile(filename)
+            return
+
         name, ok = QInputDialog.getText(self.state.mainWindow, "Alert", \
                                         "New SimObject name:")
         if not ok:

@@ -80,8 +80,8 @@ class LineDrawer(QWidget):
             for name, port, _ in sym_object.ui_ports:
                 # change keys depending on where ports end up
                 num_ports = len(sym_object.ui_ports)
-                key[0] = sym_object.scenePos().x() + sym_object.width * 3 / 4
-                key[1] = sym_object.scenePos().y() + next_y
+                key[0] = sym_object.mapToScene(sym_object.boundingRect()).boundingRect().left() + sym_object.rect.boundingRect().width() * 3 / 4
+                key[1] = sym_object.mapToScene(sym_object.boundingRect()).boundingRect().top() + next_y
                 if key[0] < parent_loc.x() and \
                         parent_loc.x() < key[0] + port.rect().width():
                     if key[1] < parent_loc.y() and \

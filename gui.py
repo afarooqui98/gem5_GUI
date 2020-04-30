@@ -129,7 +129,8 @@ class MainWindow(QMainWindow):
                         ", ".join(cur_object.connected_objects),
                         isTreeWidgetClick, False)
         if item:
-            if item.parent() is None:
+            if item.parent() is None or item.text(0) in \
+                                                self.state.importedSymObjects:
                 return
             self.attributes = \
                 self.catalog[item.parent().text(0)][item.text(0)]['params']
@@ -173,12 +174,24 @@ class MainWindow(QMainWindow):
                 tree_item.addChild(QTreeWidgetItem([sub_item]))
             self.catalogView.treeWidget.addTopLevelItem(tree_item)
 
+    def addImportedObjectToCatalog(self, object, object_name):
+        """create new entry in catalog for imported objects"""
+        parent_item = self.catalogView.treeWidget.findItems("Imported Objects", Qt.MatchContains)
+
+        if not parent_item:
+            self.catalog["Imported Objects"] = {}
+            tree_item = QTreeWidgetItem(["Imported Objects"])
+            self.catalog["Imported Objects"][object_name] = object
+            tree_item.addChild(QTreeWidgetItem([object_name]))
+            self.catalogView.treeWidget.addTopLevelItem(tree_item)
+        else:
+            parent_item[0].addChild(QTreeWidgetItem([object_name]))
 
     def closeEvent(self, event):
         """When user tries to exit, check if changes need to be saved
             before closing"""
         if not self.state.mostRecentSaved:
-            self.dialog = saveChangesDialog("closing")
+            self.dialog = saveChangesDialog("closing", self.state)
             if self.dialog.exec_():
                 self.buttonView.save_button_pressed()
 
