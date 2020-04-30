@@ -9,6 +9,8 @@ import copy
 from gui_views import state
 import json
 import logging
+import inspect
+from importlib import import_module
 
 
 from m5_calls import *
@@ -29,6 +31,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.buildViewTab(mainMenu, window)
         self.buildRunTab(mainMenu, window)
         self.buildDebugTab(mainMenu, window)
+        self.buildImportTab(mainMenu, window)
 
 
     def buildFileTab(self, mainMenu, window):
@@ -116,12 +119,33 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     def buildDebugTab(self, mainMenu, window):
         """build the debug tab"""
-        toggleAction = QAction("Show Debug Window", window)
-        toggleAction.setShortcut("Ctrl+D")
-        toggleAction.triggered.connect(self.toggleDebugWindow)
+        debugAction = mainMenu.addAction('Debug')
+        debugAction.setShortcut("Ctrl+D")
+        debugAction.triggered.connect(self.toggleDebugWindow)
 
-        debugMenu = mainMenu.addMenu('Debug')
-        debugMenu.addAction(toggleAction)
+    def buildImportTab(self, mainMenu, window):
+        """build the import tab"""
+        importAction = mainMenu.addAction('Import')
+        importAction.triggered.connect(self.importObjs)
+
+    def importObjs(self):
+        try:
+            # Open file path dialog
+            full_path = QFileDialog.getOpenFileName(None, 'Open file',
+                '',"python files (*.py)")[0]
+
+            tokens = full_path.split('/')
+            module_name = tokens[len(tokens) - 1].split('.')[0]
+            import_module(module_name, package=full_path)
+            clsmembers = inspect.getmembers(sys.modules[module_name], \
+                inspect.isclass)
+            logging.debug(clsmembers)
+            tree, instances= get_imported_obs(clsmembers, module_name)
+
+            # update the gui catalog
+            self.state.updateObjs(tree, instances, module_name)
+        except ValueError:
+            logging.info("Did not select file to import")
 
 
     def toggleDebugWindow(self):

@@ -37,3 +37,4 @@ In order to run the gui:
 You may need to specify the gem5 root directory if the above yields import errors. On the command line:
 
     GEM5_HOME=<path to gem5>
+    
