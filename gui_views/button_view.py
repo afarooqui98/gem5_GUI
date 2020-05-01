@@ -465,7 +465,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         err = simulate()
         if err:
             dialog = errorDialog(self.state, "An error occured when simulating!")
-            if dialog.exec_(): return 
+            if dialog.exec_(): return
 
     def openUI_button_pressed(self):
         """loads .ui file into gui"""

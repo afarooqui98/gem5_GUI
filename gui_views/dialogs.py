@@ -75,7 +75,7 @@ class errorDialog(QDialog):
 
         self.buttonBox = QDialogButtonBox(QBtn)
         self.buttonBox.accepted.connect(self.accept)
-        
+
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.text)
         self.layout.addWidget(self.buttonBox)
