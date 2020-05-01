@@ -97,6 +97,13 @@ class MainWindow(QMainWindow):
             # Make whatever value or default value the first option
             dropdown_list = [value] + dropdown_list
 
+            #Check if param is req
+            if dropdown_list[0] == 'None':
+                  cbstyle = " QComboBox {"
+                  cbstyle += " background: red;"
+                  cbstyle += "}"
+                  comboBox.setStyleSheet(cbstyle)
+
             comboBox.addItems(dropdown_list)
             # Add event handler to update values in the symobject structure
             comboBox.currentTextChanged.connect(functools.partial(\
