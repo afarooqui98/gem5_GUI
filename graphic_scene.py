@@ -90,6 +90,7 @@ class GraphicsScene(QGraphicsScene):
             #found a root object loaded in from a ui file
             self.state.mainWindow.buttonView.instantiate.setEnabled(True)
 
+        self.state.highlightIncomplete()
         self.addItem(new_object)
         return new_object
 

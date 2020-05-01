@@ -77,6 +77,8 @@ class CatalogView(): #dropdown and search bar
         #eager instantiation
         new_object.instantiateSimObject()
 
+        self.state.highlightIncomplete()
+
         # if sub object is being added through catalog
         if new_parent:
             child = self.state.selected_sym_objects[0]

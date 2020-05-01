@@ -107,6 +107,7 @@ class MainWindow(QMainWindow):
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
         if not isTreeWidgetClick and value == 'None': # check if param is req
             cell.setBackground(QColor("indianred"))
+            self.state.highlightIncomplete()
 
 
     def treeWidgetClicked(self, item, name):
