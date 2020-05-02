@@ -227,18 +227,23 @@ def get_debug_flags():
 def instantiate_model():
     try:
         m5.instantiate()
+        return False
     except:
         e = sys.exc_info()[0]
         logging.error("Instantiate error on proxy param by %s" % e.__name__)
+        return True
+
 
 def simulate():
     try:
         exit_event = m5.simulate()
         print('Exiting @ tick %i because %s' %(m5.curTick(), \
             exit_event.getCause()))
+        return False
     except:
         e = sys.exc_info()[0]
         logging.error("Simulation error caused by %s" % e.__name__)
+        return True
 
 
 def getRoot():
@@ -246,5 +251,5 @@ def getRoot():
     if Root.getInstance() == None:
         return Root()
     else:
-        print("existing inst")
+        logging.debug("existing inst")
         return Root.getInstance()

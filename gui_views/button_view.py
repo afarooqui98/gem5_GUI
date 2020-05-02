@@ -151,10 +151,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 clsmembers)
             self.updateState(clsmembers, module_name)
         except ValueError:
-            logging.info("Did not select file to import")
-        # except:
-        #     e = sys.exc_info()[0]
-        #     logging.error(e.__name__)
+            dialog = errorDialog(self.state, "Did not select file to import")
+            logging.info("Import file not selected")
+            if dialog.exec_(): return
+        except:
+            e = sys.exc_info()[0]
+            logging.error("Importing error caused by %s" % e.__name__)
+
 
     def toggleDebugWindow(self):
         """ Event handler which proxies toggling the debug widget"""
@@ -453,7 +456,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
-        dlg = instantiateDialog()
+        dlg = instantiateDialog(self.state)
         if dlg.exec_():
             logging.debug("Export Success!")
             self.instantiate.setEnabled(False)
@@ -463,17 +466,23 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 if object.component_name == "Root":
                     root_name , root = traverse_hierarchy_root(\
                                                 self.state.sym_objects, object)
-                    instantiate_model() #actual m5 instatiation
+                    err = instantiate_model() #actual m5 instatiation
+                    if err:
+                        dialog = errorDialog(self.state, "An error occured when instantiating!")
+                        if dialog.exec_(): return
 
     def simulate_button_pressed(self):
         """creates a python file that can be run with gem5"""
-        simulate()
+        err = simulate()
+        if err:
+            dialog = errorDialog(self.state, "An error occured when simulating!")
+            if dialog.exec_(): return
 
     def openUI_button_pressed(self):
         """loads .ui file into gui"""
         # check if any changes have been made - to save before closing
         if not self.state.mostRecentSaved:
-            dialog = saveChangesDialog("opening a new file")
+            dialog = saveChangesDialog("opening a new file", self.state)
             if dialog.exec_():
                 self.save_button_pressed()
 

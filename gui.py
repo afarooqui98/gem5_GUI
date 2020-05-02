@@ -72,12 +72,37 @@ class MainWindow(QMainWindow):
             self.debug_widget.hide()
         self.debug_hidden = not self.debug_hidden
 
+    def createDropDown(self, value, table):
+        """ Create the drop down for simobject parameters in the table view """
+        comboBox = QComboBox()
+        # Create list for dropdown including the default value
+        dropdown_list = copy.deepcopy(\
+            self.state.selected_sym_objects[0].connected_objects)
+        if value in dropdown_list:
+            dropdown_list.remove(value)
+
+        # Make whatever value or default value the first option
+        dropdown_list = [value] + dropdown_list
+
+        #Check if param is req
+        if dropdown_list[0] == 'None':
+              cbstyle = " QComboBox {"
+              cbstyle += " background: red;"
+              cbstyle += "}"
+              comboBox.setStyleSheet(cbstyle)
+
+        comboBox.addItems(dropdown_list)
+        # Add event handler to update values in the symobject structure
+        comboBox.currentTextChanged.connect(functools.partial(\
+            self.attributeView.modifyParam, param))
+        table.setCellWidget(table.rowCount() - 1, 1, comboBox)
+
     def addRow(self, param, value, isTreeWidgetClick, isSimObject):
         """ Adds the param and value to a row of the table."""
         table = self.attributeView.attributeTable
         table.insertRow(table.rowCount())
 
-        # set column 0 value
+        # set column 0 value with param
         table.setItem(table.rowCount() - 1, 0, QTableWidgetItem(param))
         cell = table.item(table.rowCount() - 1, 0)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
@@ -85,28 +110,16 @@ class MainWindow(QMainWindow):
         if param != "Name" and param != "Child Objects":
             cell.setToolTip(self.attributes[param]["Description"])
 
-        # set column 1 value
+        # set column 1 value with value
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value))
         if isSimObject: #add a drop down of child objects
-            comboBox = QComboBox()
-            # Create list for dropdown including the default value
-            dropdown_list = copy.deepcopy(\
-                self.state.selected_sym_objects[0].connected_objects)
-            if value in dropdown_list:
-                dropdown_list.remove(value)
-            # Make whatever value or default value the first option
-            dropdown_list = [value] + dropdown_list
-
-            comboBox.addItems(dropdown_list)
-            # Add event handler to update values in the symobject structure
-            comboBox.currentTextChanged.connect(functools.partial(\
-                self.attributeView.modifyParam, param))
-            table.setCellWidget(table.rowCount() - 1, 1, comboBox)
+            self.createDropDown(value, table)
 
         cell = table.item(table.rowCount() - 1, 1)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
         if not isTreeWidgetClick and value == 'None': # check if param is req
             cell.setBackground(QColor("indianred"))
+            self.state.highlightIncomplete()
 
 
     def treeWidgetClicked(self, item, name):
@@ -138,7 +151,8 @@ class MainWindow(QMainWindow):
             # only load from param list if there is a sym object in the context
             if len(self.state.selected_sym_objects) == 1 or \
                 self.state.selected_sym_objects[0].component_name == name:
-                self.attributes = self.state.selected_sym_objects[0].instance_params
+                self.attributes = \
+                    self.state.selected_sym_objects[0].instance_params
             else: # TODO: check when would this branch happen??
                 logging.debug("filling in name branch")
                 self.attributes = self.catalog[name]
@@ -176,7 +190,8 @@ class MainWindow(QMainWindow):
 
     def addImportedObjectToCatalog(self, object, object_name):
         """create new entry in catalog for imported objects"""
-        parent_item = self.catalogView.treeWidget.findItems("Imported Objects", Qt.MatchContains)
+        parent_item = self.catalogView.treeWidget.findItems(\
+            "Imported Objects", Qt.MatchContains)
 
         if not parent_item:
             self.catalog["Imported Objects"] = {}

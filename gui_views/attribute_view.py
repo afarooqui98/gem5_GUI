@@ -108,5 +108,6 @@ class AttributeView(): #table view for parameters, as well as the description
         item.setFlags(item.flags() ^ Qt.ItemIsEditable)
         if currentValue:
             item.setBackground(QColor("white"))
+            self.state.highlightIncomplete()
 
         self.state.mostRecentSaved = False
