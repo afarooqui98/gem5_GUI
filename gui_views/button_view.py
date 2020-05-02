@@ -142,17 +142,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             tokens = full_path.split('/')
             module_name = tokens[len(tokens) - 1].split('.')[0]
             modules = [key for key in sys.modules.keys()]
-            logging.debug(modules)
-
             import_module(module_name, package=full_path)
-            #m = inspect.getmembers(sys.modules[module_name]) # get module content
-            #y = [key for key in sys.modules.keys()]
-            #z = [value for value in y if value not in x]
-            #print([sys.modules[name] for name in z])
-            #print(sys.modules[module_name])
+
             clsmembers = inspect.getmembers(sys.modules[module_name], \
                 inspect.isclass)
-            clsmembers = filter(lambda x: x[1].__module__ not in modules, clsmembers)
+            clsmembers = filter(lambda x: x[1].__module__ not in modules, \
+                clsmembers)
             self.updateState(clsmembers, module_name)
         except ValueError:
             logging.info("Did not select file to import")
@@ -536,7 +531,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             from. Load the modules and code to create the object classes"""
 
         for module in imported_modules.keys():
-            if module == 'headers':
+            existing_modules = [key for key in sys.modules.keys()]
+            if module == 'headers' or module in existing_modules:
                 continue
             #create module instance in sys and get the class information
             clsmemebers = self.execCode(module, imported_modules[module], \
