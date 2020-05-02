@@ -141,16 +141,24 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             tokens = full_path.split('/')
             module_name = tokens[len(tokens) - 1].split('.')[0]
+            modules = [key for key in sys.modules.keys()]
+            logging.debug(modules)
+
             import_module(module_name, package=full_path)
+            #m = inspect.getmembers(sys.modules[module_name]) # get module content
+            #y = [key for key in sys.modules.keys()]
+            #z = [value for value in y if value not in x]
+            #print([sys.modules[name] for name in z])
+            #print(sys.modules[module_name])
             clsmembers = inspect.getmembers(sys.modules[module_name], \
                 inspect.isclass)
-            logging.debug(clsmembers)
+            clsmembers = filter(lambda x: x[1].__module__ not in modules, clsmembers)
             self.updateState(clsmembers, module_name)
         except ValueError:
             logging.info("Did not select file to import")
-        except:
-            e = sys.exc_info()[0]
-            logging.error(e.__name__)
+        # except:
+        #     e = sys.exc_info()[0]
+        #     logging.error(e.__name__)
 
     def toggleDebugWindow(self):
         """ Event handler which proxies toggling the debug widget"""
@@ -503,16 +511,10 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         with open(filename) as json_file:
             data = json.load(json_file)
 
-            # load the saved imported code and dump into a module
-            imp_code = data['code']
-            if len(imp_code) > 1:
-                mymodule = imp.new_module('imported_objects')
-                sys.modules['imported_objects'] = mymodule
-                clsmembers = execCode(imp_code, mymodule)
-                # add imported code to state
-                for key in sorted(imp_code.keys()):
-                    self.state.imported_code[key] = imp_code[key]
-                self.updateState(clsmembers, 'imported_objects')
+            # load the saved imported code and dump into new modules
+            imported_modules = data['code']
+            if len(imported_modules) > 1: #check if any exist
+                self.loadModules(imported_modules)
 
             z_score = 0
             while str(z_score) in data:
@@ -526,6 +528,49 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             self.state.line_drawer.update()
 
         self.state.mostRecentSaved = True
+
+
+    def loadModules(self, imported_modules):
+        """ User defined objects are saved with their code defs. They are
+            designated by a module name, same as the file the code was imported
+            from. Load the modules and code to create the object classes"""
+
+        for module in imported_modules.keys():
+            if module == 'headers':
+                continue
+            #create module instance in sys and get the class information
+            clsmemebers = self.execCode(module, imported_modules[module], \
+                imported_modules['headers'])
+
+            # add imported code to state
+            self.state.imported_code[module] = {}
+            for cls in imported_modules[module].keys():
+                self.state.imported_code[module][cls] = \
+                imported_modules[module][cls]
+
+            #update the gui catalog with the new objects
+            self.updateState(clsmemebers, module)
+
+    def execCode(self, module_name, imported_code, header_code):
+        """ Create module for imported code saved in ui file. Then extract the
+            class information for the code in the module """
+        existing_modules = [key for key in sys.modules.keys()]
+        new_module = imp.new_module(module_name)
+        sys.modules[module_name] = new_module
+
+        # header_code contains 'from m5.objects import *'
+        # need to run this in order to call exec on the rest of code
+        exec(header_code, new_module.__dict__)
+        for cls in sorted(imported_code.keys()):
+            exec(imported_code[cls], new_module.__dict__)
+
+        clsmembers = inspect.getmembers(sys.modules[module_name], \
+            inspect.isclass)
+        # filter out classes from modules already in gem5
+        clsmembers = filter(lambda x: x[1].__module__ not in existing_modules, \
+            clsmembers)
+
+        return clsmembers
 
     def getOutputData(self, objects):
         """build dictionary to export to file"""

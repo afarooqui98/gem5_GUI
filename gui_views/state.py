@@ -28,8 +28,9 @@ class State():
         self.zoom = 1
         # Store imported code in state
         self.imported_code = {}
-        self.imported_code['headers'] = \
-            "import m5, sys, os\nfrom m5.objects import Cache, SimObject\nfrom common import SimpleOpts"
+        self.imported_code['headers'] = "import m5, sys, os"
+        self.imported_code['headers'] += "\nfrom m5.objects import *"
+        self.imported_code['headers'] += "\nfrom common import SimpleOpts"
         self.importedSymObjects = {}
 
         self.object_clicked = 0
@@ -86,15 +87,20 @@ class State():
         if filename in self.catalog:
             logging.debug("already imported file")
             return
+
+        # Start to keep track of the imported objects
+        if filename not in self.imported_code:
+            self.imported_code[filename] = {}
+
         #Check if there are any duplicates in the imported objects
         for name in imported_instances.keys():
             if name in self.instances:
                 imported_catalog[filename].pop(name, None)
                 imported_instances.pop(name, None)
-            #FIXME: generalize this
-            elif name not in self.imported_code: #Store the src code in state
+            elif name not in self.imported_code[filename]:
+                #Store the src code in state
                 src_code = inspect.getsource(imported_instances[name])
-                self.imported_code[name] = src_code
+                self.imported_code[filename][name] = src_code
         self.catalog.update(imported_catalog)
         self.instances.update(imported_instances)
         self.mainWindow.repopulate(imported_catalog)

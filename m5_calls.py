@@ -240,17 +240,6 @@ def simulate():
         e = sys.exc_info()[0]
         logging.error("Simulation error caused by %s" % e.__name__)
 
-def execCode(imp_code, mymodule):
-    exec(imp_code["headers"], mymodule.__dict__)
-    for key in sorted(imp_code.keys()):
-        if imp_code == 'headers':
-            continue
-        exec(imp_code[key], mymodule.__dict__)
-
-    clsmembers = inspect.getmembers(sys.modules['imported_objects'], \
-        inspect.isclass)
-
-    return filter(lambda x: issubclass(x[1], SimObject), clsmembers)
 
 def getRoot():
     print("finding root inst")
