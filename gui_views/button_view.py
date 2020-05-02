@@ -140,10 +140,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 '',"python files (*.py)")[0]
 
             tokens = full_path.split('/')
+            dir_path = '/'.join(tokens[:len(tokens) - 1]) + '/'
+            sys.path.append(dir_path)
             module_name = tokens[len(tokens) - 1].split('.')[0]
             modules = [key for key in sys.modules.keys()]
             import_module(module_name, package=full_path)
-
             clsmembers = inspect.getmembers(sys.modules[module_name], \
                 inspect.isclass)
             clsmembers = filter(lambda x: x[1].__module__ not in modules, \
