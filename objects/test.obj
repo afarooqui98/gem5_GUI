@@ -12,7 +12,9 @@
                 "do_checkpoint_insts": {}, 
                 "system": {}, 
                 "function_trace_start": {}, 
-                "cpu_id": {}, 
+                "cpu_id": {
+                    "Value": "None"
+                }, 
                 "checker": {}, 
                 "eventq_index": {}, 
                 "default_p_state": {}, 
