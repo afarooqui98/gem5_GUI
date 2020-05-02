@@ -11,6 +11,15 @@ from m5.params import *
 from m5.proxy import AttrProxy
 from common import ObjectList
 
+def portsCompatible(parent, child):
+    compatible = False
+    try:
+        compatible = Port.is_compat(parent, child)
+    except:
+        e = sys.exc_info()[0]
+        logging.error("Error on port connection %s" % e.__name__)
+    return compatible
+
 
 def get_port_info(m5_object):
     """ Given a gem5 object class create a dictionary containing info on

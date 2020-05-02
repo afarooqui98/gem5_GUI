@@ -4,6 +4,7 @@ from PySide2.QtGui import QPainter, QColor, QPen
 from PySide2.QtCore import Qt, QPoint
 from connection import *
 from gui_views import state
+from m5_calls import portsCompatible
 
 class LineDrawer(QWidget):
 
@@ -51,7 +52,12 @@ class LineDrawer(QWidget):
             self.pos1 = None
             self.pos2 = None
             if valid_connection < 0:
-                ok = QMessageBox.warning(self.state.mainWindow, "Alert", "Invalid line")
+                if valid_connection == -1:
+                    ok = QMessageBox.warning(self.state.mainWindow,
+                     "Alert!", "Invalid line")
+                if valid_connection == -2:
+                    ok = QMessageBox.warning(self.state.mainWindow,
+                     "Error!", "You are drawing a line between\ntwo incompatible wires.")
 
             self.state.scene.removeItem(self.line)
             self.line = None
@@ -109,10 +115,14 @@ class LineDrawer(QWidget):
 
         key1 = ("parent", child.name, parent_port_name, child_port_name)
         key2 = ("child", parent.name, child_port_name, parent_port_name)
-        parent.ui_connections[key1] = Connection(self.pos1, self.pos2,
-            parent_port_num, child_port_num)
-        child.ui_connections[key2] = Connection(self.pos1, self.pos2,
-            parent_port_num, child_port_num)
-        parent.instance_ports[parent_port_name]['Value'] = str(child.name) + "." + \
-            str(child_port_name)
-        return 0
+        if portsCompatible(parent.instance_ports[parent_port_name]['Value'],
+            child.instance_ports[child_port_name]['Value']):
+            parent.ui_connections[key1] = Connection(self.pos1, self.pos2,
+                parent_port_num, child_port_num)
+            child.ui_connections[key2] = Connection(self.pos1, self.pos2,
+                parent_port_num, child_port_num)
+            parent.instance_ports[parent_port_name]['Value'] = str(child.name) + "." + \
+                str(child_port_name)
+            return 0
+        else:
+            return -2
