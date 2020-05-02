@@ -145,7 +145,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             # update the gui catalog
             self.state.updateObjs(tree, instances, module_name)
         except ValueError:
-            logging.info("Did not select file to import")
+            dialog = errorDialog(self.state, "Did not select file to import")
+            logging.info("Import file not selected")
+            if dialog.exec_(): return
+        except:
+            e = sys.exc_info()[0]
+            logging.error("Importing error caused by %s" % e.__name__)
 
 
     def toggleDebugWindow(self):
