@@ -168,5 +168,5 @@
     "parent": "cpu", 
     "parent_pos_x": 587.0, 
     "parent_pos_y": 489.0, 
-    "object_name": "cpu"
+    "object_name": "cpusub"
 }

@@ -106,7 +106,7 @@ class State():
         incomplete = False
         for object in self.sym_objects.values():
             for param in object.instance_params.values():
-                if param["Value"] == 'None':
+                if param["Value"] == 'None' or param["Value"] == None:
                     object.rect.setBrush(QColor("indianred"))
                     incomplete = True
 
