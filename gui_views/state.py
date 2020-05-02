@@ -74,8 +74,13 @@ class State():
     def removeHighlight(self):
         if len(self.selected_sym_objects):
             for sym_object in self.selected_sym_objects:
-                sym_object.rect.setBrush(QColor("White"))
+                if not sym_object.incomplete:
+                    sym_object.rect.setBrush(QColor("White"))
+                else:
+                    sym_object.rect.setBrush(QColor("indianred"))
+
                 sym_object.delete_button.hide()
+
 
     def updateObjs(self, imported_catalog, imported_instances, filename):
         """ Update the catalog and instance tree with new objects. """
@@ -95,6 +100,18 @@ class State():
     def addObjectToCatalog(self, object, object_name):
         """add the passed in imported object to the catalog"""
         self.mainWindow.addImportedObjectToCatalog(object, object_name)
+
+    def highlightIncomplete(self):
+        """color the object red if a parameter is not set"""
+        incomplete = False
+        for object in self.sym_objects.values():
+            for param in object.instance_params.values():
+                if param["Value"] == 'None' or param["Value"] == None:
+                    object.rect.setBrush(QColor("indianred"))
+                    incomplete = True
+
+            object.incomplete = incomplete
+            incomplete = False
 
 #finds the gem5 path
 def get_path():
