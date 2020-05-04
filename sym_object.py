@@ -85,7 +85,7 @@ class SymObject(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsFocusable, True)
 
         self.incomplete = False
-        
+
         #constructing the baseline ui elements
         self.initUIObject(self, 0, 0)
         # if we are loading from a file, we dont need to check for overlapping
@@ -814,6 +814,7 @@ class SymObject(QGraphicsItemGroup):
         self.height = b.height()
         self.x = self.sceneCoords().left()
         self.y = self.sceneCoords().bottom()
+        self.state.line_drawer.update()
 
     def interactiveResize(self, mousePos, scenePos):
         """
