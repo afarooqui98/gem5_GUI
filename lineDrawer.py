@@ -52,10 +52,10 @@ class LineDrawer(QWidget):
             self.pos1 = None
             self.pos2 = None
             if valid_connection < 0:
-                if valid_connection == -1:
+                if valid_connection == -1: #line badly drawn
                     ok = QMessageBox.warning(self.state.mainWindow,
                      "Alert!", "Invalid line")
-                if valid_connection == -2:
+                if valid_connection == -2: #port connection incompatible
                     ok = QMessageBox.warning(self.state.mainWindow,
                      "Error!", "You are drawing a line between\ntwo incompatible wires.")
 
