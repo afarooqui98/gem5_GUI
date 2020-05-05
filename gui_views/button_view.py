@@ -82,6 +82,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         editMenu.addAction(undoAction)
         editMenu.addAction(redoAction)
 
+        # store undo / redo actions to enable / disable, initially disabled
+        self.undo = undoAction
+        self.undo.setEnabled(False)
+        self.redo = redoAction
+        self.redo.setEnabled(False)
+
     def buildViewTab(self, mainMenu, window):
         """build the view tab"""
         zoomIn = QAction("Zoom In", window)
@@ -312,17 +318,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             if dialog.exec_():
                 self.save_button_pressed()
 
-        # clear out existing objects and wires
-        for object in self.state.sym_objects.values():
-            for name, connection in object.ui_connections.items():
-                if connection.line:
-                    self.state.scene.removeItem(connection.line)
-
-            self.state.scene.removeItem(object)
-            object.ui_connections.clear()
-
-        # clear out backend sym object dictionary
-        self.state.sym_objects.clear()
+        self.clearScene()
 
     def copy_button_pressed(self):
         logging.debug("copy button pressed")
@@ -436,11 +432,28 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     #TODO
     def undo_button_pressed(self):
-        logging.debug("undo button pressed")
+        self.clearScene()
+        self.state.history_index -= 1
+        self.populateSceneFromHistory(self.state.history[self.state.history_index])
+        if len(self.state.selected_sym_objects):
+            self.state.mainWindow.populateAttributes(None,
+                self.state.selected_sym_objects[0].component_name, False)
+        if not self.state.history_index:
+            self.undo.setEnabled(False)
+        self.redo.setEnabled(True)
 
     #TODO
     def redo_button_pressed(self):
-        logging.debug("redo button pressed")
+        self.clearScene()
+        self.state.history_index += 1
+        self.populateSceneFromHistory(self.state.history[self.state.history_index])
+        if len(self.state.selected_sym_objects):
+            self.state.mainWindow.populateAttributes(None,
+                self.state.selected_sym_objects[0].component_name, False)
+        if self.state.history_index == len(self.state.history) - 1:
+            self.redo.setEnabled(False)
+        self.undo.setEnabled(True)
+
 
     def zoom(self, val):
         """ modifies the window zoom with val"""
@@ -495,7 +508,15 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         tokens = filename.split('/')
         self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
 
-        # clear out existing objects and wires before loading from file
+        self.clearScene()
+        # read data in from the file and load each object
+        with open(filename) as json_file:
+            data = json.load(json_file)
+            self.populateScene(data)
+        self.state.mostRecentSaved = True
+
+    # clear out existing objects and wires
+    def clearScene(self):
         for object in self.state.sym_objects.values():
             for name, connection in object.ui_connections.items():
                 if connection.line:
@@ -506,21 +527,32 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.sym_objects.clear()
 
-        # read data in from the file and load each object
-        with open(filename) as json_file:
-            data = json.load(json_file)
-            z_score = 0
-            while str(z_score) in data:
-                cur_z_array = data[str(z_score)]
-                for object in cur_z_array:
-                    self.state.scene.loadSavedObject("component",
-                                                    object["name"], object)
 
-                z_score += 1
+    #loads objects into scene
+    def populateScene(self, data):
+        z_score = 0
+        while str(z_score) in data:
+            cur_z_array = data[str(z_score)]
+            for object in cur_z_array:
+                self.state.scene.loadSavedObject("component",
+                                                object["name"], object)
 
-            self.state.line_drawer.update()
+            z_score += 1
 
-        self.state.mostRecentSaved = True
+        self.state.line_drawer.update()
+
+    #loads objects into scene from history
+    def populateSceneFromHistory(self, data):
+        z_score = 0
+        while z_score in data:
+            cur_z_array = data[z_score]
+            for object in cur_z_array:
+                self.state.scene.loadSavedObject("component",
+                                                object["name"], object)
+
+            z_score += 1
+
+        self.state.line_drawer.update()
 
     def getOutputData(self, objects):
         """build dictionary to export to file"""

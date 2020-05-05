@@ -114,6 +114,7 @@ class CatalogView(): #dropdown and search bar
                                                     False)
 
         self.state.mostRecentSaved = False
+        self.state.addToHistory()
         #allow instantiation ONLY when root is on the canvas
         #if self.state.selected_sym_objects.component_name == "Root":
         #    self.state.mainWindow.buttonView.exportButton.setEnabled(True)

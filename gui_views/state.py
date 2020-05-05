@@ -27,10 +27,12 @@ class State():
         self.mostRecentSaved = True
         self.zoom = 1
         self.importedSymObjects = {}
-
         self.object_clicked = 0
-    # sets objects in scene as draggable or not draggable based on drag_state
-    def setDragState(self):
+        self.history_index = 0
+        self.history = []
+
+    # sets object flags in scene based on drag_state
+    def setSymObjectFlags(self):
         for object in self.sym_objects.values():
             object.setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
             object.setFlag(QGraphicsItem.ItemIsSelectable, self.drag_state)
@@ -112,6 +114,20 @@ class State():
 
             object.incomplete = incomplete
             incomplete = False
+
+    def addToHistory(self):
+        state_pos = len(self.history) - self.history_index - 1
+        #not most current state
+        if state_pos > 0:
+            #remove elements from history
+            for i in range(state_pos):
+                self.history.pop()
+        history = self.mainWindow.buttonView.getOutputData(self.sym_objects)
+        self.history.append(history)
+        self.history_index = len(self.history) - 1
+        self.mainWindow.buttonView.undo.setEnabled(True)
+        self.mainWindow.buttonView.redo.setEnabled(False)
+        self.mostRecentSaved = False
 
 #finds the gem5 path
 def get_path():

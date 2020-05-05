@@ -85,6 +85,7 @@ class SymObject(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsFocusable, True)
 
         self.incomplete = False
+        self.modified = 0
 
         #constructing the baseline ui elements
         self.initUIObject(self, 0, 0)
@@ -116,7 +117,6 @@ class SymObject(QGraphicsItemGroup):
         del self.state.selected_sym_objects[:]
         self.state.selected_sym_objects.append(self)
         self.updateHandlesPos()
-
 
     def get_param_info(self):
         """Get additional info on params such as default values  after
@@ -355,6 +355,7 @@ class SymObject(QGraphicsItemGroup):
         # delete ui object
         self.state.scene.removeItem(self)
         self.deleteBackend()
+        self.state.addToHistory()
 
     def deleteBackend(self):
         """remove backend datastructures of object"""
@@ -396,12 +397,12 @@ class SymObject(QGraphicsItemGroup):
         # delete from state
         del self.state.sym_objects[self.name]
 
-
     def mouseMoveEvent(self, event):
         '''handle changes when symobject is moved around on canvas'''
 
         if self.handleSelected is not None and not self.state.draw_wire_state:
             self.interactiveResize(event.pos(), event.scenePos())
+            self.modified = 1
 
         if self.state.object_clicked:
             self.modifyConnections(event, self)
@@ -409,6 +410,7 @@ class SymObject(QGraphicsItemGroup):
             self.state.line_drawer.update()
             super(SymObject, self).mouseMoveEvent(event)
             self.state.mostRecentSaved = False
+            self.modified = 1
 
     def modifyConnections(self, event, sym_object):
         '''update connection position information when an object is dragged
@@ -486,7 +488,6 @@ class SymObject(QGraphicsItemGroup):
                 curParent.connected_objects.remove(self.name)
                 self.parent_name = None
 
-
         for object in self.state.sym_objects.values():
             object.setZValue(object.z)
 
@@ -499,8 +500,10 @@ class SymObject(QGraphicsItemGroup):
         self.handleSelected = None
         self.mousePressPos = None
         self.mousePressRect = None
+        if self.modified:
+            self.state.addToHistory()
+        self.modified = 0
         #self.update()
-
 
     def getClickedObject(self, event):
         """based on mouse click position, return object with highest zscore"""
@@ -740,6 +743,7 @@ class SymObject(QGraphicsItemGroup):
 
         # update member variable
         self.name = newName
+        self.state.addToHistory()
 
 
     def addSubObject(self, child):
@@ -810,8 +814,8 @@ class SymObject(QGraphicsItemGroup):
         self.handles[self.handleBottomMiddle] = QRectF(b.center().x() - s / 2, b.bottom() - s, s, s)
         self.handles[self.handleBottomRight] = QRectF(b.right() - s, b.bottom() - s, s, s)
 
-        self.width = b.width()
-        self.height = b.height()
+        self.width = self.rect.rect().width()
+        self.height = self.rect.rect().height()
         self.x = self.sceneCoords().left()
         self.y = self.sceneCoords().bottom()
         self.state.line_drawer.update()
@@ -920,6 +924,7 @@ class SymObject(QGraphicsItemGroup):
         self.updateHandlesPos()
         self.moveUIObject()
         self.movePorts()
+        #self.state.addToHistory()
 
     def shape(self):
         """
@@ -948,4 +953,3 @@ class SymObject(QGraphicsItemGroup):
                     painter.drawEllipse(rect)
         self.modifyConnections(self, self)
         self.updateChildrenConnections(self, self)
-        #self.state.line_drawer.update()

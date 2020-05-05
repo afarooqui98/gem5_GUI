@@ -71,6 +71,7 @@ class AttributeView(): #table view for parameters, as well as the description
                     catalog["SimObject"][name]['ports'][currentAttribute]['Type']
         else:
             instance_params[currentAttribute]["Value"] = updatedValue
+        self.state.addToHistory()
 
 
     def modifyFields(self, item):
