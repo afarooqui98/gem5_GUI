@@ -528,7 +528,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.sym_objects.clear()
 
 
-    #loads objects into scene
+    #loads objects into scene from file
     def populateScene(self, data):
         z_score = 0
         while str(z_score) in data:
@@ -547,8 +547,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         while z_score in data:
             cur_z_array = data[z_score]
             for object in cur_z_array:
-                self.state.scene.loadSavedObject("component",
+                new_object = self.state.scene.loadSavedObject("component",
                                                 object["name"], object)
+                for sym_object in self.state.selected_sym_objects:
+                    #if selected object, need to refresh the attribute table
+                    if new_object.name == sym_object.name:
+                        self.state.selected_sym_objects.remove(sym_object)
+                        self.state.selected_sym_objects.append(new_object)
 
             z_score += 1
 
@@ -608,7 +613,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     ports[port]["Value"] = None
 
             newObject["ports"] = ports
-            newObject["connected_objects"] = object.connected_objects
+            newObject["connected_objects"] = copy.copy(object.connected_objects)
 
             connections = []
 

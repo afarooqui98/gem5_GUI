@@ -90,7 +90,6 @@ class CatalogView(): #dropdown and search bar
                 hasChildren = True
                 lastChild = self.state.sym_objects[new_parent.connected_objects[-1]]
                 child.setPos(lastChild.scenePos().x() + 10, lastChild.scenePos().y() + 10)
-
             # configure child as a UI subobject of parent
             new_parent.addSubObject(child)
 
