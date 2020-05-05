@@ -758,7 +758,7 @@ class SymObject(QGraphicsItemGroup):
             object.setZValue(object.z)
 
     def resizeParent(self, child):
-        '''reduce the size of the parent if it has one child'''
+        '''reduce the size of the parent if it had one child'''
 
         if len(self.connected_objects) == 1:
             self.width -= child.width
@@ -775,6 +775,9 @@ class SymObject(QGraphicsItemGroup):
 
         self.moveUIObject()
         self.movePorts()
+        self.modifyConnections(self, self)
+        self.updateChildrenConnections(self, self)
+        self.state.line_drawer.update()
 
     def removeUIObjects(self):
         '''disconnect all the symobjects components before it is resized'''

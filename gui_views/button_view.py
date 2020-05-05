@@ -314,11 +314,15 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def new_button_pressed(self):
         # check if any changes have been made - to save before closing
         if not self.state.mostRecentSaved:
-            dialog = saveChangesDialog("opening a new file")
+            dialog = saveChangesDialog("opening a new file", self.state)
             if dialog.exec_():
                 self.save_button_pressed()
 
         self.clearScene()
+        del self.state.history[:]
+        self.state.history_index = 0
+        self.undo.setEnabled(False)
+        self.redo.setEnabled(False)
 
     def copy_button_pressed(self):
         logging.debug("copy button pressed")
@@ -354,6 +358,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.removeHighlight()
         del self.state.copied_objects[:]
         self.state.line_drawer.update()
+        self.state.addToHistory()
 
     def copy_sym_object(self, selectedObject):
         object_name = selectedObject.name + "_copy"
@@ -509,11 +514,17 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
 
         self.clearScene()
+        del self.state.history[:]
+        self.state.history_index = 0
+        self.undo.setEnabled(False)
+        self.redo.setEnabled(False)
+
         # read data in from the file and load each object
         with open(filename) as json_file:
             data = json.load(json_file)
             self.populateScene(data)
         self.state.mostRecentSaved = True
+        self.state.addToHistory()
 
     # clear out existing objects and wires
     def clearScene(self):

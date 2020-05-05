@@ -125,9 +125,10 @@ class State():
         history = self.mainWindow.buttonView.getOutputData(self.sym_objects)
         self.history.append(history)
         self.history_index = len(self.history) - 1
-        self.mainWindow.buttonView.undo.setEnabled(True)
-        self.mainWindow.buttonView.redo.setEnabled(False)
-        self.mostRecentSaved = False
+        if self.history_index:
+            self.mainWindow.buttonView.undo.setEnabled(True)
+            self.mainWindow.buttonView.redo.setEnabled(False)
+            self.mostRecentSaved = False
 
 #finds the gem5 path
 def get_path():
