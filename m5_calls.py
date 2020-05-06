@@ -254,6 +254,7 @@ def simulate():
         logging.error("Simulation error caused by %s" % e.__name__)
         return True
 
+
 def getRoot():
     print("finding root inst")
     if Root.getInstance() == None:
