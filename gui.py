@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
             self.debug_widget.hide()
         self.debug_hidden = not self.debug_hidden
 
-    def createDropDown(self, value, table):
+    def createDropDown(self, value, table, param):
         """ Create the drop down for simobject parameters in the table view """
         comboBox = QComboBox()
         # Create list for dropdown including the default value
@@ -113,7 +113,7 @@ class MainWindow(QMainWindow):
         # set column 1 value with value
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value))
         if isSimObject: #add a drop down of child objects
-            self.createDropDown(value, table)
+            self.createDropDown(value, table, param)
 
         cell = table.item(table.rowCount() - 1, 1)
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
