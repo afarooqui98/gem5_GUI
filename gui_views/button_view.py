@@ -544,24 +544,6 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.sym_objects.clear()
 
-<<<<<<< HEAD
-=======
-        # read data in from the file and load each object
-        with open(filename) as json_file:
-            data = json.load(json_file)
-
-            # load the saved imported code and dump into new modules
-            imported_modules = data['code']
-            if len(imported_modules) > 1: #check if any exist
-                self.loadModules(imported_modules)
-
-            z_score = 0
-            while str(z_score) in data:
-                cur_z_array = data[str(z_score)]
-                for object in cur_z_array:
-                    self.state.scene.loadSavedObject("component",
-                                                    object["name"], object)
->>>>>>> master
 
     #loads objects into scene from file
     def populateScene(self, data):
