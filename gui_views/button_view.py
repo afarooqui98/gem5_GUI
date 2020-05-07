@@ -4,7 +4,7 @@ from PySide2.QtGui import *
 from graphic_scene import *
 from dialogs import *
 
-import sys, random
+import sys, random, imp
 import copy
 from gui_views import state
 import json
@@ -128,6 +128,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         importAction = mainMenu.addAction('Import')
         importAction.triggered.connect(self.importObjs)
 
+    def updateState(self, clsmembers, name):
+        tree, instances= get_imported_obs(clsmembers, name)
+        # update the gui catalog
+        self.state.updateObjs(tree, instances, name)
+
     def importObjs(self):
         try:
             # Open file path dialog
@@ -138,14 +143,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             dir_path = '/'.join(tokens[:len(tokens) - 1]) + '/'
             sys.path.append(dir_path)
             module_name = tokens[len(tokens) - 1].split('.')[0]
+            modules = [key for key in sys.modules.keys()]
             import_module(module_name, package=full_path)
             clsmembers = inspect.getmembers(sys.modules[module_name], \
                 inspect.isclass)
-            logging.debug(clsmembers)
-            tree, instances= get_imported_obs(clsmembers, module_name)
-
-            # update the gui catalog
-            self.state.updateObjs(tree, instances, module_name)
+            clsmembers = filter(lambda x: x[1].__module__ not in modules, \
+                clsmembers)
+            self.updateState(clsmembers, module_name)
         except ValueError:
             dialog = errorDialog(self.state, "Did not select file to import")
             logging.info("Import file not selected")
@@ -511,6 +515,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         # read data in from the file and load each object
         with open(filename) as json_file:
             data = json.load(json_file)
+
+            # load the saved imported code and dump into new modules
+            imported_modules = data['code']
+            if len(imported_modules) > 1: #check if any exist
+                self.loadModules(imported_modules)
+
             z_score = 0
             while str(z_score) in data:
                 cur_z_array = data[str(z_score)]
@@ -523,6 +533,50 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             self.state.line_drawer.update()
 
         self.state.mostRecentSaved = True
+
+
+    def loadModules(self, imported_modules):
+        """ User defined objects are saved with their code defs. They are
+            designated by a module name, same as the file the code was imported
+            from. Load the modules and code to create the object classes"""
+
+        for module in imported_modules.keys():
+            existing_modules = [key for key in sys.modules.keys()]
+            if module == 'headers' or module in existing_modules:
+                continue
+            #create module instance in sys and get the class information
+            clsmemebers = self.execCode(module, imported_modules[module], \
+                imported_modules['headers'])
+
+            # add imported code to state
+            self.state.imported_code[module] = {}
+            for cls in imported_modules[module].keys():
+                self.state.imported_code[module][cls] = \
+                imported_modules[module][cls]
+
+            #update the gui catalog with the new objects
+            self.updateState(clsmemebers, module)
+
+    def execCode(self, module_name, imported_code, header_code):
+        """ Create module for imported code saved in ui file. Then extract the
+            class information for the code in the module """
+        existing_modules = [key for key in sys.modules.keys()]
+        new_module = imp.new_module(module_name)
+        sys.modules[module_name] = new_module
+
+        # header_code contains 'from m5.objects import *'
+        # need to run this in order to call exec on the rest of code
+        exec(header_code, new_module.__dict__)
+        for cls in sorted(imported_code.keys()):
+            exec(imported_code[cls], new_module.__dict__)
+
+        clsmembers = inspect.getmembers(sys.modules[module_name], \
+            inspect.isclass)
+        # filter out classes from modules already in gem5
+        clsmembers = filter(lambda x: x[1].__module__ not in existing_modules, \
+            clsmembers)
+
+        return clsmembers
 
     def getOutputData(self, objects):
         """build dictionary to export to file"""
@@ -605,6 +659,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 savedObjects[object.z] = []
 
             savedObjects[object.z].append(newObject)
+            savedObjects['code'] = self.state.imported_code
 
         return savedObjects
 
