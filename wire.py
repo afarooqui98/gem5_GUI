@@ -41,6 +41,8 @@ class Wire(QGraphicsItemGroup):
         selected_action = menu.exec_(QCursor.pos())
         if selected_action == delete_action:
             self.deleteWire()
+        elif selected_action == inspect_action:
+            self.inspect()
 
     def deleteWire(self):
         """delete all backend entries associate with connection and remove
@@ -60,3 +62,15 @@ class Wire(QGraphicsItemGroup):
             del parent.ui_connections[self.parent_key]
             del child.ui_connections[self.child_key]
             self.state.scene.removeItem(self)
+
+    def inspect(self):
+        parent = self.state.sym_objects[self.child_key[1]]
+        child = self.state.sym_objects[self.parent_key[1]]
+        parent_port = self.parent_key[2]
+        child_port = self.parent_key[3]
+
+        print("parent: " + parent.name)
+        print("port: " + parent_port)
+        # print(parent.instance_ports[parent_port]['Value'].role)
+        print("child: " + child.name)
+        print("port: " + child_port)
