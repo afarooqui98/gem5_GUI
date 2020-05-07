@@ -85,7 +85,7 @@ class SymObject(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsFocusable, True)
 
         self.incomplete = False
-        
+
         #constructing the baseline ui elements
         self.initUIObject(self, 0, 0)
         # if we are loading from a file, we dont need to check for overlapping
@@ -117,6 +117,15 @@ class SymObject(QGraphicsItemGroup):
         self.state.selected_sym_objects.append(self)
         self.updateHandlesPos()
 
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        copy_action = menu.addAction("copy (Ctrl+C)")
+        inspect_action = menu.addAction("inspect object")
+        selected_action = menu.exec_(QCursor.pos())
+        if selected_action == copy_action:
+            self.state.mainWindow.buttonView.copy_button_pressed()
+        elif selected_action == inspect_action:
+            print("insepct button pressed")
 
     def get_param_info(self):
         """Get additional info on params such as default values  after

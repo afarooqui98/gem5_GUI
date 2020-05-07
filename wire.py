@@ -54,6 +54,15 @@ class Wire(QGraphicsItemGroup):
         if dialog.exec_():
             self.deleteWire()
 
+    def contextMenuEvent(self, event):
+        print("context menu reached")
+        menu = QMenu()
+        delete_action = menu.addAction("delete wire")
+        insepct_action = menu.addAction("inspect wire")
+        selected_action = menu.exec_(QCursor.pos())
+        if selected_action == paste_action:
+            self.deleteWire()
+
     def deleteWire(self):
         """delete all backend entries associate with connection and remove
         from scene"""

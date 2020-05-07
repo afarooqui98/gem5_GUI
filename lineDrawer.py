@@ -1,7 +1,7 @@
 import sys, string, random
-from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QMessageBox)
-from PySide2.QtGui import QPainter, QColor, QPen
-from PySide2.QtCore import Qt, QPoint
+from PySide2.QtWidgets import *
+from PySide2.QtGui import *
+from PySide2.QtCore import *
 from connection import *
 from gui_views import state
 from m5_calls import portsCompatible

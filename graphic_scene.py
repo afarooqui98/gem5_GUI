@@ -94,6 +94,13 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(new_object)
         return new_object
 
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        paste_action = menu.addAction("paste (Ctrl+v)")
+        selected_action = menu.exec_(QCursor.pos())
+        if selected_action == paste_action:
+            self.state.mainWindow.buttonView.paste_button_pressed()
+
     def addObjectToScene(self, type, component_name, name):
         """Creates symobject representation of object and adds to the scene"""
         # generate random string name for object
