@@ -67,6 +67,13 @@ class LineDrawer(QWidget):
     def update(self):
         self.state.drawLines(self.pen)
 
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        paste_action = menu.addAction("paste (Ctrl+v)")
+        selected_action = menu.exec_(QCursor.pos())
+        if selected_action == paste_action:
+            self.state.mainWindow.buttonView.paste_button_pressed()
+
     def setObjectConnection(self):
         parent_loc = self.pos1
         child_loc = self.pos2
