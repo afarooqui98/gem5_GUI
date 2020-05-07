@@ -618,7 +618,7 @@ class SymObject(QGraphicsItemGroup):
         # if item is a new parent
         if not item.connected_objects: # or force_resize:
             item.width += self.width
-            item.height += self.width
+            item.height += self.height
             new_rect = item.rect.rect()
             new_rect.setWidth(new_rect.width() + self.rect.rect().width())
             new_rect.setHeight(new_rect.height() + self.rect.rect().height())
@@ -761,17 +761,19 @@ class SymObject(QGraphicsItemGroup):
         '''reduce the size of the parent if it had one child'''
 
         if len(self.connected_objects) == 1:
-            self.width -= child.width
-            self.height -= child.width
-            new_rect = self.rect.rect()
-            new_rect.setWidth(new_rect.width() - child.rect.rect().width())
-            new_rect.setHeight(new_rect.height() - child.rect.rect().height())
-            self.rect.setRect(new_rect)
-            # self.setPos(item.scenePos().x(),
-            #             item.scenePos().y() + item.height - self.height)
-            self.x = self.scenePos().x()
-            self.y = self.scenePos().y()
-            self.updateHandlesPos()
+            pass
+            #child.resizeUIObject(self, 1, -child.width)
+            # self.width -= child.width
+            # self.height -= child.width
+            # new_rect = self.rect.rect()
+            # new_rect.setWidth(new_rect.width() - child.rect.rect().width())
+            # new_rect.setHeight(new_rect.height() - child.rect.rect().height())
+            # self.rect.setRect(new_rect)
+            # # self.setPos(item.scenePos().x(),
+            # #             item.scenePos().y() + item.height - self.height)
+            # self.x = self.scenePos().x()
+            # self.y = self.scenePos().y()
+            # self.updateHandlesPos()
 
         self.moveUIObject()
         self.movePorts()
