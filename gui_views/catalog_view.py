@@ -90,7 +90,6 @@ class CatalogView(): #dropdown and search bar
                 hasChildren = True
                 lastChild = self.state.sym_objects[new_parent.connected_objects[-1]]
                 child.setPos(lastChild.scenePos().x() + 10, lastChild.scenePos().y() + 10)
-
             # configure child as a UI subobject of parent
             new_parent.addSubObject(child)
 
@@ -114,6 +113,7 @@ class CatalogView(): #dropdown and search bar
                                                     False)
 
         self.state.mostRecentSaved = False
+        self.state.addToHistory()
         #allow instantiation ONLY when root is on the canvas
         #if self.state.selected_sym_objects.component_name == "Root":
         #    self.state.mainWindow.buttonView.exportButton.setEnabled(True)

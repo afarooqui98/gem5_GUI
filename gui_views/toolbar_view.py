@@ -30,7 +30,7 @@ class ToolBarView():
             disable object dragging"""
         self.state.drag_state = not self.state.drag_state
         self.state.draw_wire_state = not self.state.draw_wire_state
-        self.state.setDragState()
+        self.state.setSymObjectFlags()
         #update cursor type immediately
         pos = QCursor.pos()
         QCursor.setPos(0, 0)

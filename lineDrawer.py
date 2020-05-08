@@ -123,6 +123,7 @@ class LineDrawer(QWidget):
                 parent_port_num, child_port_num)
             parent.instance_ports[parent_port_name]['Value'] = str(child.name) + "." + \
                 str(child_port_name)
+            self.state.addToHistory()
             return 0
         else:
             return -2
