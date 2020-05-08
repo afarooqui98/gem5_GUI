@@ -70,7 +70,7 @@ class Wire(QGraphicsItemGroup):
         child_port = self.parent_key[3]
 
         print("parent: " + parent.name)
-        # print("port: " + parent.instance_ports[parent_port]['Description'])
+        print("port: " + parent.instance_ports[parent_port]['Description'])
 
         print("child: " + child.name)
-        # print("port: " + child.instance_ports[parent_port]['Description'])
+        print("port: " + child.instance_ports[child_port]['Description'])
