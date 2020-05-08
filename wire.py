@@ -71,6 +71,6 @@ class Wire(QGraphicsItemGroup):
 
         print("parent: " + parent.name)
         print("port: " + parent_port)
-        # print(parent.instance_ports[parent_port]['Value'].role)
+        
         print("child: " + child.name)
         print("port: " + child_port)
