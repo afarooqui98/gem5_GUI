@@ -573,7 +573,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                         self.state.selected_sym_objects.append(new_object)
 
             z_score += 1
-
+        self.state.setSymObjectFlags()
         self.state.line_drawer.update()
 
 
