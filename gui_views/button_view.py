@@ -82,6 +82,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         editMenu.addAction(undoAction)
         editMenu.addAction(redoAction)
 
+        # store undo / redo actions to enable / disable, initially disabled
+        self.undo = undoAction
+        self.undo.setEnabled(False)
+        self.redo = redoAction
+        self.redo.setEnabled(False)
+
     def buildViewTab(self, mainMenu, window):
         """build the view tab"""
         zoomIn = QAction("Zoom In", window)
@@ -314,21 +320,15 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def new_button_pressed(self):
         # check if any changes have been made - to save before closing
         if not self.state.mostRecentSaved:
-            dialog = saveChangesDialog("opening a new file")
+            dialog = saveChangesDialog("opening a new file", self.state)
             if dialog.exec_():
                 self.save_button_pressed()
 
-        # clear out existing objects and wires
-        for object in self.state.sym_objects.values():
-            for name, connection in object.ui_connections.items():
-                if connection.line:
-                    self.state.scene.removeItem(connection.line)
-
-            self.state.scene.removeItem(object)
-            object.ui_connections.clear()
-
-        # clear out backend sym object dictionary
-        self.state.sym_objects.clear()
+        self.clearScene()
+        del self.state.history[:]
+        self.state.history_index = 0
+        self.undo.setEnabled(False)
+        self.redo.setEnabled(False)
 
     def copy_button_pressed(self):
         logging.debug("copy button pressed")
@@ -364,6 +364,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.removeHighlight()
         del self.state.copied_objects[:]
         self.state.line_drawer.update()
+        self.state.addToHistory()
 
     def copy_sym_object(self, selectedObject):
         object_name = selectedObject.name + "_copy"
@@ -442,11 +443,28 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     #TODO
     def undo_button_pressed(self):
-        logging.debug("undo button pressed")
+        self.clearScene()
+        self.state.history_index -= 1
+        self.populateSceneFromHistory(self.state.history[self.state.history_index])
+        if len(self.state.selected_sym_objects):
+            self.state.mainWindow.populateAttributes(None,
+                self.state.selected_sym_objects[0].component_name, False)
+        if not self.state.history_index:
+            self.undo.setEnabled(False)
+        self.redo.setEnabled(True)
 
     #TODO
     def redo_button_pressed(self):
-        logging.debug("redo button pressed")
+        self.clearScene()
+        self.state.history_index += 1
+        self.populateSceneFromHistory(self.state.history[self.state.history_index])
+        if len(self.state.selected_sym_objects):
+            self.state.mainWindow.populateAttributes(None,
+                self.state.selected_sym_objects[0].component_name, False)
+        if self.state.history_index == len(self.state.history) - 1:
+            self.redo.setEnabled(False)
+        self.undo.setEnabled(True)
+
 
     def zoom(self, val):
         """ modifies the window zoom with val"""
@@ -501,7 +519,21 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         tokens = filename.split('/')
         self.state.mainWindow.setWindowTitle("gem5 GUI | " + tokens[-1])
 
-        # clear out existing objects and wires before loading from file
+        self.clearScene()
+        del self.state.history[:]
+        self.state.history_index = 0
+        self.undo.setEnabled(False)
+        self.redo.setEnabled(False)
+
+        # read data in from the file and load each object
+        with open(filename) as json_file:
+            data = json.load(json_file)
+            self.populateScene(data)
+        self.state.mostRecentSaved = True
+        self.state.addToHistory()
+
+    # clear out existing objects and wires
+    def clearScene(self):
         for object in self.state.sym_objects.values():
             for name, connection in object.ui_connections.items():
                 if connection.line:
@@ -512,27 +544,37 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.sym_objects.clear()
 
-        # read data in from the file and load each object
-        with open(filename) as json_file:
-            data = json.load(json_file)
 
-            # load the saved imported code and dump into new modules
-            imported_modules = data['code']
-            if len(imported_modules) > 1: #check if any exist
-                self.loadModules(imported_modules)
+    #loads objects into scene from file
+    def populateScene(self, data):
+        z_score = 0
+        while str(z_score) in data:
+            cur_z_array = data[str(z_score)]
+            for object in cur_z_array:
+                self.state.scene.loadSavedObject("component",
+                                                object["name"], object)
 
-            z_score = 0
-            while str(z_score) in data:
-                cur_z_array = data[str(z_score)]
-                for object in cur_z_array:
-                    self.state.scene.loadSavedObject("component",
-                                                    object["name"], object)
+            z_score += 1
 
-                z_score += 1
+        self.state.line_drawer.update()
 
-            self.state.line_drawer.update()
+    #loads objects into scene from history
+    def populateSceneFromHistory(self, data):
+        z_score = 0
+        while z_score in data:
+            cur_z_array = data[z_score]
+            for object in cur_z_array:
+                new_object = self.state.scene.loadSavedObject("component",
+                                                object["name"], object)
+                for sym_object in self.state.selected_sym_objects:
+                    #if selected object, need to refresh the attribute table
+                    if new_object.name == sym_object.name:
+                        self.state.selected_sym_objects.remove(sym_object)
+                        self.state.selected_sym_objects.append(new_object)
 
-        self.state.mostRecentSaved = True
+            z_score += 1
+        self.state.setSymObjectFlags()
+        self.state.line_drawer.update()
 
 
     def loadModules(self, imported_modules):
@@ -632,7 +674,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     ports[port]["Value"] = None
 
             newObject["ports"] = ports
-            newObject["connected_objects"] = object.connected_objects
+            newObject["connected_objects"] = copy.copy(object.connected_objects)
 
             connections = []
 

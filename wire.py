@@ -64,3 +64,4 @@ class Wire(QGraphicsItemGroup):
         del parent.ui_connections[self.parent_key]
         del child.ui_connections[self.child_key]
         self.state.scene.removeItem(self)
+        self.state.addToHistory()

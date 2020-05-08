@@ -224,6 +224,7 @@ if __name__ == "__m5_main__":
     #create new instance of main window
     main_window = MainWindow(obj_tree, instance_tree)
     main_window.state.mainWindow = main_window
+    main_window.state.addToHistory()
     main_window.setWindowTitle("gem5 GUI | Untitled")
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack
