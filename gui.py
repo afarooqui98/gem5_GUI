@@ -9,6 +9,7 @@ from gui_views.button_view import *
 from gui_views.catalog_view import *
 from gui_views.attribute_view import *
 from gui_views.debug_view import *
+from gui_views.inspect_view import *
 from gui_views.toolbar_view import *
 from gui_views.state import *
 from m5_calls import isSimObjectParam
@@ -51,11 +52,20 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.graphics_view)
 
 
+        self.debugInspectLayout = QVBoxLayout()
+
         #add debug window
         self.debug_hidden = False # Flag for toggling debug widget
         self.debug_widget = DebugWidget(self.state)
-        self.layout.addWidget(self.debug_widget)
+        self.debugInspectLayout.addWidget(self.debug_widget)
         self.toggleDebug()
+
+        #inspect window
+        self.inspect_hidden = True
+        self.inspect_widget = InspectWidget(self.state)
+        self.debugInspectLayout.addWidget(self.inspect_widget)
+
+        self.layout.addLayout(self.debugInspectLayout)
 
         self.main.setLayout(self.layout)
         self.setCentralWidget(self.main)
@@ -63,6 +73,14 @@ class MainWindow(QMainWindow):
         # populate treeview
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
+
+    def toggleInspect(self, isObject, attributeList):
+        if self.inspect_hidden:
+            self.inspect_widget.populate(isObject, attributeList)
+            self.inspect_widget.show()
+        else:
+            self.inspect_widget.clear()
+            self.inspect_widget.hide()
 
     def toggleDebug(self):
         """ Enables or disables the debug widget from being shown"""

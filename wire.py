@@ -69,6 +69,8 @@ class Wire(QGraphicsItemGroup):
         parent_port = self.parent_key[2]
         child_port = self.parent_key[3]
 
+        self.state.mainWindow.toggleInspect(False, [parent.name, parent.instance_ports[parent_port]['Description'],
+            child.name, child.instance_ports[child_port]['Description']])
         print("parent: " + parent.name)
         print("port: " + parent.instance_ports[parent_port]['Description'])
 
