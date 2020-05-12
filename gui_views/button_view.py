@@ -54,6 +54,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         importAction.triggered.connect(self.import_object_button_pressed)
 
         fileMenu = mainMenu.addMenu('File')
+        fileMenu.setObjectName("File")
         fileMenu.addAction(newAction)
         fileMenu.addAction(saveAction)
         fileMenu.addAction(saveAsAction)
@@ -485,15 +486,21 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     root_name , root = traverse_hierarchy_root(\
                                                 self.state.sym_objects, object)
                     err = instantiate_model() #actual m5 instatiation
+                    #lock flow so system isnt modifiable
+                    self.mainMenu.findChild(QMenu, "File").setEnabled(False)
+                    self.state.drag_state = False
+                    self.state.setSymObjectFlags()
                     if err:
-                        dialog = errorDialog(self.state, "An error occured when instantiating!")
+                        dialog = errorDialog(self.state, \
+                            "An error occured when instantiating!")
                         if dialog.exec_(): return
 
     def simulate_button_pressed(self):
         """creates a python file that can be run with gem5"""
         err = simulate()
         if err:
-            dialog = errorDialog(self.state, "An error occured when simulating!")
+            dialog = errorDialog(self.state,\
+             "An error occured when simulating!")
             if dialog.exec_(): return
 
     def openUI_button_pressed(self):
@@ -547,6 +554,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     #loads objects into scene from file
     def populateScene(self, data):
+        # execute any code saved for user-def simobjects
+        imported_modules = data['code']
+        if len(imported_modules) > 1: #check if any exist
+            self.loadModules(imported_modules)
+
         z_score = 0
         while str(z_score) in data:
             cur_z_array = data[str(z_score)]

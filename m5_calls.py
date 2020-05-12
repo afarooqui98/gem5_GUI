@@ -27,7 +27,7 @@ def get_port_info(m5_object):
     port_dict = {} #Save port info for the objects
     for port_name, port in m5_object._ports.items():
         port_attr = {"Description": port.desc, 'Name': port_name, \
-        'Value': port,  'Type': Port}
+        'Value': port, 'Default': port, 'Type': Port}
 
         port_dict[port_name] = port_attr
     return port_dict

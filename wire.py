@@ -62,7 +62,6 @@ class Wire(QGraphicsItemGroup):
             self.state.scene.removeItem(self)
             self.state.addToHistory()
 
-
     def inspect(self):
         pass
         # parent = self.state.sym_objects[self.child_key[1]]
@@ -75,3 +74,4 @@ class Wire(QGraphicsItemGroup):
         #
         # print("child: " + child.name)
         # print("port: " + child.instance_ports[child_port]['Description'])
+
