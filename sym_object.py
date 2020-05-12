@@ -485,8 +485,8 @@ class SymObject(QGraphicsItemGroup):
                 # child relationship
                 curParent = self.state.sym_objects[self.parent_name]
                 curParent.connected_objects.remove(self.name)
-                curParent.resizeParent(self)
                 self.parent_name = None
+                curParent.resizeParent(self)
 
         for object in self.state.sym_objects.values():
             object.setZValue(object.z)
@@ -531,9 +531,10 @@ class SymObject(QGraphicsItemGroup):
             if self != object and not self.isAncestor(object) and not\
                 self.isDescendant(object):
                 if self.doesOverlap(object):
-                    if object.z > highest_zscore:
-                        highest_zscore = object.z
-                        frontmost_object = object
+                    if object.parent_name != self.parent_name or self.parent_name is None:
+                        if object.z > highest_zscore:
+                            highest_zscore = object.z
+                            frontmost_object = object
 
         return frontmost_object
 
@@ -692,9 +693,6 @@ class SymObject(QGraphicsItemGroup):
         for object_name in item.connected_objects:
             object_rect = self.state.sym_objects[object_name].rect.rect()
             child_area += object_rect.width() * object_rect.height()
-
-        # if self.name not in item.connected_objects:
-        #     child_area += self.rect.rect().width() * self.rect.rect().height()
 
         ratio = child_area / parent_area
         if ratio < resize_threshold / 2:
