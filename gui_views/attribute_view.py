@@ -78,7 +78,7 @@ class AttributeView(): #table view for parameters, as well as the description
         # remove highlight for object if it is complete now
         object = self.state.selected_sym_objects[0]
         if not object.incomplete:
-            object.rect.setBrush(QColor("White"))
+            object.rect.setBrush(QColor("Green"))
 
 
     def modifyFields(self, item):
