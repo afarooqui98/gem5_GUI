@@ -48,7 +48,7 @@ class GraphicsScene(QGraphicsScene):
         z = newObject["z"]
         width = newObject["width"]
         height = newObject["height"]
-        component_name = newObject["component_name"]
+        component_name = convert(newObject["component_name"])
         parameters = newObject["parameters"]
         connected_objects = newObject["connected_objects"]
         parent = newObject["parent_name"]
