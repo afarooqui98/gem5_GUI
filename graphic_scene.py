@@ -30,15 +30,10 @@ class GraphicsScene(QGraphicsScene):
     def __init__(self, x, y, width, height, state):
         super(GraphicsScene, self).__init__(x, y, width, height)
         self.state = state
+        self.default_width = width
+        self.default_height = height
         self.state.line_drawer = LineDrawer(state)
-        self.state.line_drawer.resize(self.width(), self.height())
-
-        # change background of canvas to light gray
-        pal = QPalette()
-        pal.setColor(QPalette.Background, Qt.lightGray)
-        self.state.line_drawer.setAutoFillBackground(True)
-        self.state.line_drawer.setPalette(pal)
-
+        self.setLineDrawer()
         self.addWidget(self.state.line_drawer)
 
     def loadSavedObject(self, type, name, newObject):
@@ -132,3 +127,19 @@ class GraphicsScene(QGraphicsScene):
             event.accept()
         else:
             return
+
+    def resizeScene(self):
+        scale = self.state.zoom
+        rect = self.itemsBoundingRect()
+        self.setSceneRect(rect.x(), rect.y(), self.default_width / scale, self.default_height / scale)
+        self.setLineDrawer()
+
+
+    def setLineDrawer(self):
+        self.state.line_drawer.resize(self.width(), self.height())
+
+        # change background of canvas to light gray
+        pal = QPalette()
+        pal.setColor(QPalette.Background, Qt.lightGray)
+        self.state.line_drawer.setAutoFillBackground(True)
+        self.state.line_drawer.setPalette(pal)

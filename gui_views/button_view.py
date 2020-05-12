@@ -471,6 +471,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.zoom = val
         self.state.mainWindow.graphics_view.setTransform(QTransform().scale(val,
             val).rotate(0))
+        self.state.scene.resizeScene()
 
     # creates a python file that can be run with gem5
     def export_button_pressed(self):
