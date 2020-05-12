@@ -125,7 +125,7 @@ class SymObject(QGraphicsItemGroup):
         if selected_action == copy_action:
             self.state.mainWindow.buttonView.copy_button_pressed()
         elif selected_action == inspect_action:
-            print("insepct button pressed")
+            pass
 
     def get_param_info(self):
         """Get additional info on params such as default values  after

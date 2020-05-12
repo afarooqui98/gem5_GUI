@@ -34,7 +34,6 @@ class Wire(QGraphicsItemGroup):
         self.addToGroup(arrow2)
 
     def contextMenuEvent(self, event):
-        print("context menu reached")
         menu = QMenu()
         delete_action = menu.addAction("delete wire")
         inspect_action = menu.addAction("inspect wire")
@@ -42,7 +41,7 @@ class Wire(QGraphicsItemGroup):
         if selected_action == delete_action:
             self.deleteWire()
         elif selected_action == inspect_action:
-            self.inspect()
+            pass
 
     def deleteWire(self):
         """delete all backend entries associate with connection and remove
@@ -64,15 +63,14 @@ class Wire(QGraphicsItemGroup):
             self.state.scene.removeItem(self)
 
     def inspect(self):
-        parent = self.state.sym_objects[self.child_key[1]]
-        child = self.state.sym_objects[self.parent_key[1]]
-        parent_port = self.parent_key[2]
-        child_port = self.parent_key[3]
-
-        self.state.mainWindow.toggleInspect(False, [parent.name, parent.instance_ports[parent_port]['Description'],
-            child.name, child.instance_ports[child_port]['Description']])
-        print("parent: " + parent.name)
-        print("port: " + parent.instance_ports[parent_port]['Description'])
-
-        print("child: " + child.name)
-        print("port: " + child.instance_ports[child_port]['Description'])
+        pass
+        # parent = self.state.sym_objects[self.child_key[1]]
+        # child = self.state.sym_objects[self.parent_key[1]]
+        # parent_port = self.parent_key[2]
+        # child_port = self.parent_key[3]
+        #
+        # print("parent: " + parent.name)
+        # print("port: " + parent.instance_ports[parent_port]['Description'])
+        #
+        # print("child: " + child.name)
+        # print("port: " + child.instance_ports[child_port]['Description'])

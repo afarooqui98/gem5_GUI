@@ -9,7 +9,6 @@ from gui_views.button_view import *
 from gui_views.catalog_view import *
 from gui_views.attribute_view import *
 from gui_views.debug_view import *
-from gui_views.inspect_view import *
 from gui_views.toolbar_view import *
 from gui_views.state import *
 from m5_calls import isSimObjectParam
@@ -51,21 +50,11 @@ class MainWindow(QMainWindow):
         self.layout.addLayout(self.gridLayout)
         self.layout.addWidget(self.graphics_view)
 
-
-        self.debugInspectLayout = QVBoxLayout()
-
         #add debug window
         self.debug_hidden = False # Flag for toggling debug widget
         self.debug_widget = DebugWidget(self.state)
-        self.debugInspectLayout.addWidget(self.debug_widget)
+        self.layout.addWidget(self.debug_widget)
         self.toggleDebug()
-
-        #inspect window
-        self.inspect_hidden = True
-        self.inspect_widget = InspectWidget(self.state)
-        self.debugInspectLayout.addWidget(self.inspect_widget)
-
-        self.layout.addLayout(self.debugInspectLayout)
 
         self.main.setLayout(self.layout)
         self.setCentralWidget(self.main)
