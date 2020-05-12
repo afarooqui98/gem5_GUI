@@ -162,7 +162,7 @@ class SymObject(QGraphicsItemGroup):
         # Some parameters are included in the class but not in the actual instance_params
         #   given in enumerateParams TODO: look into this!!!
         weird_params = []
-        print(port_dict)
+        
         for port, port_info in self.instance_ports.items():
             port_info["Description"] = port_dict[port]["Description"]
             port_info["Default"] = port_dict[port]["Default"]
