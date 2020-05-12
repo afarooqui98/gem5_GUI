@@ -11,7 +11,7 @@
 ### Step 1
 Clone our repository into the gem5 repository using:
 
-    git clone https://github.com/afarooqui98/ECS193a.git
+    git clone https://github.com/afarooqui98/gem5_GUI.git
 
 ### Step 2 (Optional)
 Create a virtual environment to manage installed packages and activate it.
