@@ -72,6 +72,14 @@ class AttributeView(): #table view for parameters, as well as the description
         else:
             instance_params[currentAttribute]["Value"] = updatedValue
 
+        self.state.addToHistory()
+        self.state.highlightIncomplete()
+
+        # remove highlight for object if it is complete now
+        object = self.state.selected_sym_objects[0]
+        if not object.incomplete:
+            object.rect.setBrush(QColor("Green"))
+
 
     def modifyFields(self, item):
         """ this signal disconnects itself after finishing execution,
@@ -108,6 +116,5 @@ class AttributeView(): #table view for parameters, as well as the description
         item.setFlags(item.flags() ^ Qt.ItemIsEditable)
         if currentValue:
             item.setBackground(QColor("white"))
-            self.state.highlightIncomplete()
 
         self.state.mostRecentSaved = False

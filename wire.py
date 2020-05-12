@@ -74,3 +74,15 @@ class Wire(QGraphicsItemGroup):
         #
         # print("child: " + child.name)
         # print("port: " + child.instance_ports[child_port]['Description'])
+
+    def deleteWire(self):
+        """delete all backend entries associate with connection and remove
+        from scene"""
+
+        parent = self.state.sym_objects[self.child_key[1]]
+        child = self.state.sym_objects[self.parent_key[1]]
+        parent.instance_ports[self.parent_key[2]]['Value'] = None
+        del parent.ui_connections[self.parent_key]
+        del child.ui_connections[self.child_key]
+        self.state.scene.removeItem(self)
+        self.state.addToHistory()

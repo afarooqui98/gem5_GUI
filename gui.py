@@ -91,12 +91,15 @@ class MainWindow(QMainWindow):
         # Make whatever value or default value the first option
         dropdown_list = [value] + dropdown_list
 
+        cbstyle = ""
+
         #Check if param is req
         if dropdown_list[0] == 'None':
               cbstyle = " QComboBox {"
               cbstyle += " background: red;"
               cbstyle += "}"
-              comboBox.setStyleSheet(cbstyle)
+
+        comboBox.setStyleSheet(cbstyle)
 
         comboBox.addItems(dropdown_list)
         # Add event handler to update values in the symobject structure
@@ -126,7 +129,8 @@ class MainWindow(QMainWindow):
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
         if not isTreeWidgetClick and value == 'None': # check if param is req
             cell.setBackground(QColor("indianred"))
-            self.state.highlightIncomplete()
+
+        self.state.highlightIncomplete()
 
 
     def treeWidgetClicked(self, item, name):
@@ -231,6 +235,7 @@ if __name__ == "__m5_main__":
     #create new instance of main window
     main_window = MainWindow(obj_tree, instance_tree)
     main_window.state.mainWindow = main_window
+    main_window.state.addToHistory()
     main_window.setWindowTitle("gem5 GUI | Untitled")
     main_window.show() #make instance visible
     main_window.raise_() #raise instance to top of window stack
