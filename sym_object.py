@@ -612,47 +612,6 @@ class SymObject(QGraphicsItemGroup):
 
     def resizeUIObject(self, item, force_resize, size):
         """resizes a sym_object when another object is placed in it"""
-        #item.removeUIObjects()
-        # item.x = item.scenePos().x()
-        # item.y = item.scenePos().y()
-        #
-        # # if item is a new parent
-        # if not item.connected_objects: # or force_resize:
-        #     item.width += self.width
-        #     item.height += self.height
-        #     new_rect = item.rect.rect()
-        #     new_rect.setWidth(new_rect.width() + self.rect.rect().width())
-        #     new_rect.setHeight(new_rect.height() + self.rect.rect().height())
-        #     item.rect.setRect(new_rect)
-        #
-        #     self.setPos(item.scenePos().x(),
-        #                 item.scenePos().y() + new_rect.height() - self.rect.rect().height())
-        #     self.x = self.scenePos().x()
-        #     self.y = self.scenePos().y()
-        #     item.updateHandlesPos()
-        #
-        # # get rightmost and lowest child for dynamic resizing in case a child
-        # # if not within bounds of parent
-        # rightmost_object = item.rightMostChild(self)
-        # lowest_object = item.lowestChild(self)
-        #
-        # y_diff = lowest_object.scenePos().y() + lowest_object.height - \
-        #     item.scenePos().y() - item.height
-        # x_diff = item.scenePos().x() + item.width - \
-        #                 rightmost_object.scenePos().x() - rightmost_object.width
-        #
-        # if item.connected_objects:
-        #     new_rect = item.rect.rect()
-        #     if x_diff < size:
-        #         item.width += size
-        #         new_rect.setWidth(new_rect.width() + size)
-        #     if y_diff > 0:
-        #         item.height += y_diff
-        #         new_rect.setHeight(new_rect.height() + y_diff)
-        #     item.rect.setRect(new_rect)
-        #     item.updateHandlesPos()
-        #     # place first child at x coordinate of parent
-        #     next_x = item.scenePos().x()
         ret = self.resizeNeeded(item)
         if ret == 0:
             return #no need to resize object
@@ -682,7 +641,7 @@ class SymObject(QGraphicsItemGroup):
         item.movePorts()
         self.modifyConnections(item, item)
         self.updateChildrenConnections(item, item)
-
+        self.state.line_drawer.update()
 
     def resizeNeeded(self, item):
         """determines if a resize is needed by calculating ratio of children
