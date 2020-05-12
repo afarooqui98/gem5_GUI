@@ -12,6 +12,7 @@ import sys, random, os, logging, inspect
 class State():
     def __init__(self, instances, catalog):
         self.drag_state = True
+        self.select_state = True
         self.draw_wire_state = False
         self.sym_objects = {} # Map name to actual symobject (has coords)
         self.selected_sym_objects = []
@@ -40,7 +41,7 @@ class State():
     def setSymObjectFlags(self):
         for object in self.sym_objects.values():
             object.setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
-            object.setFlag(QGraphicsItem.ItemIsSelectable, self.drag_state)
+            object.setFlag(QGraphicsItem.ItemIsSelectable, self.select_state)
             object.setFlag(QGraphicsItem.ItemIsFocusable, self.drag_state)
             object.setAcceptHoverEvents(self.drag_state)
             object.rect.setAcceptHoverEvents(self.drag_state)
