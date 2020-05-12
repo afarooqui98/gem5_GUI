@@ -43,7 +43,11 @@ class CatalogView(): #dropdown and search bar
 
         # if selecting an imported object from catalog
         if item.text(0) in self.state.importedSymObjects:
-            if item.text(0) in self.state.importedSymObjects:
+            # if the same object has already been imported, copy and paste it
+            if item.text(0) in self.state.importedSymObjects and \
+                    self.state.importedSymObjects[item.text(0)]["parent"].name \
+                                                    in self.state.sym_objects:
+
                 del self.state.selected_sym_objects[:]
                 self.state.selected_sym_objects.append(\
                         self.state.importedSymObjects[item.text(0)]["parent"])
