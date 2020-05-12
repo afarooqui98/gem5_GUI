@@ -84,12 +84,15 @@ class MainWindow(QMainWindow):
         # Make whatever value or default value the first option
         dropdown_list = [value] + dropdown_list
 
+        cbstyle = ""
+
         #Check if param is req
         if dropdown_list[0] == 'None':
               cbstyle = " QComboBox {"
               cbstyle += " background: red;"
               cbstyle += "}"
-              comboBox.setStyleSheet(cbstyle)
+
+        comboBox.setStyleSheet(cbstyle)
 
         comboBox.addItems(dropdown_list)
         # Add event handler to update values in the symobject structure
@@ -119,7 +122,8 @@ class MainWindow(QMainWindow):
         cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
         if not isTreeWidgetClick and value == 'None': # check if param is req
             cell.setBackground(QColor("indianred"))
-            self.state.highlightIncomplete()
+
+        self.state.highlightIncomplete()
 
 
     def treeWidgetClicked(self, item, name):
