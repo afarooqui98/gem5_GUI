@@ -60,7 +60,9 @@ class Wire(QGraphicsItemGroup):
 
         parent = self.state.sym_objects[self.child_key[1]]
         child = self.state.sym_objects[self.parent_key[1]]
-        parent.instance_ports[self.parent_key[2]]['Value'] = None
+        print(parent.instance_ports)
+        parent.instance_ports[self.parent_key[2]]['Value'] = parent.instance_ports[self.parent_key[2]]['Default']
+        child.instance_ports[self.child_key[2]]['Value'] = child.instance_ports[self.child_key[2]]['Default']
         del parent.ui_connections[self.parent_key]
         del child.ui_connections[self.child_key]
         self.state.scene.removeItem(self)

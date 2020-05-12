@@ -157,13 +157,16 @@ class SymObject(QGraphicsItemGroup):
         else:
             self.sim_object_instance = self.sim_object()
         param_dict = self.sim_object_instance._params
-        port_dict = self.sim_object_instance._ports
+        port_dict = get_port_info(self.sim_object_instance)
 
         # Some parameters are included in the class but not in the actual instance_params
         #   given in enumerateParams TODO: look into this!!!
         weird_params = []
-
+        print(port_dict)
         for port, port_info in self.instance_ports.items():
+            port_info["Description"] = port_dict[port]["Description"]
+            port_info["Default"] = port_dict[port]["Default"]
+            port_info["Type"] = port_dict[port]["Type"]
             if port_info["Value"] == None:
                 port_info["Value"] = port_dict.get(port) #load default port
 

@@ -113,6 +113,8 @@ class LineDrawer(QWidget):
         if not parent or not child:
             return -1
 
+        print(child.instance_ports)
+
         key1 = ("parent", child.name, parent_port_name, child_port_name)
         key2 = ("child", parent.name, child_port_name, parent_port_name)
         if portsCompatible(parent.instance_ports[parent_port_name]['Value'],
