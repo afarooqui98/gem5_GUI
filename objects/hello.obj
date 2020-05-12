@@ -1,0 +1,56 @@
+{
+    "0": [
+        {
+            "parent_name": null, 
+            "name": "hello", 
+            "parameters": {
+                "eventq_index": {}, 
+                "goodbye_object": {
+                    "Value": "bye"
+                }, 
+                "number_of_fires": {}, 
+                "time_to_wait": {
+                    "Value": "1ns"
+                }
+            }, 
+            "height": 150.0, 
+            "connections": [], 
+            "width": 300.0, 
+            "connected_objects": [
+                "bye"
+            ], 
+            "y": 550.0, 
+            "x": 725.0, 
+            "z": 0, 
+            "ports": {}, 
+            "component_name": "HelloObject"
+        }
+    ], 
+    "1": [
+        {
+            "parent_name": "hello", 
+            "name": "bye", 
+            "parameters": {
+                "buffer_size": {}, 
+                "write_bandwidth": {}, 
+                "eventq_index": {}
+            }, 
+            "height": 75.0, 
+            "connections": [], 
+            "width": 150.0, 
+            "connected_objects": [], 
+            "y": 625.0, 
+            "x": 725.0, 
+            "z": 1, 
+            "ports": {}, 
+            "component_name": "GoodbyeObject"
+        }
+    ], 
+    "code": {
+        "headers": "import m5, sys, os\nfrom m5.objects import *\nfrom common import SimpleOpts"
+    }, 
+    "parent": "hello", 
+    "parent_pos_x": 725.0, 
+    "parent_pos_y": 550.0, 
+    "object_name": "hello"
+}
