@@ -28,7 +28,9 @@ class ToolBarView():
     def wire_button_pressed(self):
         """changes gui state to allow for wire drawing and
             disable object dragging"""
+        # objects shldnt be movable or selectable
         self.state.drag_state = not self.state.drag_state
+        self.state.select_state = not self.state.select_state
         self.state.draw_wire_state = not self.state.draw_wire_state
         self.state.setSymObjectFlags()
         #update cursor type immediately
