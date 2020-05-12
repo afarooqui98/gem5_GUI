@@ -11,9 +11,9 @@ import sys, random, os, logging, inspect
 
 class State():
     def __init__(self, instances, catalog):
-        self.drag_state = True
-        self.select_state = True
-        self.draw_wire_state = False
+        self.drag_state = True # User can drag the objects
+        self.select_state = True # User can select the objects
+        self.draw_wire_state = False # User can draw wires
         self.sym_objects = {} # Map name to actual symobject (has coords)
         self.selected_sym_objects = []
         self.line_drawer = None

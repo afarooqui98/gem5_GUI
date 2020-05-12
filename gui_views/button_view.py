@@ -486,7 +486,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     root_name , root = traverse_hierarchy_root(\
                                                 self.state.sym_objects, object)
                     err = instantiate_model() #actual m5 instatiation
-
+                    #lock flow so system isnt modifiable
                     self.mainMenu.findChild(QMenu, "File").setEnabled(False)
                     self.state.drag_state = False
                     self.state.setSymObjectFlags()
@@ -554,6 +554,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     #loads objects into scene from file
     def populateScene(self, data):
+        # execute any code saved for user-def simobjects
         imported_modules = data['code']
         if len(imported_modules) > 1: #check if any exist
             self.loadModules(imported_modules)
