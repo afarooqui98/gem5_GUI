@@ -748,7 +748,9 @@ class SymObject(QGraphicsItemGroup):
                     connected_object.ui_connections[new_key] = value
 
         # update member variable
+        del self.state.sym_objects[self.name]
         self.name = newName
+        self.state.sym_objects[newName] = self
         self.state.addToHistory()
 
 

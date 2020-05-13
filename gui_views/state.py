@@ -49,7 +49,7 @@ class State():
     def drawLines(self, p):
         for object in self.sym_objects.values():
             for name, connection in object.ui_connections.items():
-                if name[0] == "parent": #draw line once
+                if name[0] == "parent" and name[1] in self.sym_objects: #draw line once
                     self.drawConnection(p, connection, name, object.name)
 
 
