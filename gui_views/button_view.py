@@ -685,6 +685,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 else:
                     ports[port]["Value"] = None
 
+            ports[port]["Description"] = object.instance_ports[port]["Description"]
+            ports[port]["Default"] = object.instance_ports[port]["Value"]
+
             newObject["ports"] = ports
             newObject["connected_objects"] = copy.copy(object.connected_objects)
 

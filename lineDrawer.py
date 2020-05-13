@@ -1,7 +1,7 @@
 import sys, string, random
-from PySide2.QtWidgets import (QApplication, QLabel, QWidget, QMessageBox)
-from PySide2.QtGui import QPainter, QColor, QPen
-from PySide2.QtCore import Qt, QPoint
+from PySide2.QtWidgets import *
+from PySide2.QtGui import *
+from PySide2.QtCore import *
 from connection import *
 from gui_views import state
 from m5_calls import portsCompatible
@@ -66,6 +66,13 @@ class LineDrawer(QWidget):
 
     def update(self):
         self.state.drawLines(self.pen)
+
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        paste_action = menu.addAction("paste (Ctrl+v)")
+        selected_action = menu.exec_(QCursor.pos())
+        if selected_action == paste_action:
+            self.state.mainWindow.buttonView.paste_button_pressed()
 
     def setObjectConnection(self):
         parent_loc = self.pos1

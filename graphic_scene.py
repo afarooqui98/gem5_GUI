@@ -94,6 +94,7 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(new_object)
         return new_object
 
+
     def addObjectToScene(self, type, component_name, name):
         """Creates symobject representation of object and adds to the scene"""
         # generate random string name for object

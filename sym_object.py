@@ -118,6 +118,16 @@ class SymObject(QGraphicsItemGroup):
         self.state.selected_sym_objects.append(self)
         self.updateHandlesPos()
 
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        copy_action = menu.addAction("copy (Ctrl+C)")
+        inspect_action = menu.addAction("inspect object")
+        selected_action = menu.exec_(QCursor.pos())
+        if selected_action == copy_action:
+            self.state.mainWindow.buttonView.copy_button_pressed()
+        elif selected_action == inspect_action:
+            pass
+
     def get_param_info(self):
         """Get additional info on params such as default values  after
         instantiating object. This information is held in a dictionary produced

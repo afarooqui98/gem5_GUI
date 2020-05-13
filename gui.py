@@ -50,7 +50,6 @@ class MainWindow(QMainWindow):
         self.layout.addLayout(self.gridLayout)
         self.layout.addWidget(self.graphics_view)
 
-
         #add debug window
         self.debug_hidden = False # Flag for toggling debug widget
         self.debug_widget = DebugWidget(self.state)
@@ -63,6 +62,14 @@ class MainWindow(QMainWindow):
         # populate treeview
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
+
+    def toggleInspect(self, isObject, attributeList):
+        if self.inspect_hidden:
+            self.inspect_widget.populate(isObject, attributeList)
+            self.inspect_widget.show()
+        else:
+            self.inspect_widget.clear()
+            self.inspect_widget.hide()
 
     def toggleDebug(self):
         """ Enables or disables the debug widget from being shown"""

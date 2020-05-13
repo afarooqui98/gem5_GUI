@@ -1,4 +1,3 @@
-
 from PySide2.QtGui import *
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
@@ -21,7 +20,6 @@ class State():
         self.mainWindow = None
         self.instances = instances
         self.catalog = catalog
-        self.buttonView = None
         self.fileName = None
         self.copyState = False
         self.copied_objects = []

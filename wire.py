@@ -33,15 +33,19 @@ class Wire(QGraphicsItemGroup):
         self.addToGroup(arrow1)
         self.addToGroup(arrow2)
 
-        # line only recieves double click events if it is selectable
-        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        delete_action = menu.addAction("delete wire")
+        inspect_action = menu.addAction("inspect wire")
+        selected_action = menu.exec_(QCursor.pos())
+        if selected_action == delete_action:
+            self.deleteWire()
+        elif selected_action == inspect_action:
+            pass
 
-    def mouseDoubleClickEvent(self, event):
-        """register mouse press events"""
-
-        # remove bounding box
-        self.setSelected(False)
-
+    def deleteWire(self):
+        """delete all backend entries associate with connection and remove
+        from scene"""
         parent = self.state.sym_objects[self.child_key[1]]
         child = self.state.sym_objects[self.parent_key[1]]
 
@@ -49,21 +53,25 @@ class Wire(QGraphicsItemGroup):
         dialog = deleteWireDialog("Delete connection between " + parent.name +
                                 "." + self.parent_key[2] + " and " + child.name
                                 + "." + self.parent_key[3] + "?")
-
         # if yes, delete
         if dialog.exec_():
-            self.deleteWire()
+            parent.instance_ports[self.parent_key[2]]['Value'] = parent.instance_ports[self.parent_key[2]]['Default']
+            child.instance_ports[self.child_key[2]]['Value'] = child.instance_ports[self.child_key[2]]['Default']
+            del parent.ui_connections[self.parent_key]
+            del child.ui_connections[self.child_key]
+            self.state.scene.removeItem(self)
+            self.state.addToHistory()
 
-    def deleteWire(self):
-        """delete all backend entries associate with connection and remove
-        from scene"""
+    def inspect(self):
+        pass
+        # parent = self.state.sym_objects[self.child_key[1]]
+        # child = self.state.sym_objects[self.parent_key[1]]
+        # parent_port = self.parent_key[2]
+        # child_port = self.parent_key[3]
+        #
+        # print("parent: " + parent.name)
+        # print("port: " + parent.instance_ports[parent_port]['Description'])
+        #
+        # print("child: " + child.name)
+        # print("port: " + child.instance_ports[child_port]['Description'])
 
-        parent = self.state.sym_objects[self.child_key[1]]
-        child = self.state.sym_objects[self.parent_key[1]]
-        print(parent.instance_ports)
-        parent.instance_ports[self.parent_key[2]]['Value'] = parent.instance_ports[self.parent_key[2]]['Default']
-        child.instance_ports[self.child_key[2]]['Value'] = child.instance_ports[self.child_key[2]]['Default']
-        del parent.ui_connections[self.parent_key]
-        del child.ui_connections[self.child_key]
-        self.state.scene.removeItem(self)
-        self.state.addToHistory()
