@@ -107,6 +107,14 @@ class MainWindow(QMainWindow):
             self.attributeView.modifyParam, param))
         table.setCellWidget(table.rowCount() - 1, 1, comboBox)
 
+    def parseParam(self, param):
+        """parse m5.params for cleaner tooltip view"""
+        new_param = param
+        if param[0] == "<":
+            new_param = param.lstrip("<").rstrip(">").split()[1]
+
+        return new_param
+
     def addRow(self, param, value, isTreeWidgetClick, isSimObject):
         """ Adds the param and value to a row of the table."""
         table = self.attributeView.attributeTable
@@ -114,21 +122,22 @@ class MainWindow(QMainWindow):
 
         # set column 0 value with param
         table.setItem(table.rowCount() - 1, 0, QTableWidgetItem(param))
-        cell = table.item(table.rowCount() - 1, 0)
-        cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
-
-        if param != "Name" and param != "Child Objects":
-            cell.setToolTip(self.attributes[param]["Description"])
+        cell_1 = table.item(table.rowCount() - 1, 0)
+        cell_1.setFlags(cell_1.flags() ^ Qt.ItemIsEditable)
 
         # set column 1 value with value
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value))
         if isSimObject: #add a drop down of child objects
             self.createDropDown(value, table, param)
 
-        cell = table.item(table.rowCount() - 1, 1)
-        cell.setFlags(cell.flags() ^ Qt.ItemIsEditable)
+        cell_2 = table.item(table.rowCount() - 1, 1)
+        cell_2.setFlags(cell_2.flags() ^ Qt.ItemIsEditable)
         if not isTreeWidgetClick and value == 'None': # check if param is req
-            cell.setBackground(QColor("indianred"))
+            cell_2.setBackground(QColor("indianred"))
+
+        if param != "Name" and param != "Child Objects":
+            cell_1.setToolTip(self.attributes[param]["Description"])
+            cell_2.setToolTip(self.parseParam(str(self.attributes[param]["Type"])))
 
         self.state.highlightIncomplete()
 

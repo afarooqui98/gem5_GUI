@@ -47,7 +47,14 @@ class AttributeView(): #table view for parameters, as well as the description
     def makeEditable(self, item):
         """ this function feeds into the next one, after the cell is
         changed it will trigger """
-        if len(self.state.selected_sym_objects) != 1 or not item:
+        currentColumn = self.attributeTable.column(item)
+        currentRow = self.attributeTable.row(item)
+        if currentColumn == 1 and  \
+            self.attributeTable.item(currentRow, currentColumn - 1).text() == "Child Objects":
+            return
+
+        if len(self.state.selected_sym_objects) != 1 or not item or \
+         self.attributeTable.item(0,0).text() != "Name":
              return
         # set item to editable
         item.setFlags(item.flags() | Qt.ItemIsEditable)
