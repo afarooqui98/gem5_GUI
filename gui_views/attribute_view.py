@@ -13,7 +13,15 @@ class AttributeView(): #table view for parameters, as well as the description
     def __init__(self, layout, state):
         self.state = state
         #attribute table for an object, is editable
-        self.attributeLayout = QHBoxLayout()
+        self.attributeLayout = QVBoxLayout()
+
+        #search bar for the attributes
+        self.attr_search = QLineEdit()
+        self.attr_search.setPlaceholderText("Search for a attribute flag here!")
+        self.attr_search.setFixedWidth(250)
+        self.attr_search.textChanged.connect(self.searchAttributes)
+        self.attributeLayout.addWidget(self.attr_search)
+
         self.attributeTable = QTableWidget(0,2)
         self.attributeTable.setObjectName("attributeTable")
         self.attributeTable.verticalHeader().setVisible(False)
@@ -37,6 +45,17 @@ class AttributeView(): #table view for parameters, as well as the description
         self.attributeTable.itemDoubleClicked.connect(self.makeEditable)
         self.attributeTable.cellEntered.connect(self.changeCursor)
 
+    def searchAttributes(self):
+        """
+        Searches attribute table based on search bar test
+        """
+        search_string = self.attr_search.text()
+        for rowIndex in range(self.attributeTable.rowCount()):
+            twItem = self.attributeTable.item(rowIndex, 0)
+            if twItem.text().startswith(search_string):
+                self.attributeTable.setRowHidden(rowIndex, False)
+            else:
+                self.attributeTable.setRowHidden(rowIndex, True)
 
     def changeCursor(self, row, col):
         if col == 1:
