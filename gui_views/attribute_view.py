@@ -73,7 +73,8 @@ class AttributeView(): #table view for parameters, as well as the description
             return
 
         if len(self.state.selected_sym_objects) != 1 or not item or \
-         self.attributeTable.item(0,0).text() != "Name":
+         self.attributeTable.item(0,0).text() != "Name" or \
+         currentColumn == 0:
              return
         # set item to editable
         item.setFlags(item.flags() | Qt.ItemIsEditable)
