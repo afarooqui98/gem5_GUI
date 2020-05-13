@@ -17,7 +17,7 @@ class AttributeView(): #table view for parameters, as well as the description
 
         #search bar for the attributes
         self.attr_search = QLineEdit()
-        self.attr_search.setPlaceholderText("Search for a attribute flag here!")
+        self.attr_search.setPlaceholderText("Search for an attribute flag here!")
         self.attr_search.setFixedWidth(250)
         self.attr_search.textChanged.connect(self.searchAttributes)
         self.attributeLayout.addWidget(self.attr_search)
