@@ -79,12 +79,18 @@ class MainWindow(QMainWindow):
             self.debug_widget.hide()
         self.debug_hidden = not self.debug_hidden
 
-    def createDropDown(self, value, table, param):
+    def createDropDown(self, value, table, param, param_type):
         """ Create the drop down for simobject parameters in the table view """
         comboBox = QComboBox()
         # Create list for dropdown including the default value
-        dropdown_list = copy.deepcopy(\
+        con_objects = copy.deepcopy(\
             self.state.selected_sym_objects[0].connected_objects)
+        # Check if the simobject matches the type for the param
+        dropdown_list = []
+        if len(con_objects) > 0:
+            dropdown_list = [x for x in con_objects if \
+                issubclass(type(self.state.sym_objects[x].sim_object_instance),\
+                param_type)]
         if value in dropdown_list:
             dropdown_list.remove(value)
 
@@ -128,7 +134,8 @@ class MainWindow(QMainWindow):
         # set column 1 value with value
         table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value))
         if isSimObject: #add a drop down of child objects
-            self.createDropDown(value, table, param)
+            param_type = self.attributes[param]["Type"]
+            self.createDropDown(value, table, param, param_type)
 
         cell_2 = table.item(table.rowCount() - 1, 1)
         cell_2.setFlags(cell_2.flags() ^ Qt.ItemIsEditable)
