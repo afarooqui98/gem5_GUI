@@ -80,6 +80,7 @@ class State():
     def removeHighlight(self):
         if len(self.selected_sym_objects):
             for sym_object in self.selected_sym_objects:
+                sym_object.setIncomplete()
                 if not sym_object.incomplete:
                     sym_object.rect.setBrush(QColor("White"))
                 else:
@@ -118,15 +119,10 @@ class State():
 
     def highlightIncomplete(self):
         """color the object red if a parameter is not set"""
-        incomplete = False
         for object in self.sym_objects.values():
-            for param in object.instance_params.values():
-                if param["Value"] == 'None' or param["Value"] == None:
-                    object.rect.setBrush(QColor("indianred"))
-                    incomplete = True
-
-            object.incomplete = incomplete
-            incomplete = False
+            object.setIncomplete()
+            if object.incomplete:
+                object.rect.setBrush(QColor("indianred"))
 
     def addToHistory(self):
         state_pos = len(self.history) - self.history_index - 1
