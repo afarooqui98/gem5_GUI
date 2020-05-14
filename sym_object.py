@@ -172,7 +172,7 @@ class SymObject(QGraphicsItemGroup):
         # Some parameters are included in the class but not in the actual instance_params
         #   given in enumerateParams TODO: look into this!!!
         weird_params = []
-        
+
         for port, port_info in self.instance_ports.items():
             port_info["Description"] = port_dict[port]["Description"]
             port_info["Default"] = port_dict[port]["Default"]
@@ -220,12 +220,13 @@ class SymObject(QGraphicsItemGroup):
 
     def initPorts(self):
         """Create the display for the ports on the symobjects"""
-
         del self.ui_ports[:]
         x = self.sceneCoords().left() + self.rect.boundingRect().width() * 3 / 4
         num_ports = len(self.instance_ports)
         delete_button_height = self.delete_button.boundingRect().height()
         next_y = delete_button_height
+        port_scale_factor = 30
+
         for sim_object_instance_port in sorted(self.instance_ports):
             y = self.sceneCoords().top() + next_y
             port_box = QGraphicsRectItem(x, y, self.rect.boundingRect().width() / 4, (self.rect.boundingRect().height() - \
@@ -233,7 +234,7 @@ class SymObject(QGraphicsItemGroup):
             self.addToGroup(port_box)
             port_name = QGraphicsTextItem(sim_object_instance_port)
             font = QFont()
-            font.setPointSize(5)
+            font.setPointSize(self.rect.boundingRect().width()/port_scale_factor)
             port_name.setFont(font)
             port_name.setPos(port_box.boundingRect().center() - \
                 port_name.boundingRect().center())
@@ -262,6 +263,7 @@ class SymObject(QGraphicsItemGroup):
         object.rect_text = QGraphicsTextItem(object.name + "::" +
                                                         object.component_name)
         object.rect_text.setPos(object.rect.boundingRect().topLeft())
+        object.setupDynamicFonts()
 
         # create delete button
         object.delete_button = QGraphicsTextItem('X')
@@ -282,11 +284,27 @@ class SymObject(QGraphicsItemGroup):
         object.setAcceptDrops(True)
         object.setFlag(QGraphicsItem.ItemIsMovable, True)
 
+    def setupDynamicFonts(self):
+        """resize the name text box based on the size of the object"""
+        scaling_factor = 15
+        max_font = 15
+
+        font = QFont()
+        size = self.rect.boundingRect().width()/scaling_factor
+
+        # make sure name text box doesnt get too big
+        if size > max_font:
+            size = max_font
+
+        font.setPointSize(size)
+        self.rect_text.setFont(font)
+
     def moveUIObject(self):
         self.rect_text.setPos(self.rect.boundingRect().topLeft())
         self.delete_button.setPos(self.rect.boundingRect().topRight() -
                                 self.delete_button.boundingRect().topRight())
         self.rect_text.setTextWidth(self.rect.boundingRect().width() - 20)
+        self.setupDynamicFonts()
 
     def handleAt(self, point):
         """
