@@ -2,6 +2,7 @@ from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from graphic_scene import *
+from dialogs import *
 
 import sys, random
 import copy
@@ -76,8 +77,17 @@ class CatalogView(): #dropdown and search bar
 
         if len(self.state.selected_sym_objects) == 1:
             new_parent = self.state.selected_sym_objects[0]
+
+            # confirm that user wants to add a subobject to selected object
+            dialog = addChildDialog("Add " + name + " as child of " + \
+                                                        new_parent.name + "?")
+            if not dialog.exec_():
+                return
+
         self.state.removeHighlight()
+
         del self.state.selected_sym_objects[:]
+
         #modify state to accomodate the new object
         new_object = \
             self.state.scene.addObjectToScene("component", item.text(0), name)

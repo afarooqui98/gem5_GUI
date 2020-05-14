@@ -80,3 +80,22 @@ class errorDialog(QDialog):
         self.layout.addWidget(self.text)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
+
+class addChildDialog(QDialog):
+    def __init__(self, dialogText):
+        super(addChildDialog, self).__init__()
+
+        self.setWindowTitle("Add new child")
+        QBtn = QDialogButtonBox.Yes | QDialogButtonBox.No
+
+        self.text = QLabel(self)
+        self.text.setText(dialogText)
+
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.text)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
