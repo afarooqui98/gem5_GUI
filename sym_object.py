@@ -306,6 +306,15 @@ class SymObject(QGraphicsItemGroup):
         self.rect_text.setTextWidth(self.rect.boundingRect().width() - 20)
         self.setupDynamicFonts()
 
+    def setIncomplete(self):
+        incomplete = False
+
+        for param in self.instance_params.values():
+            if param["Value"] == 'None' or param["Value"] == None:
+                incomplete = True
+
+        self.incomplete = incomplete
+
     def handleAt(self, point):
         """
         Returns the resize handle below the given point.
@@ -346,6 +355,7 @@ class SymObject(QGraphicsItemGroup):
         # get object that was clicked on (since multiple objects can be stacked
         # on top of each other)
         clicked = self.getClickedObject(event)
+
         #bring clicked object to foreground so drag events have object clarity
         clicked.setZValue(100)
 
@@ -365,9 +375,6 @@ class SymObject(QGraphicsItemGroup):
             self.state.removeHighlight()
             del self.state.selected_sym_objects[:]
 
-        # show button for current object
-        clicked.rect.setBrush(QColor("Green"))
-
         # add clicked to list if not present and update attributes for it
         if not clicked in self.state.selected_sym_objects:
             self.state.selected_sym_objects.append(clicked)
@@ -379,6 +386,14 @@ class SymObject(QGraphicsItemGroup):
             table = self.state.mainWindow.attributeView.attributeTable
             table.clear()
             table.setRowCount(0)
+
+        clicked.setIncomplete()
+
+        # show button for current object
+        if clicked.incomplete:
+            clicked.rect.setBrush(QColor("darkRed"))
+        else:
+            clicked.rect.setBrush(QColor("Green"))
 
     def delete(self):
         # attach children so all children get removed when parent does
@@ -731,6 +746,7 @@ class SymObject(QGraphicsItemGroup):
 
         for child_name in self.connected_objects:
             self.removeFromGroup(self.state.sym_objects[child_name])
+            self.state.sym_objects[child_name].detachChildren()
 
     def updateName(self, newName):
         """updates a symobjects name"""
