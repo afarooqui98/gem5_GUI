@@ -25,6 +25,7 @@ class State():
         self.copied_objects = []
         self.mostRecentSaved = True
         self.zoom = 1
+
         # Store imported code in state
         self.imported_code = {}
         self.imported_code['headers'] = "import m5, sys, os"
