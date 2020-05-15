@@ -68,7 +68,7 @@ class AttributeView(): #table view for parameters, as well as the description
         changed it will trigger """
         currentColumn = self.attributeTable.column(item)
         currentRow = self.attributeTable.row(item)
-        if currentColumn == 1 and  \
+        if currentColumn == 1 and \
             self.attributeTable.item(currentRow, currentColumn - 1).text() == "Child Objects":
             return
 

@@ -143,7 +143,7 @@ def set_param_value(simobject, symobject, param, param_info, m5_children):
                     + " for " + symObject.component_name)
                 else:
                     param_info["Value"] = result
-            setattr(simobject, param, param_info["Value"])
+                setattr(simobject, param, param_info["Value"])
         else:
             if str(param_info["Value"]) in symobject.connected_objects:
                 logging.error("object exists and can be parameterized")
