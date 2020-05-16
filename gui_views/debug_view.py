@@ -11,7 +11,7 @@ import json
 import logging
 
 class DebugWidget(QWidget):
-    """ Displays options for development and allows enabling of these options"""
+    """Displays options for development and allows enabling of these options"""
     def __init__(self, state):
         super(DebugWidget, self).__init__()
         self.state = state
@@ -35,7 +35,7 @@ class DebugWidget(QWidget):
         self.stdout_box = QCheckBox("Log to Stdout")
         self.stdout_box.toggled.connect(lambda:self.btnState(self.stdout_box))
 
-        #search bar for the debug flags
+        # search bar for the debug flags
         self.flag_search = QLineEdit()
         self.flag_search.setPlaceholderText("Search for a debug flag here!")
         self.flag_search.setFixedWidth(250)
@@ -44,6 +44,7 @@ class DebugWidget(QWidget):
         self.flag_list = self.createFlagList()
         self.flag_list.resize(250, 250)
 
+        # Add widgets to layout
         self.debug_layout.addWidget(self.file_box)
         self.debug_layout.addWidget(self.logfile_edit)
         self.debug_layout.addWidget(self.stdout_box)
@@ -52,25 +53,24 @@ class DebugWidget(QWidget):
         self.debug_layout.addStretch(5)
         self.debug_layout.setSpacing(10)
 
+        # Add debug layout to the main layout
         self.setLayout(self.debug_layout)
         self.switch_debug_output()
 
 
     def searchFlag(self, text):
         """ Search the list widget for flags that match the text"""
-
         for row in range(self.flag_list.count()):
-            it = self.flag_list.item(row)
+            flag = self.flag_list.item(row)
             if text:
-                it.setHidden(not text in it.text())
+                flag.setHidden(not text in flag.text())
             else:
-                it.setHidden(False)
-
+                flag.setHidden(False)
 
 
     def switch_debug_output(self):
         """ This handler switches between stdout and a file for debug msgs"""
-        #Get rid of current stream
+        # Get rid of current stream
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
 
@@ -79,6 +79,7 @@ class DebugWidget(QWidget):
             logfile = self.logfile_edit.text()
             if '.' not in logfile:
                 logfile += '.log'
+
             logging.basicConfig(filename=logfile, filemode='w', level= \
                 logging.DEBUG, format='%(name)s - %(levelname)s - %(message)s')
         else:
@@ -91,7 +92,8 @@ class DebugWidget(QWidget):
         if box.text() == "Log to File":
             if box.isChecked():
                 self.stdout_box.setChecked(False)
-                self.logfile_edit.setReadOnly(False) #shld not edit filename
+                # should not edit filename
+                self.logfile_edit.setReadOnly(False)
                 self.debug_statements = True
                 self.switch_debug_output()
 
@@ -111,6 +113,7 @@ class DebugWidget(QWidget):
             flag_item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             flag_item.setCheckState(Qt.Unchecked)
             flag_list.addItem(flag_item)
+
         flag_list.itemClicked.connect(self.flagEnable)
         return flag_list
 
