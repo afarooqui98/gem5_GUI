@@ -1,3 +1,9 @@
+import sys
+import random
+import os
+import logging
+import inspect
+
 from PySide2.QtGui import *
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
@@ -6,10 +12,9 @@ from graphic_scene import *
 from connection import *
 from wire import *
 
-import sys, random, os, logging, inspect
-
 class State():
     def __init__(self, instances, catalog):
+        """initialize state and backend datastructures"""
         self.drag_state = True # User can drag the objects
         self.select_state = True # User can select the objects
         self.draw_wire_state = False # User can draw wires
@@ -36,8 +41,8 @@ class State():
         self.history_index = 0
         self.history = []
 
-    # sets object flags in scene based on drag_state
     def setSymObjectFlags(self):
+        """sets object flags in scene based on drag_state"""
         for object in self.sym_objects.values():
             object.setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
             object.setFlag(QGraphicsItem.ItemIsSelectable, self.select_state)
@@ -45,16 +50,16 @@ class State():
             object.setAcceptHoverEvents(self.drag_state)
             object.rect.setAcceptHoverEvents(self.drag_state)
 
-
-    # draws each line in lines using the QPen p
     def drawLines(self, p):
+        """draws each line in lines using the QPen p"""
         for object in self.sym_objects.values():
             for name, connection in object.ui_connections.items():
                 if name[0] == "parent" and name[1] in self.sym_objects: #draw line once
                     self.drawConnection(p, connection, name, object.name)
 
-
     def drawConnection(self, p, connection, parent_key, parent_name):
+        """draw actual line and create a wire object"""
+
         # remove old line if it exists
         if connection.line:
             self.scene.removeItem(connection.line)
@@ -79,8 +84,10 @@ class State():
         connection.line.setZValue(1000)
 
     def removeHighlight(self):
+        """clear the highlight from any selected object"""
         if len(self.selected_sym_objects):
             for sym_object in self.selected_sym_objects:
+                # sets the incomplete variable of all sym objects
                 sym_object.setIncomplete()
                 if not sym_object.incomplete:
                     sym_object.rect.setBrush(QColor("White"))
@@ -89,9 +96,9 @@ class State():
 
                 sym_object.delete_button.hide()
 
-
     def updateObjs(self, imported_catalog, imported_instances, filename):
-        """ Update the catalog and instance tree with new objects. """
+        """Update the catalog and instance tree with new objects. """
+
         if filename in self.catalog:
             logging.debug("already imported file")
             return
@@ -109,10 +116,10 @@ class State():
                 #Store the src code in state
                 src_code = inspect.getsource(imported_instances[name])
                 self.imported_code[filename][name] = src_code
+
         self.catalog.update(imported_catalog)
         self.instances.update(imported_instances)
         self.mainWindow.repopulate(imported_catalog)
-
 
     def addObjectToCatalog(self, object, object_name):
         """add the passed in imported object to the catalog"""
@@ -127,25 +134,30 @@ class State():
 
     def addToHistory(self):
         state_pos = len(self.history) - self.history_index - 1
-        #not most current state
+
+        # not most current state
         if state_pos > 0:
             #remove elements from history
             for i in range(state_pos):
                 self.history.pop()
+
         history = self.mainWindow.buttonView.getOutputData(self.sym_objects)
         self.history.append(history)
+
         self.history_index = len(self.history) - 1
         if self.history_index:
             self.mainWindow.buttonView.undo.setEnabled(True)
             self.mainWindow.buttonView.redo.setEnabled(False)
             self.mostRecentSaved = False
 
-#finds the gem5 path
 def get_path():
+    """finds the gem5 path"""
     gem5_parent_dir = os.getenv("GEM5_HOME")
-    #if parent dir not explicitly set, procure it from executable path
+
+    # if parent dir not explicitly set, procure it from executable path
     if not gem5_parent_dir:
         gem5_parent_dir = sys.executable.split("gem5")[0]
+
     for root, dirs, files in os.walk(gem5_parent_dir, topdown=False):
         for name in dirs:
             abs_path = os.path.join(root, name)

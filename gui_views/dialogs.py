@@ -1,10 +1,10 @@
+import sys
+
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 
 from graphic_scene import *
-
-import sys
 
 class instantiateDialog(QDialog):
     def __init__(self, state):
@@ -20,14 +20,14 @@ class instantiateDialog(QDialog):
                             any values. As such, we will save before
                             continuing.""")
 
-        self.button_box = QDialogButtonBox(QBtn)
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
         # Create new layout for the dialog box and add text/button widgets to it
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button_box)
+        self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
 
@@ -43,14 +43,14 @@ class saveChangesDialog(QDialog):
         self.text = QLabel(self)
         self.text.setText("Would you like to save before " + reason + "?")
 
-        self.button_box = QDialogButtonBox(QBtn)
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
         # Create new layout for the dialog box and add text/button widgets to it
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button_box)
+        self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
 
@@ -65,14 +65,14 @@ class deleteWireDialog(QDialog):
         self.text = QLabel(self)
         self.text.setText(dialogText)
 
-        self.button_box = QDialogButtonBox(QBtn)
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
         # Create new layout for the dialog box and add text/button widgets to it
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button_box)
+        self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
 
@@ -88,13 +88,13 @@ class errorDialog(QDialog):
         self.text = QLabel(self)
         self.text.setText(msg)
 
-        self.button_box = QDialogButtonBox(QBtn)
-        self.button_box.accepted.connect(self.accept)
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
 
         # Create new layout for the dialog box and add text/button widgets to it
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button_box)
+        self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
 
@@ -109,12 +109,12 @@ class addChildDialog(QDialog):
         self.text = QLabel(self)
         self.text.setText(dialogText)
 
-        self.button_box = QDialogButtonBox(QBtn)
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
         # Create new layout for the dialog box and add text/button widgets to it
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button_box)
+        self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)

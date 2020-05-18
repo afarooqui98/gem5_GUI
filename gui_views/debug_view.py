@@ -1,14 +1,15 @@
+import sys, random
+import copy
+import json
+import logging
+
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from graphic_scene import *
 from m5_calls import *
 
-import sys, random
-import copy
 from gui_views import state
-import json
-import logging
 
 class DebugWidget(QWidget):
     """Displays options for development and allows enabling of these options"""
@@ -16,67 +17,67 @@ class DebugWidget(QWidget):
         super(DebugWidget, self).__init__()
         self.state = state
         self.flags = get_debug_flags()
-        self.debug_layout = QVBoxLayout()
-        self.debug_statements = True
+        self.debugLayout = QVBoxLayout()
+        self.debugStatements = True
 
         # Add check box to redirect debug statements to log file
-        self.file_box = QCheckBox("Log to File")
-        self.file_box.setChecked(True)
-        self.file_box.stateChanged.connect(lambda:self.btnState(self.file_box))
+        self.fileBox = QCheckBox("Log to File")
+        self.fileBox.setChecked(True)
+        self.fileBox.stateChanged.connect(lambda:self.btnState(self.fileBox))
 
         # Add input to edit name of log file
-        self.logfile_edit = QLineEdit()
-        self.logfile_edit.setPlaceholderText("Enter filename")
-        self.logfile_edit.setText("debug.log")
-        self.logfile_edit.setFixedWidth(150)
-        self.logfile_edit.editingFinished.connect(self.switch_debug_output)
+        self.logfileEdit = QLineEdit()
+        self.logfileEdit.setPlaceholderText("Enter filename")
+        self.logfileEdit.setText("debug.log")
+        self.logfileEdit.setFixedWidth(150)
+        self.logfileEdit.editingFinished.connect(self.switchDebugOutput)
 
         # Add check box to redirect debug statements to stdout
-        self.stdout_box = QCheckBox("Log to Stdout")
-        self.stdout_box.toggled.connect(lambda:self.btnState(self.stdout_box))
+        self.stdoutBox = QCheckBox("Log to Stdout")
+        self.stdoutBox.toggled.connect(lambda:self.btnState(self.stdoutBox))
 
         # search bar for the debug flags
-        self.flag_search = QLineEdit()
-        self.flag_search.setPlaceholderText("Search for a debug flag here!")
-        self.flag_search.setFixedWidth(250)
-        self.flag_search.textChanged.connect(self.searchFlag)
+        self.flagSearch = QLineEdit()
+        self.flagSearch.setPlaceholderText("Search for a debug flag here!")
+        self.flagSearch.setFixedWidth(250)
+        self.flagSearch.textChanged.connect(self.searchFlag)
 
-        self.flag_list = self.createFlagList()
-        self.flag_list.resize(250, 250)
+        self.flagList = self.createFlagList()
+        self.flagList.resize(250, 250)
 
         # Add widgets to layout
-        self.debug_layout.addWidget(self.file_box)
-        self.debug_layout.addWidget(self.logfile_edit)
-        self.debug_layout.addWidget(self.stdout_box)
-        self.debug_layout.addWidget(self.flag_search)
-        self.debug_layout.addWidget(self.flag_list, 50)
-        self.debug_layout.addStretch(5)
-        self.debug_layout.setSpacing(10)
+        self.debugLayout.addWidget(self.fileBox)
+        self.debugLayout.addWidget(self.logfileEdit)
+        self.debugLayout.addWidget(self.stdoutBox)
+        self.debugLayout.addWidget(self.flagSearch)
+        self.debugLayout.addWidget(self.flagList, 50)
+        self.debugLayout.addStretch(5)
+        self.debugLayout.setSpacing(10)
 
         # Add debug layout to the main layout
-        self.setLayout(self.debug_layout)
-        self.switch_debug_output()
+        self.setLayout(self.debugLayout)
+        self.switchDebugOutput()
 
 
     def searchFlag(self, text):
         """ Search the list widget for flags that match the text"""
-        for row in range(self.flag_list.count()):
-            flag = self.flag_list.item(row)
+        for row in range(self.flagList.count()):
+            flag = self.flagList.item(row)
             if text:
                 flag.setHidden(not text in flag.text())
             else:
                 flag.setHidden(False)
 
 
-    def switch_debug_output(self):
+    def switchDebugOutput(self):
         """ This handler switches between stdout and a file for debug msgs"""
         # Get rid of current stream
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
 
-        if self.debug_statements:
+        if self.debugStatements:
             # redirect debug msgs to file
-            logfile = self.logfile_edit.text()
+            logfile = self.logfileEdit.text()
             if '.' not in logfile:
                 logfile += '.log'
 
@@ -91,18 +92,18 @@ class DebugWidget(QWidget):
         """ If file_box or stdout_box are checked the other shld be unchecked"""
         if box.text() == "Log to File":
             if box.isChecked():
-                self.stdout_box.setChecked(False)
+                self.stdoutBox.setChecked(False)
                 # should not edit filename
-                self.logfile_edit.setReadOnly(False)
-                self.debug_statements = True
-                self.switch_debug_output()
+                self.logfileEdit.setReadOnly(False)
+                self.debugStatements = True
+                self.switchDebugOutput()
 
         if box.text() == "Log to Stdout":
             if box.isChecked():
-                self.file_box.setChecked(False)
-                self.logfile_edit.setReadOnly(True)
-                self.debug_statements = False
-                self.switch_debug_output()
+                self.fileBox.setChecked(False)
+                self.logfileEdit.setReadOnly(True)
+                self.debugStatements = False
+                self.switchDebugOutput()
 
     def createFlagList(self):
         """ Create list widget with all the debug flags"""
