@@ -1,10 +1,15 @@
-import sys, string, random
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
+import random
+import string
+import sys
+
 from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
+
+from m5_calls import portsCompatible
+
 from connection import *
 from gui_views import state
-from m5_calls import portsCompatible
 
 class LineDrawer(QWidget):
 
@@ -15,7 +20,7 @@ class LineDrawer(QWidget):
         self.initUI()
         self.setMouseTracking(True)
 
-    # sets up the line position objects and state variable
+    # sets up the line position objects
     def initUI(self):
         self.pos1 = None
         self.pos2 = None
@@ -35,6 +40,8 @@ class LineDrawer(QWidget):
             table.setRowCount(0)
 
     def mouseMoveEvent(self, event):
+        """if we are drawing a line, delete previous line and redraw to current
+        mouse position"""
         if self.state.draw_wire_state and self.pos1:
             self.pos2 = event.pos()
             line = self.state.scene.addLine(self.pos1.x(), self.pos1.y(), \
@@ -47,6 +54,7 @@ class LineDrawer(QWidget):
             self.line.setZValue(1000)
 
     def mouseReleaseEvent(self, event):
+        """check if a valid connection was made, reset line drawing variables"""
         if self.state.draw_wire_state and self.pos1 and self.pos2:
             valid_connection = self.setObjectConnection()
             self.pos1 = None
@@ -54,10 +62,11 @@ class LineDrawer(QWidget):
             if valid_connection < 0:
                 if valid_connection == -1: #line badly drawn
                     ok = QMessageBox.warning(self.state.mainWindow,
-                     "Alert!", "Invalid line")
+                     "Alert!", "Line must connect two ports")
                 if valid_connection == -2: #port connection incompatible
                     ok = QMessageBox.warning(self.state.mainWindow,
-                     "Error!", "You are drawing a line between\ntwo incompatible wires.")
+                     "Error!", "You are drawing a line between \
+                     two incompatible wires.")
 
             self.state.scene.removeItem(self.line)
             self.line = None
@@ -65,6 +74,7 @@ class LineDrawer(QWidget):
             self.state.mostRecentSaved = False
 
     def update(self):
+        """redraw all lines in the scene"""
         self.state.drawLines(self.pen)
 
     def contextMenuEvent(self, event):
@@ -75,6 +85,7 @@ class LineDrawer(QWidget):
             self.state.mainWindow.buttonView.paste_button_pressed()
 
     def setObjectConnection(self):
+        """Sets up connection objects, calculates line positions"""
         parent_loc = self.pos1
         child_loc = self.pos2
         parent, child = None, None
@@ -116,12 +127,13 @@ class LineDrawer(QWidget):
                 next_y += (sym_object.height - delete_button_height) / num_ports
                 count = count + 1
 
-        #create connection, add to parent and child
+        # create connection, add to parent and child
         if not parent or not child:
             return -1
 
         key1 = ("parent", child.name, parent_port_name, child_port_name)
         key2 = ("child", parent.name, child_port_name, parent_port_name)
+        # sets up backend port information
         if portsCompatible(parent.instance_ports[parent_port_name]['Value'],
             child.instance_ports[child_port_name]['Value']):
             parent.ui_connections[key1] = Connection(self.pos1, self.pos2,
