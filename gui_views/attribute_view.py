@@ -89,7 +89,7 @@ class AttributeView(): #table view for parameters, as well as the description
     def modifyParam(self, currentAttribute, updatedValue):
         """Given the current Attribute(param) and a new value entered in the
             gui, update the current symobject's value for the parameter"""
-        instance_params = self.state.selected_sym_objects[0].instance_params
+        instance_params = self.state.selected_sym_objects[0].instanceParams
         # if the value is name or connected objects, set the param instead of
         # the dict
         if currentAttribute not in instance_params:
@@ -97,7 +97,7 @@ class AttributeView(): #table view for parameters, as well as the description
             #TODO look into this check, it seems like we do not need it
             if "Value" not in instance_params[currentAttribute]:
                 catalog = self.state.catalog
-                name = self.state.selected_sym_objects[0].component_name
+                name = self.state.selected_sym_objects[0].componentName
                 instance_params[currentAttribute]["Value"] = updatedValue
                 instance_params[currentAttribute]["Type"] = \
                     catalog["SimObject"][name]['ports'][currentAttribute]['Type']
@@ -137,7 +137,7 @@ class AttributeView(): #table view for parameters, as well as the description
 
             self.state.sym_objects[current_name] = self.state.selected_sym_objects[0]
         # elif currentAttribute == "Child Objects":
-        #     self.state.selected_sym_objects[0].connected_objects = currentValue
+        #     self.state.selected_sym_objects[0].connectedObjects = currentValue
         #     self.state.line_drawer.connectSubObject(self.state.selected_sym_objects[0].name,
         #                                         currentValue)
         else:

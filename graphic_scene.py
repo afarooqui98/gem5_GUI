@@ -52,11 +52,11 @@ class GraphicsScene(QGraphicsScene):
 
     def setSymObjectFields(self, sym_object, new_object):
         """Sets backend fields for the sym object"""
-        sym_object.instance_params = new_object["parameters"]
-        sym_object.connected_objects = new_object["connected_objects"]
-        sym_object.parent_name = new_object["parent_name"]
+        sym_object.instanceParams = new_object["parameters"]
+        sym_object.connectedObjects = new_object["connected_objects"]
+        sym_object.parentName = new_object["parent_name"]
         sym_object.z = new_object["z"]
-        sym_object.instance_ports = convert(new_object["ports"])
+        sym_object.instancePorts = convert(new_object["ports"])
 
     def setSymObjectConnections(self, sym_object, new_object):
         """Builds the connection dictionary for the sym object"""
@@ -76,7 +76,7 @@ class GraphicsScene(QGraphicsScene):
                 connection["key"][2], connection["key"][3])
             new_object_connections[key] = new_connection
 
-        sym_object.ui_connections = new_object_connections
+        sym_object.uiConnections = new_object_connections
 
 
     def loadSavedObject(self, type, name, new_object):
@@ -112,7 +112,7 @@ class GraphicsScene(QGraphicsScene):
         if component_name == "Root":
             #user created a root object, can instantiate now
             self.state.mainWindow.buttonView.instantiate.setEnabled(True)
-        new_object.delete_button.show()
+        new_object.deleteButton.show()
         new_object.rect.setBrush(QColor("Green"))
 
         self.addItem(new_object)
