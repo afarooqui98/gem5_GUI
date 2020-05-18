@@ -12,7 +12,7 @@ import json
 class AttributeView(): #table view for parameters, as well as the description
     def __init__(self, layout, state):
         self.state = state
-        #attribute table for an object, is editable
+
         self.attributeLayout = QVBoxLayout()
 
         #search bar for the attributes
@@ -22,6 +22,7 @@ class AttributeView(): #table view for parameters, as well as the description
         self.attr_search.textChanged.connect(self.searchAttributes)
         self.attributeLayout.addWidget(self.attr_search)
 
+        #attribute table for an object, is editable
         self.attributeTable = QTableWidget(0,2)
         self.attributeTable.setObjectName("attributeTable")
         self.attributeTable.verticalHeader().setVisible(False)
@@ -33,6 +34,7 @@ class AttributeView(): #table view for parameters, as well as the description
 
         layout.addLayout(self.attributeLayout)
         self.attributeTable.setMouseTracking(True)
+        
         #description label
         self.label = QLabel()
         self.label.setFrameStyle(QFrame.Panel | QFrame.Sunken)
@@ -76,6 +78,7 @@ class AttributeView(): #table view for parameters, as well as the description
          self.attributeTable.item(0,0).text() != "Name" or \
          currentColumn == 0:
              return
+
         # set item to editable
         item.setFlags(item.flags() | Qt.ItemIsEditable)
         self.attributeTable.itemChanged.connect(self.modifyFields)
@@ -111,6 +114,7 @@ class AttributeView(): #table view for parameters, as well as the description
     def modifyFields(self, item):
         """ this signal disconnects itself after finishing execution,
          since we only want to trigger it AFTER a double press """
+
         # get attributes
         currentColumn = self.attributeTable.column(item)
         currentRow = self.attributeTable.row(item)

@@ -37,8 +37,8 @@ class CatalogView(): #dropdown and search bar
         self.treeWidget.itemClicked.connect(self.state.removeHighlight)
         self.treeWidget.itemDoubleClicked.connect(self.createSymObject)
 
-    #this creates a new symobject at some point in the CanvasView
     def createSymObject(self, item):
+        """this creates a new SymObject at some point in the CanvasView"""
         if item.parent() is None:
             return
 
@@ -61,13 +61,13 @@ class CatalogView(): #dropdown and search bar
                 self.state.mainWindow.buttonView.importFromFile(filename)
                 return
 
-        name, ok = QInputDialog.getText(self.state.mainWindow, "Alert", \
+        name, ok = QInputDialog.getText(self.state.mainWindow, "New Object", \
                                         "New SimObject name:")
         if not ok:
             return
 
         if name in self.state.sym_objects:
-            ok = QMessageBox.about(self.state.mainWindow, "Alert", \
+            ok = QMessageBox.about(self.state.mainWindow, "Error", \
                             "SimObject with name: " + name + " already exists!")
             if not ok:
                 pass
@@ -89,6 +89,7 @@ class CatalogView(): #dropdown and search bar
         del self.state.selected_sym_objects[:]
 
         #modify state to accomodate the new object
+        # print(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
         new_object = \
             self.state.scene.addObjectToScene("component", item.text(0), name)
         new_object.instance_params = \
@@ -100,6 +101,7 @@ class CatalogView(): #dropdown and search bar
         #eager instantiation
         new_object.instantiateSimObject()
 
+        #find incomplete parameters and indicate them in the AttributeView
         self.state.highlightIncomplete()
 
         # if sub object is being added through catalog
@@ -113,6 +115,7 @@ class CatalogView(): #dropdown and search bar
                 hasChildren = True
                 lastChild = self.state.sym_objects[new_parent.connected_objects[-1]]
                 child.setPos(lastChild.scenePos().x() + 10, lastChild.scenePos().y() + 10)
+
             # configure child as a UI subobject of parent
             new_parent.addSubObject(child)
 
@@ -137,15 +140,12 @@ class CatalogView(): #dropdown and search bar
 
         self.state.mostRecentSaved = False
         self.state.addToHistory()
-        #allow instantiation ONLY when root is on the canvas
-        #if self.state.selected_sym_objects.component_name == "Root":
-        #    self.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
-    # make tree view searchable
     def searchItem(self):
         """
         Searches treeview whenever a user types something in the search bar
         """
+        
         # Get string in the search bar and use treeview's search fn
         search_string = self.edit.text()
         match_items = self.treeWidget.findItems(search_string, Qt.MatchContains

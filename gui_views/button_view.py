@@ -36,22 +36,28 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     def buildFileTab(self, mainMenu, window):
         """build the file tab"""
+
         newAction = QAction("New File", window)
         newAction.setShortcut("Ctrl+N")
-        newAction.triggered.connect(self.new_button_pressed)
+
         saveAction = QAction("Save", window)
         saveAction.setShortcut("Ctrl+S")
-        saveAction.triggered.connect(self.save_button_pressed)
+
         saveAsAction = QAction("Save As", window)
         saveAsAction.setShortcut(QKeySequence("Ctrl+Shift+S"))
-        saveAsAction.triggered.connect(self.save_as_UI_button_pressed)
+
         openAction = QAction("Open", window)
         openAction.setShortcut("Ctrl+O")
-        openAction.triggered.connect(self.openUI_button_pressed)
+
         exportAction = QAction("Export UI Object", window)
-        exportAction.triggered.connect(self.export_object_button_pressed)
         importAction = QAction("Import UI Object", window)
-        importAction.triggered.connect(self.import_object_button_pressed)
+
+        #set up handlers
+        newAction.triggered.connect(self.newButtonPressed)
+        saveAction.triggered.connect(self.saveButtonPressed)
+        saveAsAction.triggered.connect(self.saveAsUIButtonPressed)
+        openAction.triggered.connect(self.openUIButtonPressed)
+        importAction.triggered.connect(self.importObjectButtonPressed)
 
         fileMenu = mainMenu.addMenu('File')
         fileMenu.setObjectName("File")
@@ -66,17 +72,25 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         """build the edit tab"""
         copyAction = QAction("Copy", window)
         copyAction.setShortcut("Ctrl+C")
-        copyAction.triggered.connect(self.copy_button_pressed)
+
         pasteAction = QAction("Paste", window)
         pasteAction.setShortcut("Ctrl+V")
-        pasteAction.triggered.connect(self.paste_button_pressed)
+
+
         undoAction = QAction("Undo", window)
         undoAction.setShortcut("Ctrl+Z")
-        undoAction.triggered.connect(self.undo_button_pressed)
+
+
         redoAction = QAction("Redo", window)
         redoAction.setShortcut(QKeySequence("Ctrl+Shift+Z"))
-        redoAction.triggered.connect(self.redo_button_pressed)
 
+        #handlers for the edit tab
+        copyAction.triggered.connect(self.copyButtonPressed)
+        pasteAction.triggered.connect(self.pasteButtonPressed)
+        undoAction.triggered.connect(self.undoButtonPressed)
+        redoAction.triggered.connect(self.redoButtonPressed)
+
+        #add to menu
         editMenu = mainMenu.addMenu('Edit')
         editMenu.addAction(copyAction)
         editMenu.addAction(pasteAction)
@@ -93,12 +107,16 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         """build the view tab"""
         zoomIn = QAction("Zoom In", window)
         zoomIn.setShortcut(QKeySequence.ZoomIn) #ctrl shift +
-        zoomIn.triggered.connect(lambda: self.zoom(1.05 * self.state.zoom))
+
         zoomOut = QAction("Zoom Out", window)
         zoomOut.setShortcut(QKeySequence("Ctrl+Shift+-"))
-        zoomOut.triggered.connect(lambda: self.zoom(.95 * self.state.zoom))
+
         zoomReset = QAction("Reset Zoom", window)
         zoomReset.setShortcut(QKeySequence("Ctrl+Shift+0"))
+
+        #actions for zoom in and zoom out
+        zoomOut.triggered.connect(lambda: self.zoom(.95 * self.state.zoom))
+        zoomIn.triggered.connect(lambda: self.zoom(1.05 * self.state.zoom))
         zoomReset.triggered.connect(lambda: self.zoom(1))
 
         viewMenu = mainMenu.addMenu('View')
@@ -110,10 +128,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         """build the run tab"""
         instantiateAction = QAction("Instantiate", window)
         instantiateAction.setShortcut("Ctrl+I")
-        instantiateAction.triggered.connect(self.export_button_pressed)
+
         simulateAction = QAction("Simulate", window)
         simulateAction.setShortcut("Ctrl+R")
-        simulateAction.triggered.connect(self.simulate_button_pressed)
+
+        #handlers
+        instantiateAction.triggered.connect(self.exportButtonPressed)
+        simulateAction.triggered.connect(self.simulateButtonPressed)
 
         runMenu = mainMenu.addMenu('Run')
         runMenu.addAction(instantiateAction)
@@ -149,13 +170,16 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             tokens = full_path.split('/')
             dir_path = '/'.join(tokens[:len(tokens) - 1]) + '/'
             sys.path.append(dir_path)
+
             module_name = tokens[len(tokens) - 1].split('.')[0]
             modules = [key for key in sys.modules.keys()]
             import_module(module_name, package=full_path)
+
             clsmembers = inspect.getmembers(sys.modules[module_name], \
                 inspect.isclass)
             clsmembers = filter(lambda x: x[1].__module__ not in modules, \
                 clsmembers)
+
             self.updateState(clsmembers, module_name)
         except ValueError:
             dialog = errorDialog(self.state, "Did not select file to import")
@@ -217,7 +241,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             json.dump(savedObjects, outfile, indent=4)
 
 
-    def import_object_button_pressed(self):
+    def importObjectButtonPressed(self):
         """let user select file and import object"""
         # show dialog box for user to select a file to open
         filename = QFileDialog.getOpenFileName(None, 'Open file',
@@ -318,12 +342,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 subObjects.append(child)
                 self.createChildList(child, subObjects)
 
-    def new_button_pressed(self):
+    def newButtonPressed(self):
         # check if any changes have been made - to save before closing
         if not self.state.mostRecentSaved:
             dialog = saveChangesDialog("opening a new file", self.state)
             if dialog.exec_():
-                self.save_button_pressed()
+                self.saveButtonPressed()
 
         self.clearScene()
         del self.state.history[:]
@@ -331,7 +355,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.undo.setEnabled(False)
         self.redo.setEnabled(False)
 
-    def copy_button_pressed(self):
+    def copyButtonPressed(self):
         logging.debug("copy button pressed")
         if not len(self.state.selected_sym_objects):
             return
@@ -353,7 +377,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 self.state.copied_objects.append(child)
                 self.addChildren(child)
 
-    def paste_button_pressed(self):
+    def pasteButtonPressed(self):
         if not self.state.copyState:
             return
 
@@ -443,7 +467,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
 
     #TODO
-    def undo_button_pressed(self):
+    def undoButtonPressed(self):
         self.clearScene()
         self.state.history_index -= 1
         self.populateSceneFromHistory(self.state.history[self.state.history_index])
@@ -455,7 +479,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.redo.setEnabled(True)
 
     #TODO
-    def redo_button_pressed(self):
+    def redoButtonPressed(self):
         self.clearScene()
         self.state.history_index += 1
         self.populateSceneFromHistory(self.state.history[self.state.history_index])
@@ -475,13 +499,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.scene.resizeScene()
 
     # creates a python file that can be run with gem5
-    def export_button_pressed(self):
+    def exportButtonPressed(self):
         dlg = instantiateDialog(self.state)
         if dlg.exec_():
             logging.debug("Export Success!")
             self.instantiate.setEnabled(False)
             self.simulate.setEnabled(True)
-            self.save_button_pressed() #want to save before instantiation
+            self.saveButtonPressed() #want to save before instantiation
             for object in self.state.sym_objects.values():
                 if object.component_name == "Root":
                     root_name , root = traverse_hierarchy_root(\
@@ -496,7 +520,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                             "An error occured when instantiating!")
                         if dialog.exec_(): return
 
-    def simulate_button_pressed(self):
+    def simulateButtonPressed(self):
         """creates a python file that can be run with gem5"""
         err = simulate()
         if err:
@@ -504,13 +528,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
              "An error occured when simulating!")
             if dialog.exec_(): return
 
-    def openUI_button_pressed(self):
+    def openUIButtonPressed(self):
         """loads .ui file into gui"""
         # check if any changes have been made - to save before closing
         if not self.state.mostRecentSaved:
             dialog = saveChangesDialog("opening a new file", self.state)
             if dialog.exec_():
-                self.save_button_pressed()
+                self.saveButtonPressed()
 
         # show dialog box for user to select a file to open
         filename = QFileDialog.getOpenFileName(None, 'Open file',
@@ -691,6 +715,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             connections = []
 
+            #storing connection metadata
             for c in object.ui_connections:
                 newConnection = {}
                 newConnection["key"] = c
@@ -718,7 +743,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         return savedObjects
 
-    def save_button_pressed(self):
+    def saveButtonPressed(self):
         """saves current state to open file if it exists, otherwise use dialog
         to select new file to save to"""
         # check if file is already open
@@ -748,7 +773,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.mostRecentSaved = True
 
-    def save_as_UI_button_pressed(self):
+    def saveAsUIButtonPressed(self):
         """saves gui state to a .ui file, shows dialog to select output file
         regardless of whether file exists in the state"""
         # show dialog box to let user create output file
