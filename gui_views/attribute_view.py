@@ -1,12 +1,14 @@
+import copy
+import json
+import random
+import sys
+
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
-from graphic_scene import *
 
-import sys, random
-import copy
+from graphic_scene import *
 from gui_views import state
-import json
 
 
 class AttributeView(): #table view for parameters, as well as the description
@@ -34,7 +36,7 @@ class AttributeView(): #table view for parameters, as well as the description
 
         layout.addLayout(self.attributeLayout)
         self.attributeTable.setMouseTracking(True)
-        
+
         #description label
         self.label = QLabel()
         self.label.setFrameStyle(QFrame.Panel | QFrame.Sunken)

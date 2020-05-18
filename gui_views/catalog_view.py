@@ -1,13 +1,15 @@
+import copy
+import json
+import random
+import sys
+
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
-from graphic_scene import *
-from dialogs import *
 
-import sys, random
-import copy
+from dialogs import *
+from graphic_scene import *
 from gui_views import state
-import json
 
 class CatalogView(): #dropdown and search bar
     def __init__(self, layout, catalog, state):
@@ -145,7 +147,7 @@ class CatalogView(): #dropdown and search bar
         """
         Searches treeview whenever a user types something in the search bar
         """
-        
+
         # Get string in the search bar and use treeview's search fn
         search_string = self.edit.text()
         match_items = self.treeWidget.findItems(search_string, Qt.MatchContains

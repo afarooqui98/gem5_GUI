@@ -1,18 +1,19 @@
+import copy
+import logging
+import imp
+import inspect
+import json
+import random
+import sys
+from importlib import import_module
+
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from graphic_scene import *
+
 from dialogs import *
-
-import sys, random, imp
-import copy
 from gui_views import state
-import json
-import logging
-import inspect
-from importlib import import_module
-
-
 from m5_calls import *
 
 class ButtonView(): #export, draw line, save and load self.stateuration buttons
