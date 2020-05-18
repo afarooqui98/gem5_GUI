@@ -1,17 +1,22 @@
-import sys
-import os
 import inspect
 import logging
-from gui_views.state import *
+import os
+import sys
+
+from gui_views.state import get_path
+
 get_path()
 sys.path.append(os.getenv('gem5_path'))
+
+from common import ObjectList
 import m5.objects
 from m5.objects import *
 from m5.params import *
 from m5.proxy import AttrProxy
-from common import ObjectList
+
 
 def portsCompatible(parent, child):
+    """ Checks if two port values are compatible for connections """
     compatible = False
     try:
         compatible = Port.is_compat(parent, child)
@@ -21,18 +26,17 @@ def portsCompatible(parent, child):
     return compatible
 
 
-def get_port_info(m5_object):
+def getPortInfo(m5_object):
     """ Given a gem5 object class create a dictionary containing info on
         the objects ports"""
     port_dict = {} #Save port info for the objects
     for port_name, port in m5_object._ports.items():
         port_attr = {"Description": port.desc, 'Name': port_name, \
         'Value': port, 'Default': port, 'Type': Port}
-
         port_dict[port_name] = port_attr
     return port_dict
 
-def get_param_info(m5_object):
+def getParamInfo(m5_object):
     """ Given a gem5 object class create a dictionary containing info on
         the objects parameter."""
     param_dict = {}
@@ -47,7 +51,7 @@ def get_param_info(m5_object):
         param_dict[pname] = param_attr
     return param_dict
 
-def obj_tree_preprocessing(obj_tree):
+def objTreePreprocessing(obj_tree):
     """ Any preprocessing on the paramters or ports for any gem5 object is
         done in this fn before passing it to the gui"""
     # Root has a default value for eventq_indexthat referecnes a Parent which
@@ -61,9 +65,9 @@ def get_obj_lists():
     """ Given a set of predertimened base classes creates two dictionaries used
         for metadata purposes in the gui.
 
-        The first is a nested dictionary which maps base object names to another
-        dictionary which maps the sub-object name to a dictionary containing
-        parameter info.
+        The first is a nested dictionary which maps base object names to
+        another dictionary which maps the sub-object name to a dictionary
+        containing parameter info.
 
         The second dictionary maps an object's name to the actual class in
         m5.objects to be used for instantiating objects.
@@ -94,18 +98,17 @@ def get_obj_lists():
             else:
                 set_subtypes.add(sub_obj_name)
 
-            instance_tree[sub_obj_name] = sub_obj_inst #Save the object instance
-
-            port_dict = get_port_info(obj_list._sub_classes[sub_obj_name])
-            param_dict = get_param_info(obj_list._sub_classes[sub_obj_name])
-
+            #Save the object instance
+            instance_tree[sub_obj_name] = sub_obj_inst
+            port_dict = getPortInfo(obj_list._sub_classes[sub_obj_name])
+            param_dict = getParamInfo(obj_list._sub_classes[sub_obj_name])
             sub_objs[sub_obj_name] = {'params': param_dict, 'ports': port_dict}
 
         if base_obj == 'SimObject':
             base_obj = 'Other'
         obj_tree[base_obj] = sub_objs
 
-    obj_tree_preprocessing(obj_tree)
+    objTreePreprocessing(obj_tree)
 
     return obj_tree, instance_tree
 
@@ -113,8 +116,7 @@ def isSimObjectParam(param_info):
     """ Given metadata of parameter see if it is a SimObject Param"""
     return issubclass(param_info["Type"], SimObject)
 
-
-def set_param_value(simobject, symobject, param, param_info, m5_children):
+def setParamValue(simobject, symobject, param, param_info, m5_children):
     """ Set a certain param for the simobject instance. This entails multiple
         checks to see how the value of the param is set """
     # Check if the user changed the parameter's value ie the type of the value
@@ -148,7 +150,7 @@ def set_param_value(simobject, symobject, param, param_info, m5_children):
             if str(param_info["Value"]) in symobject.connected_objects:
                 logging.error("object exists and can be parameterized")
 
-def traverse_params(sym_catalog, symobject, simobject):
+def traverseParams(sym_catalog, symobject, simobject):
     """ Recursively goes through object tree starting at symobject and
     set parameters and child objects for corresponding simobject instance"""
 
@@ -164,15 +166,15 @@ def traverse_params(sym_catalog, symobject, simobject):
 
     # Setting the paramerters for the object instance
     for param, param_info in symobject.instance_params.items():
-        set_param_value(simobject, symobject, param, param_info, m5_children)
+        setParamValue(simobject, symobject, param, param_info, m5_children)
 
     # Recurse for the objects children
     for m_child in m5_children:
-        traverse_params(sym_catalog, sym_catalog[m_child[0]], m_child[1])
+        traverseParams(sym_catalog, sym_catalog[m_child[0]], m_child[1])
 
     return (symobject.name, simobject)
 
-def set_port_value(port, port_info, sym_catalog, simobject):
+def setPortValue(port, port_info, sym_catalog, simobject):
     """Create a port connection between two simobjects"""
     if isinstance(port_info["Value"], str):
         values = port_info["Value"].split(".")
@@ -181,21 +183,20 @@ def set_port_value(port, port_info, sym_catalog, simobject):
             getattr(sym_catalog[values[0]].sim_object_instance,values[1]))
     else:
         logging.debug("Port value for " + port + " is not set")
-        #TODO figure out why its getting into else case
 
-def traverse_ports(sym_catalog, symobject, simobject):
-    """ Traverse object tree starting at simobject and set ports recursively """
+def traversePorts(sym_catalog, symobject, simobject):
+    """Traverse object tree starting at simobject and set ports recursively"""
     for port, port_info in symobject.instance_ports.items():
         if isinstance(simobject, list): #for vector param value
             for i in range(len(simobject)):
-                set_port_value(port, port_info, sym_catalog, simobject[i])
+                setPortValue(port, port_info, sym_catalog, simobject[i])
         else:
             #nonvector param value
-            set_port_value(port, port_info, sym_catalog, simobject)
+            setPortValue(port, port_info, sym_catalog, simobject)
 
     #set ports for children
     for child in symobject.connected_objects:
-        traverse_ports(sym_catalog, sym_catalog[child],\
+        traversePorts(sym_catalog, sym_catalog[child],\
             getattr(simobject, child))
 
     return symobject.name, simobject
@@ -206,8 +207,8 @@ def traverse_hierarchy_root(sym_catalog, symroot):
     simroot = None
     try:
         root = symroot.sim_object_instance
-        name, simroot = traverse_params(sym_catalog, symroot, root)
-        name, simroot = traverse_ports(sym_catalog, symroot, simroot)
+        name, simroot = traverseParams(sym_catalog, symroot, root)
+        name, simroot = traversePorts(sym_catalog, symroot, simroot)
     except:
         e = sys.exc_info()[0]
         logging.error("Could not create simobject tree due to %s" % e.__name__)
@@ -220,9 +221,10 @@ def get_imported_obs(obj_clss, filename):
     instances = {}
     for name, cls in obj_clss:
         if name != 'SimObject':
-            port_dict = get_port_info(cls)
-            param_dict = get_param_info(cls)
-            mini_tree[filename][name] = {'params': param_dict, 'ports': port_dict}
+            port_dict = getPortInfo(cls)
+            param_dict = getParamInfo(cls)
+            mini_tree[filename][name] = \
+                {'params': param_dict, 'ports': port_dict}
             instances[name] = cls
     return mini_tree, instances
 
@@ -234,6 +236,7 @@ def get_debug_flags():
         logging.error("Erorr returning debug flags %s" % e.__name__)
 
 def instantiate_model():
+    """ Instantiate the model on the gui """
     try:
         m5.instantiate()
         return False
@@ -244,6 +247,7 @@ def instantiate_model():
 
 
 def simulate():
+    """ Simulate the model on the gui """
     try:
         exit_event = m5.simulate()
         print('Exiting @ tick %i because %s' %(m5.curTick(), \
@@ -256,7 +260,8 @@ def simulate():
 
 
 def getRoot():
-    print("finding root inst")
+    """ Singleton type fn for Root simobject instance """
+    logging.debug("finding root inst")
     if Root.getInstance() == None:
         return Root()
     else:
