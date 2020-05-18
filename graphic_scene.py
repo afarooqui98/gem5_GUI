@@ -1,15 +1,15 @@
-
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-
-from lineDrawer import *
-from PySide2.QtCore import *
-from gui_views import state
-from sym_object import *
-import string
-import random
 import collections
 import copy
+import random
+import string
+
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
+
+from gui_views import state
+from lineDrawer import *
+from sym_object import *
 
 def convert(data):
     """convert a dictionary with unicode keys and values to utf-8"""
@@ -36,27 +36,31 @@ class GraphicsScene(QGraphicsScene):
         self.setLineDrawer()
         self.addWidget(self.state.line_drawer)
 
-    def loadSavedObject(self, type, name, newObject):
-        """load object from saved UI file"""
-        x = newObject["x"]
-        y = newObject["y"]
-        z = newObject["z"]
-        width = newObject["width"]
-        height = newObject["height"]
-        component_name = convert(newObject["component_name"])
-        parameters = newObject["parameters"]
-        connected_objects = newObject["connected_objects"]
-        parent = newObject["parent_name"]
-        connections = convert(newObject["connections"])
+    def loadSymObject(self, name, new_object):
+        """Creates the sym object from the necessary UI fields"""
+        x = new_object["x"]
+        y = new_object["y"]
+        width = new_object["width"]
+        height = new_object["height"]
+        component_name = convert(new_object["component_name"])
+        if component_name == "Root":
+            #found a root object loaded in from a ui file
+            self.state.mainWindow.buttonView.instantiate.setEnabled(True)
 
-        new_object = SymObject(x, y, width, height, self, component_name, name,
+        return SymObject(x, y, width, height, self, component_name, name,
             True, self.state)
-        new_object.instanceParams = parameters
-        new_object.connectedObjects = connected_objects
-        new_object.parentName = parent
-        new_object.z = z
-        new_object.instancePorts = convert(newObject["ports"])
 
+    def setSymObjectFields(self, sym_object, new_object):
+        """Sets backend fields for the sym object"""
+        sym_object.instanceParams = new_object["parameters"]
+        sym_object.connectedObjects = new_object["connected_objects"]
+        sym_object.parentName = new_object["parent_name"]
+        sym_object.z = new_object["z"]
+        sym_object.instancePorts = convert(new_object["ports"])
+
+    def setSymObjectConnections(self, sym_object, new_object):
+        """Builds the connection dictionary for the sym object"""
+        connections = convert(new_object["connections"])
         new_object_connections = {}
 
         # rebuild the connection dictionary for the object
@@ -72,27 +76,29 @@ class GraphicsScene(QGraphicsScene):
                 connection["key"][2], connection["key"][3])
             new_object_connections[key] = new_connection
 
-        new_object.uiConnections = new_object_connections
+        sym_object.uiConnections = new_object_connections
+
+
+    def loadSavedObject(self, type, name, new_object):
+        """load object from saved UI file"""
+        sym_object = self.loadSymObject(name, new_object)
+        self.setSymObjectFields(sym_object, new_object)
+        self.setSymObjectConnections(sym_object, new_object)
+        sym_object.initPorts()
+        # instantiate the simobject and set its parameters
+        sym_object.load_instantiate()
 
         # add new object to backend datastructures
-        self.state.sym_objects[name] = new_object
-        new_object.initPorts()
-
-        # instantiate the simobject and set its parameters
-        new_object.load_instantiate()
-
-        if component_name == "Root":
-            #found a root object loaded in from a ui file
-            self.state.mainWindow.buttonView.instantiate.setEnabled(True)
+        self.state.sym_objects[name] = sym_object
 
         self.state.highlightIncomplete()
-        self.addItem(new_object)
-        return new_object
+        self.addItem(sym_object)
+        return sym_object
 
 
     def addObjectToScene(self, type, component_name, name):
         """Creates symobject representation of object and adds to the scene"""
-        # generate random string name for object
+        # generate random string name for object if none provided by user
         if not name:
             name = ''.join(random.choice(string.ascii_lowercase)
                             for i in range(7))
@@ -112,31 +118,18 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(new_object)
         return new_object
 
-    def dragEnterEvent(self,event):
-        """if an object is dragged into the scene"""
-        if self.state.drag_state:
-            event.accept()
-
-    def dragMoveEvent(self,event):
-        """if an object is dragged around on the scene"""
-        if self.state.drag_state:
-            event.accept()
-
-    def dropEvent(self,event):
-        """if an object is dropped on the scene"""
-        if self.state.drag_state:
-            event.accept()
-        else:
-            return
 
     def resizeScene(self):
+        """Resize the graphics scene based on zoom value"""
         scale = self.state.zoom
         rect = self.itemsBoundingRect()
-        self.setSceneRect(rect.x(), rect.y(), self.default_width / scale, self.default_height / scale)
+        self.setSceneRect(rect.x(), rect.y(), self.default_width / scale,
+                self.default_height / scale)
         self.setLineDrawer()
 
 
     def setLineDrawer(self):
+        """Initialize line drawer"""
         self.state.line_drawer.resize(self.width(), self.height())
 
         # change background of canvas to light gray

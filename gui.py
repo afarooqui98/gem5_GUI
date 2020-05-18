@@ -83,12 +83,16 @@ class MainWindow(QMainWindow):
         # Create list for dropdown including the default value
         connected_objects = copy.deepcopy(\
             self.state.selected_sym_objects[0].connectedObjects)
-        # Check if the simobject matches the type for the param
-        sim_obj_type = type(self.state.sym_objects[x].simObjectInstance)
+
         dropdown_list = []
         if len(connected_objects) > 0:
-            dropdown_list = [obj for obj in connected_objects if \
-                issubclass(sim_obj_type, param_type)]
+            for obj in connected_object:
+                # Check if the simobject matches the type for the param
+                sim_obj_type = \
+                    type(self.state.sym_objects[obj].simObjectInstance)
+                if issubclass(sim_obj_type, param_type):
+                    dropdown_list.append(obj)
+
         if value in dropdown_list:
             # value for the param should at the top of the drop down
             dropdown_list.remove(value)
