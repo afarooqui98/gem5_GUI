@@ -1,7 +1,11 @@
+import copy
+import functools
+import logging
+import sys
 
 from PySide2.QtCore import *
-from PySide2.QtWidgets import *
 from PySide2.QtGui import *
+from PySide2.QtWidgets import *
 
 from graphic_scene import *
 from gui_views.catalog_view import *
@@ -13,12 +17,6 @@ from gui_views.toolbar_view import *
 from gui_views.state import *
 from m5_calls import isSimObjectParam
 
-import sys, random
-import copy
-import json
-import functools
-import logging
-
 
 class MainWindow(QMainWindow):
     """this class creates the main window"""
@@ -26,7 +24,6 @@ class MainWindow(QMainWindow):
     def __init__(self, catalog, instances):
         super(MainWindow, self).__init__()
         self.state = State(instances, catalog)
-        #self.setWindowTitle("gem5 GUI | Untitled")
         self.main = QWidget()
         self.catalog = catalog
         self.setLayoutDirection(Qt.LeftToRight)
@@ -43,17 +40,17 @@ class MainWindow(QMainWindow):
         #add attributes
         self.attributeView = AttributeView(self.gridLayout, self.state)
 
-        self.state.scene = GraphicsScene(0,0, 1750, 1250, self.state)
-        self.graphics_view = QGraphicsView(self.state.scene)
+        self.state.scene = GraphicsScene(0, 0, 1750, 1250, self.state)
+        self.graphicsView = QGraphicsView(self.state.scene)
 
         self.layout = QHBoxLayout()
         self.layout.addLayout(self.gridLayout)
-        self.layout.addWidget(self.graphics_view)
+        self.layout.addWidget(self.graphicsView)
 
         #add debug window
-        self.debug_hidden = False # Flag for toggling debug widget
-        self.debug_widget = DebugWidget(self.state)
-        self.layout.addWidget(self.debug_widget)
+        self.debugHidden = False # Flag for toggling debug widget
+        self.debugWidget = DebugWidget(self.state)
+        self.layout.addWidget(self.debugWidget)
         self.toggleDebug()
 
         self.main.setLayout(self.layout)
@@ -63,88 +60,89 @@ class MainWindow(QMainWindow):
         self.populate()
         self.catalogView.treeWidget.itemClicked.connect(self.treeWidgetClicked)
 
-    def toggleInspect(self, isObject, attributeList):
-        if self.inspect_hidden:
-            self.inspect_widget.populate(isObject, attributeList)
-            self.inspect_widget.show()
+    def toggleInspect(self, is_object, attribute_list):
+        """ Enables or disables the inspect menu for gui items """
+        if self.inspectHidden:
+            self.inspectWidget.populate(is_object, attribute_list)
+            self.inspectWidget.show()
         else:
-            self.inspect_widget.clear()
-            self.inspect_widget.hide()
+            self.inspectWidget.clear()
+            self.inspectWidget.hide()
 
     def toggleDebug(self):
         """ Enables or disables the debug widget from being shown"""
-        if self.debug_hidden:
-            self.debug_widget.show()
+        if self.debugHidden:
+            self.debugWidget.show()
         else:
-            self.debug_widget.hide()
-        self.debug_hidden = not self.debug_hidden
+            self.debugWidget.hide()
+        self.debugHidden = not self.debugHidden
 
-    def createDropDown(self, value, table, param, param_type):
+    def createDropDown(self, value, attr_table, param, param_type):
         """ Create the drop down for simobject parameters in the table view """
-        comboBox = QComboBox()
+        combo_box = QComboBox()
         # Create list for dropdown including the default value
-        con_objects = copy.deepcopy(\
+        connected_objects = copy.deepcopy(\
             self.state.selected_sym_objects[0].connected_objects)
         # Check if the simobject matches the type for the param
+        sim_obj_type = type(self.state.sym_objects[x].sim_object_instance)
         dropdown_list = []
-        if len(con_objects) > 0:
-            dropdown_list = [x for x in con_objects if \
-                issubclass(type(self.state.sym_objects[x].sim_object_instance),\
-                param_type)]
+        if len(connected_objects) > 0:
+            dropdown_list = [obj for obj in connected_objects if \
+                issubclass(sim_obj_type, param_type)]
         if value in dropdown_list:
+            # value for the param should at the top of the drop down
             dropdown_list.remove(value)
 
         # Make whatever value or default value the first option
         dropdown_list = [value] + dropdown_list
-
-        cbstyle = ""
 
         #Check if param is req
         if dropdown_list[0] == 'None':
               cbstyle = " QComboBox {"
               cbstyle += " background: red;"
               cbstyle += "}"
+              combo_box.setStyleSheet(cbstyle)
 
-        comboBox.setStyleSheet(cbstyle)
-
-        comboBox.addItems(dropdown_list)
+        combo_box.addItems(dropdown_list)
         # Add event handler to update values in the symobject structure
-        comboBox.currentTextChanged.connect(functools.partial(\
+        combo_box.currentTextChanged.connect(functools.partial(\
             self.attributeView.modifyParam, param))
-        table.setCellWidget(table.rowCount() - 1, 1, comboBox)
+        attr_table.setCellWidget(attr_table.rowCount() - 1, 1, combo_box)
 
     def parseParam(self, param):
         """parse m5.params for cleaner tooltip view"""
         new_param = param
         if param[0] == "<":
             new_param = param.lstrip("<").rstrip(">").split()[1]
-
         return new_param
 
-    def addRow(self, param, value, isTreeWidgetClick, isSimObject):
+    def addRow(self, param, value, is_tree_widget, is_sim_obj):
         """ Adds the param and value to a row of the table."""
-        table = self.attributeView.attributeTable
-        table.insertRow(table.rowCount())
+        attr_table = self.attributeView.attributeTable
+        attr_table.insertRow(attr_table.rowCount())
 
         # set column 0 value with param
-        table.setItem(table.rowCount() - 1, 0, QTableWidgetItem(param))
-        cell_1 = table.item(table.rowCount() - 1, 0)
+        attr_table.setItem(attr_table.rowCount() - 1, 0, \
+            QTableWidgetItem(param))
+        cell_1 = attr_table.item(attr_table.rowCount() - 1, 0)
         cell_1.setFlags(cell_1.flags() ^ Qt.ItemIsEditable)
 
         # set column 1 value with value
-        table.setItem(table.rowCount() - 1, 1, QTableWidgetItem(value))
-        if isSimObject: #add a drop down of child objects
+        attr_table.setItem(attr_table.rowCount() - 1, 1,\
+            QTableWidgetItem(value))
+        if is_sim_obj: #add a drop down of child simobjects
             param_type = self.attributes[param]["Type"]
-            self.createDropDown(value, table, param, param_type)
+            self.createDropDown(value, attr_table, param, param_type)
 
-        cell_2 = table.item(table.rowCount() - 1, 1)
+        cell_2 = attr_table.item(attr_table.rowCount() - 1, 1)
         cell_2.setFlags(cell_2.flags() ^ Qt.ItemIsEditable)
-        if not isTreeWidgetClick and value == 'None': # check if param is req
+        if not is_tree_widget and value == 'None': # check if param is req
             cell_2.setBackground(QColor("indianred"))
 
         if param != "Name" and param != "Child Objects":
             cell_1.setToolTip(self.attributes[param]["Description"])
-            cell_2.setToolTip(self.parseParam(str(self.attributes[param]["Type"])))
+            cell_2.setToolTip(\
+                self.parseParam(str(self.attributes[param]["Type"])))
 
         self.state.highlightIncomplete()
 
@@ -152,22 +150,9 @@ class MainWindow(QMainWindow):
     def treeWidgetClicked(self, item, name):
         self.populateAttributes(item, name, True)
 
-    def populateAttributes(self, item, name, isTreeWidgetClick):
-        """Populate the attribute table holding info for an objects
-            params and children"""
-        table = self.attributeView.attributeTable
-        table.clear()
-        table.setRowCount(0)
-
-        # If there is an object being viewed on the board display the name and
-        #   connected objects as well
-        if len(self.state.selected_sym_objects) == 1:
-            cur_object = self.state.selected_sym_objects[0]
-            self.addRow("Name", cur_object.name,
-                        isTreeWidgetClick, False)
-            self.addRow("Child Objects",
-                        ", ".join(cur_object.connected_objects),
-                        isTreeWidgetClick, False)
+    def loadAttributes(self, item, name):
+        """ Set the attributes member variable, which contains values for the
+        params, based on the current conext of the object selected"""
         if item:
             if item.parent() is None or item.text(0) in \
                                                 self.state.importedSymObjects:
@@ -176,7 +161,7 @@ class MainWindow(QMainWindow):
                 self.catalog[item.parent().text(0)][item.text(0)]['params']
         else:
             # only load from param list if there is a sym object in the context
-            if len(self.state.selected_sym_objects) == 1 or \
+            if len(self.state.selectedSymObjects) == 1 or \
                 self.state.selected_sym_objects[0].component_name == name:
                 self.attributes = \
                     self.state.selected_sym_objects[0].instance_params
@@ -184,15 +169,35 @@ class MainWindow(QMainWindow):
                 logging.debug("filling in name branch")
                 self.attributes = self.catalog[name]
 
+
+    def populateAttributes(self, item, name, is_tree_widget_click):
+        """Populate the attribute table holding info for an objects
+            params and children"""
+        attr_table = self.attributeView.attributeTable
+        attr_table.clear()
+        attr_table.setRowCount(0)
+
+        # If there is an object being viewed on the board display the name and
+        #   connected objects as well
+        if len(self.state.selected_sym_objects) == 1:
+            cur_object = self.state.selected_sym_objects[0]
+            self.addRow("Name", cur_object.name, is_tree_widget_click, False)
+            self.addRow("Child Objects", \
+                        ", ".join(cur_object.connected_objects), \
+                        is_tree_widget_click, False)
+
+        self.loadAttributes(item, name)
+
         # display the param name and values
         for attribute in sorted(self.attributes.keys()):
             # Simobject params are special cases with dropdowns in the table
             isSim = False
+            param = self.attributes[attribute]
             if len(self.state.selected_sym_objects) > 0:
                 isSim = self.state.selected_sym_objects[0] and \
-                    isSimObjectParam(self.attributes[attribute])
-            self.addRow(attribute, str(self.attributes[attribute]["Value"]),
-                                                    isTreeWidgetClick, isSim)
+                    isSimObjectParam(param)
+            self.addRow(attribute, str(param["Value"]), \
+                is_tree_widget_click, isSim)
 
     def repopulate(self, imported_catalog):
         """Adds newly imported sub_objs and updates the catalog"""
@@ -219,7 +224,6 @@ class MainWindow(QMainWindow):
         """create new entry in catalog for imported objects"""
         parent_item = self.catalogView.treeWidget.findItems(\
             "Imported Objects", Qt.MatchContains)
-
         if not parent_item:
             self.catalog["Imported Objects"] = {}
             tree_item = QTreeWidgetItem(["Imported Objects"])
@@ -238,12 +242,14 @@ class MainWindow(QMainWindow):
                 self.buttonView.save_button_pressed()
 
 if __name__ == "__m5_main__":
-    import sys
     import os
-    sys.path.append(os.getenv('gem5_path'))
+    import sys
+
     import m5.objects
+
     from common import ObjectList
     from m5_calls import get_obj_lists
+    sys.path.append(os.getenv('gem5_path'))
 
     # use gem5 to get list of objects
     obj_tree, instance_tree = get_obj_lists()
