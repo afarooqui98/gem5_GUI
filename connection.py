@@ -6,15 +6,15 @@ class Connection:
 
     def __init__(self, parent_endpoint, child_endpoint, parent_port_num,
         child_port_num):
-        self.parent_endpoint = parent_endpoint
-        self.child_endpoint = child_endpoint
-        self.parent_port_num = parent_port_num
-        self.child_port_num = child_port_num
+        self.parentEndpoint = parent_endpoint
+        self.childEndpoint = child_endpoint
+        self.parentPortNum = parent_port_num
+        self.childPortNum = child_port_num
         self.line = None
 
     # sets new endpoints for the line (None passed in if unmodified)
     def setEndpoints(self, parent_endpoint, child_endpoint):
         if parent_endpoint is not None:
-            self.parent_endpoint = parent_endpoint
+            self.parentEndpoint = parent_endpoint
         if child_endpoint is not None:
-            self.child_endpoint = child_endpoint
+            self.childEndpoint = child_endpoint

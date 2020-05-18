@@ -8,7 +8,7 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 from gui_views import state
-from lineDrawer import *
+from line_drawer import *
 from sym_object import *
 
 def convert(data):
@@ -30,11 +30,11 @@ class GraphicsScene(QGraphicsScene):
     def __init__(self, x, y, width, height, state):
         super(GraphicsScene, self).__init__(x, y, width, height)
         self.state = state
-        self.default_width = width
-        self.default_height = height
-        self.state.line_drawer = LineDrawer(state)
+        self.defaultWidth = width
+        self.defaultHeight = height
+        self.state.lineDrawer = LineDrawer(state)
         self.setLineDrawer()
-        self.addWidget(self.state.line_drawer)
+        self.addWidget(self.state.lineDrawer)
 
     def loadSymObject(self, name, new_object):
         """Creates the sym object from the necessary UI fields"""
@@ -89,7 +89,7 @@ class GraphicsScene(QGraphicsScene):
         sym_object.load_instantiate()
 
         # add new object to backend datastructures
-        self.state.sym_objects[name] = sym_object
+        self.state.symObjects[name] = sym_object
 
         self.state.highlightIncomplete()
         self.addItem(sym_object)
@@ -107,7 +107,7 @@ class GraphicsScene(QGraphicsScene):
         new_object = SymObject(0, 0, 150, 75, self, component_name, name,
                                 False, self.state)
 
-        self.state.sym_objects[name] = new_object
+        self.state.symObjects[name] = new_object
 
         if component_name == "Root":
             #user created a root object, can instantiate now
@@ -123,17 +123,17 @@ class GraphicsScene(QGraphicsScene):
         """Resize the graphics scene based on zoom value"""
         scale = self.state.zoom
         rect = self.itemsBoundingRect()
-        self.setSceneRect(rect.x(), rect.y(), self.default_width / scale,
-                self.default_height / scale)
+        self.setSceneRect(rect.x(), rect.y(), self.defaultWidth / scale,
+                self.defaultHeight / scale)
         self.setLineDrawer()
 
 
     def setLineDrawer(self):
         """Initialize line drawer"""
-        self.state.line_drawer.resize(self.width(), self.height())
+        self.state.lineDrawer.resize(self.width(), self.height())
 
         # change background of canvas to light gray
         pal = QPalette()
         pal.setColor(QPalette.Background, Qt.lightGray)
-        self.state.line_drawer.setAutoFillBackground(True)
-        self.state.line_drawer.setPalette(pal)
+        self.state.lineDrawer.setAutoFillBackground(True)
+        self.state.lineDrawer.setPalette(pal)

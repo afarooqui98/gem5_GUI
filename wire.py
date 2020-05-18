@@ -14,8 +14,8 @@ class Wire(QGraphicsItemGroup):
         # set line passed in
         graphicsLine = QGraphicsLineItem(line)
         graphicsLine.setPen(pen)
-        self.parent_key = None
-        self.child_key = None
+        self.parentKey = None
+        self.childKey = None
         self.state = state
 
         self.addToGroup(graphicsLine)
@@ -51,23 +51,23 @@ class Wire(QGraphicsItemGroup):
     def deleteWire(self):
         """delete all backend entries associate with connection and remove
         from scene"""
-        parent = self.state.sym_objects[self.child_key[1]]
-        child = self.state.sym_objects[self.parent_key[1]]
+        parent = self.state.symObjects[self.childKey[1]]
+        child = self.state.symObjects[self.parentKey[1]]
 
         # confirm deletion
         dialog = deleteWireDialog("Delete connection between " + parent.name +
-                                "." + self.parent_key[2] + " and " + child.name
-                                + "." + self.parent_key[3] + "?")
+                                "." + self.parentKey[2] + " and " + child.name
+                                + "." + self.parentKey[3] + "?")
         # if yes, delete
         if dialog.exec_():
             # reset port values to default
-            parent.instancePorts[self.parent_key[2]]['Value'] = \
-                    parent.instancePorts[self.parent_key[2]]['Default']
-            child.instancePorts[self.child_key[2]]['Value'] = \
-                    child.instancePorts[self.child_key[2]]['Default']
+            parent.instancePorts[self.parentKey[2]]['Value'] = \
+                    parent.instancePorts[self.parentKey[2]]['Default']
+            child.instancePorts[self.childKey[2]]['Value'] = \
+                    child.instancePorts[self.childKey[2]]['Default']
             #delete connection from each object's connection dictionary
-            del parent.uiConnections[self.parent_key]
-            del child.uiConnections[self.child_key]
+            del parent.uiConnections[self.parentKey]
+            del child.uiConnections[self.childKey]
             #remove item from scene, add action to history
             self.state.scene.removeItem(self)
             self.state.addToHistory()
@@ -75,13 +75,13 @@ class Wire(QGraphicsItemGroup):
     # TODO: fix and finish this function
     def inspect(self):
         pass
-        # parent = self.state.sym_objects[self.child_key[1]]
-        # child = self.state.sym_objects[self.parent_key[1]]
-        # parent_port = self.parent_key[2]
-        # child_port = self.parent_key[3]
+        # parent = self.state.symObjects[self.childKey[1]]
+        # child = self.state.symObjects[self.parentKey[1]]
+        # parent_port = self.parentKey[2]
+        # child_port = self.parentKey[3]
         #
         # print("parent: " + parent.name)
         # print("port: " + parent.instancePorts[parent_port]['Description'])
         #
         # print("child: " + child.name)
-        # print("port: " + child.instance_ports[child_port]['Description'])
+        # print("port: " + child.instancePorts[child_port]['Description'])

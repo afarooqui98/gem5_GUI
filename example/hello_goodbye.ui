@@ -19,8 +19,8 @@
             "connected_objects": [
                 "hello"
             ], 
-            "y": 550.0, 
-            "x": 725.0, 
+            "y": 477.0, 
+            "x": 617.0, 
             "z": 0, 
             "ports": {}, 
             "component_name": "Root"
@@ -46,8 +46,8 @@
             "connected_objects": [
                 "bye"
             ], 
-            "y": 625.0, 
-            "x": 725.0, 
+            "y": 552.0, 
+            "x": 617.0, 
             "z": 1, 
             "ports": {}, 
             "component_name": "HelloObject"
@@ -66,8 +66,8 @@
             "connections": [], 
             "width": 150.0, 
             "connected_objects": [], 
-            "y": 700.0, 
-            "x": 725.0, 
+            "y": 627.0, 
+            "x": 617.0, 
             "z": 2, 
             "ports": {}, 
             "component_name": "GoodbyeObject"

@@ -35,9 +35,9 @@ class ToolBarView():
         """changes gui state to allow for wire drawing and
             disable object dragging"""
         # objects should not be movable or selectable
-        self.state.drag_state = not self.state.drag_state
-        self.state.select_state = not self.state.select_state
-        self.state.draw_wire_state = not self.state.draw_wire_state
+        self.state.dragState = not self.state.dragState
+        self.state.selectState = not self.state.selectState
+        self.state.drawWireState = not self.state.drawWireState
         self.state.setSymObjectFlags()
 
         # update cursor type immediately
@@ -46,13 +46,13 @@ class ToolBarView():
         QCursor.setPos(pos)
 
         # set the cursor type and button image based on wire state
-        if self.state.draw_wire_state:
+        if self.state.drawWireState:
             QGuiApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
             self.drawWire.setIcon(QIcon("images/wire_pressed.png"))
         else:
             QGuiApplication.restoreOverrideCursor()
             self.drawWire.setIcon(QIcon("images/draw_wire.png"))
-            self.state.line_drawer.pos1 = None
+            self.state.lineDrawer.pos1 = None
 
         # update connections
-        self.state.line_drawer.update()
+        self.state.lineDrawer.update()

@@ -82,14 +82,14 @@ class MainWindow(QMainWindow):
         combo_box = QComboBox()
         # Create list for dropdown including the default value
         connected_objects = copy.deepcopy(\
-            self.state.selected_sym_objects[0].connectedObjects)
+            self.state.selectedSymObjects[0].connectedObjects)
 
         dropdown_list = []
         if len(connected_objects) > 0:
-            for obj in connected_object:
+            for obj in connected_objects:
                 # Check if the simobject matches the type for the param
                 sim_obj_type = \
-                    type(self.state.sym_objects[obj].simObjectInstance)
+                    type(self.state.symObjects[obj].simObjectInstance)
                 if issubclass(sim_obj_type, param_type):
                     dropdown_list.append(obj)
 
@@ -166,9 +166,9 @@ class MainWindow(QMainWindow):
         else:
             # only load from param list if there is a sym object in the context
             if len(self.state.selectedSymObjects) == 1 or \
-                self.state.selected_sym_objects[0].componentName == name:
+                self.state.selectedSymObjects[0].componentName == name:
                 self.attributes = \
-                    self.state.selected_sym_objects[0].instanceParams
+                    self.state.selectedSymObjects[0].instanceParams
             else: # TODO: check when would this branch happen??
                 logging.debug("filling in name branch")
                 self.attributes = self.catalog[name]
@@ -183,8 +183,8 @@ class MainWindow(QMainWindow):
 
         # If there is an object being viewed on the board display the name and
         #   connected objects as well
-        if len(self.state.selected_sym_objects) == 1:
-            cur_object = self.state.selected_sym_objects[0]
+        if len(self.state.selectedSymObjects) == 1:
+            cur_object = self.state.selectedSymObjects[0]
             self.addRow("Name", cur_object.name, is_tree_widget_click, False)
             self.addRow("Child Objects", \
                         ", ".join(cur_object.connectedObjects), \
@@ -197,8 +197,8 @@ class MainWindow(QMainWindow):
             # Simobject params are special cases with dropdowns in the table
             isSim = False
             param = self.attributes[attribute]
-            if len(self.state.selected_sym_objects) > 0:
-                isSim = self.state.selected_sym_objects[0] and \
+            if len(self.state.selectedSymObjects) > 0:
+                isSim = self.state.selectedSymObjects[0] and \
                     isSimObjectParam(param)
             self.addRow(attribute, str(param["Value"]), \
                 is_tree_widget_click, isSim)
@@ -243,7 +243,7 @@ class MainWindow(QMainWindow):
         if not self.state.mostRecentSaved:
             self.dialog = saveChangesDialog("closing", self.state)
             if self.dialog.exec_():
-                self.buttonView.save_button_pressed()
+                self.buttonView.saveButtonPressed()
 
 if __name__ == "__m5_main__":
     import os

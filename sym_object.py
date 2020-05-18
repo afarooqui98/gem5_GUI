@@ -1,4 +1,4 @@
-from lineDrawer import *
+from line_drawer import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
@@ -103,8 +103,8 @@ class SymObject(QGraphicsItemGroup):
 
         # iterate through existing objects and check if current object overlaps
         # with any of them
-        for key in self.state.sym_objects:
-            item = self.state.sym_objects[key]
+        for key in self.state.symObjects:
+            item = self.state.symObjects[key]
             if self.doesOverlap(item):
                 self.setPos(item.scenePos().x() + item.width + 10,
                             item.scenePos().y() + item.height + 10)
@@ -114,8 +114,8 @@ class SymObject(QGraphicsItemGroup):
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
         self.state.removeHighlight()
-        del self.state.selected_sym_objects[:]
-        self.state.selected_sym_objects.append(self)
+        del self.state.selectedSymObjects[:]
+        self.state.selectedSymObjects.append(self)
         self.updateHandlesPos()
 
     def contextMenuEvent(self, event):
@@ -124,7 +124,7 @@ class SymObject(QGraphicsItemGroup):
         inspect_action = menu.addAction("inspect object")
         selected_action = menu.exec_(QCursor.pos())
         if selected_action == copy_action:
-            self.state.mainWindow.buttonView.copy_button_pressed()
+            self.state.mainWindow.buttonView.copyButtonPressed()
         elif selected_action == inspect_action:
             pass
 
@@ -226,7 +226,8 @@ class SymObject(QGraphicsItemGroup):
         """Create the display for the ports on the symobjects"""
         del self.uiPorts[:]
         x = self.sceneCoords().left() + \
-            self.rect.boundingRect().width() * (3 / 4)
+            self.rect.boundingRect().width() * 3 / 4
+
         num_ports = len(self.instancePorts)
         delete_button_height = self.deleteButton.boundingRect().height()
         next_y = delete_button_height
@@ -337,7 +338,7 @@ class SymObject(QGraphicsItemGroup):
         """
         Executed when the mouse moves over the shape (NOT PRESSED).
         """
-        if self.isSelected() and not self.state.draw_wire_state:
+        if self.isSelected() and not self.state.drawWireState:
             handle = self.handleAt(moveEvent.pos())
             cursor = Qt.OpenHandCursor if handle is None \
                 else self.handleCursors[handle]
@@ -347,21 +348,21 @@ class SymObject(QGraphicsItemGroup):
         """
         Executed when the mouse leaves the shape (NOT PRESSED).
         """
-        if not self.state.draw_wire_state:
+        if not self.state.drawWireState:
             self.setCursor(Qt.ArrowCursor)
 
     def mousePressEvent(self, event):
 
         self.handleSelected = self.handleAt(event.pos())
-        if self.handleSelected and not self.state.draw_wire_state:
+        if self.handleSelected and not self.state.drawWireState:
             self.mousePressPos = event.pos()
             self.mousePressRect = self.rect.boundingRect()
             return
 
         '''handle required operations when a sym object is clicked on'''
-        if not self.state.draw_wire_state:
+        if not self.state.drawWireState:
             self.setCursor(QCursor(Qt.ClosedHandCursor))
-        self.state.object_clicked = 1
+        self.state.objectClicked = 1
         # get object that was clicked on (since multiple objects can be stacked
         # on top of each other)
         clicked = self.getClickedObject(event)
@@ -383,12 +384,12 @@ class SymObject(QGraphicsItemGroup):
         if modifiers != Qt.ShiftModifier:
             # hide button on previously selected object
             self.state.removeHighlight()
-            del self.state.selected_sym_objects[:]
+            del self.state.selectedSymObjects[:]
 
         # add clicked to list if not present and update attributes for it
-        if not clicked in self.state.selected_sym_objects:
-            self.state.selected_sym_objects.append(clicked)
-        if len(self.state.selected_sym_objects) == 1:
+        if not clicked in self.state.selectedSymObjects:
+            self.state.selectedSymObjects.append(clicked)
+        if len(self.state.selectedSymObjects) == 1:
             clicked.deleteButton.show()
             self.state.mainWindow.populateAttributes(None,
                 clicked.componentName, False)
@@ -419,12 +420,12 @@ class SymObject(QGraphicsItemGroup):
         for connect in self.uiConnections.keys():
             if connect[0] == "child":
                 key = ("parent", str(self.name), connect[3], connect[2])
-                parent_connection = self.state.sym_objects[connect[1]].\
+                parent_connection = self.state.symObjects[connect[1]].\
                                                             uiConnections[key]
                 if parent_connection.line:
                     parent_connection.line.state.scene.removeItem(\
                                                         parent_connection.line)
-                del self.state.sym_objects[connect[1]].uiConnections[key]
+                del self.state.symObjects[connect[1]].uiConnections[key]
 
             else:
                 connection = self.uiConnections[connect]
@@ -432,7 +433,7 @@ class SymObject(QGraphicsItemGroup):
                     connection.line.state.scene.removeItem(connection.line)
 
                 key = ("child", str(self.name), connect[3], connect[2])
-                del self.state.sym_objects[connect[1]].uiConnections[key]
+                del self.state.symObjects[connect[1]].uiConnections[key]
 
             del self.uiConnections[connect]
 
@@ -440,30 +441,30 @@ class SymObject(QGraphicsItemGroup):
 
         # recursively delete children's backend datastructures
         for child in self.connectedObjects:
-            self.state.sym_objects[child].deleteBackend()
+            self.state.symObjects[child].deleteBackend()
 
         del self.connectedObjects
 
         # remove the current object from it's parent connected object list
         if self.parentName:
-            parent = self.state.sym_objects[self.parentName]
+            parent = self.state.symObjects[self.parentName]
             if self.name in parent.connectedObjects:
                 parent.connectedObjects.remove(self.name)
 
         # delete from state
-        del self.state.sym_objects[self.name]
+        del self.state.symObjects[self.name]
 
     def mouseMoveEvent(self, event):
         '''handle changes when symobject is moved around on canvas'''
 
-        if self.handleSelected is not None and not self.state.draw_wire_state:
+        if self.handleSelected is not None and not self.state.drawWireState:
             self.interactiveResize(event.pos(), event.scenePos())
             self.modified = 1
 
-        if self.state.object_clicked:
+        if self.state.objectClicked:
             self.modifyConnections(event, self)
             self.updateChildrenConnections(event, self)
-            self.state.line_drawer.update()
+            self.state.lineDrawer.update()
             super(SymObject, self).mouseMoveEvent(event)
             self.state.mostRecentSaved = False
             self.modified = 1
@@ -483,35 +484,35 @@ class SymObject(QGraphicsItemGroup):
         for name, connection in sym_object.uiConnections.items():
             new_y = delete_button_height
             if name[0] == "parent":
-                new_y += sym_object.sceneCoords().top() + connection.parent_port_num\
+                new_y += sym_object.sceneCoords().top() + connection.parentPortNum\
                     * y_offset + y_offset / 2
                 new_coords = QPointF(new_x, new_y)
                 key = ("child", sym_object.name, name[3], name[2])
                 connection.setEndpoints(new_coords, None)
-                self.state.sym_objects[name[1]].uiConnections[key].setEndpoints(\
+                self.state.symObjects[name[1]].uiConnections[key].setEndpoints(\
                                                             new_coords, None)
             else:
-                new_y += sym_object.sceneCoords().top() + connection.child_port_num \
+                new_y += sym_object.sceneCoords().top() + connection.childPortNum \
                     * y_offset + y_offset / 2
                 new_coords = QPointF(new_x, new_y)
                 key = ("parent", sym_object.name, name[3], name[2])
                 connection.setEndpoints(None, new_coords)
-                self.state.sym_objects[name[1]].uiConnections[key].setEndpoints(\
+                self.state.symObjects[name[1]].uiConnections[key].setEndpoints(\
                                                             None, new_coords)
 
 
     def updateChildrenConnections(self, event, sym_object):
         """update all child connections"""
         for object_name in sym_object.connectedObjects:
-            object = self.state.sym_objects[object_name]
+            object = self.state.symObjects[object_name]
             self.modifyConnections(event, object)
             self.updateChildrenConnections(event, object)
 
     def mouseReleaseEvent(self, event):
         """when mouse is release on object, update its position including the case
         where it overlaps and deal with subobject being created"""
-        self.state.object_clicked = 0
-        if not self.state.draw_wire_state:
+        self.state.objectClicked = 0
+        if not self.state.drawWireState:
             self.setCursor(QCursor(Qt.PointingHandCursor))
         super(SymObject, self).mouseReleaseEvent(event)
 
@@ -530,28 +531,28 @@ class SymObject(QGraphicsItemGroup):
 
             # update child z indices
             for child in self.connectedObjects:
-                self.state.sym_objects[child].z = self.z + 1
+                self.state.symObjects[child].z = self.z + 1
 
             if not self.name in parent.connectedObjects:
                 parent.connectedObjects.append(self.name) # add new child
             self.resizeUIObject(parent, 1, self.width)
         else:
-            if self.parentName and not self.doesOverlap(self.state.sym_objects[self.parentName]):
+            if self.parentName and not self.doesOverlap(self.state.symObjects[self.parentName]):
                 # if the object is dragged out of a parent, remove the parent,
                 # child relationship
-                curParent = self.state.sym_objects[self.parentName]
+                curParent = self.state.symObjects[self.parentName]
                 curParent.connectedObjects.remove(self.name)
                 self.parentName = None
                 curParent.resizeParent(self)
 
-        for object in self.state.sym_objects.values():
+        for object in self.state.symObjects.values():
             object.setZValue(object.z)
 
         # update the object's position instanceParams
         self.x = self.scenePos().x()
         self.y = self.scenePos().y()
         self.detachChildren()
-        #self.state.line_drawer.update()
+        #self.state.lineDrawer.update()
         self.state.mostRecentSaved = False
         self.handleSelected = None
         self.mousePressPos = None
@@ -565,8 +566,8 @@ class SymObject(QGraphicsItemGroup):
         """based on mouse click position, return object with highest zscore"""
         frontmost_object = None
         highest_zscore = -1
-        for key in self.state.sym_objects:
-            object = self.state.sym_objects[key]
+        for key in self.state.symObjects:
+            object = self.state.symObjects[key]
             if object.isClicked(event):
                 if object.z > highest_zscore:
                     highest_zscore = object.z
@@ -581,8 +582,8 @@ class SymObject(QGraphicsItemGroup):
         """based on object being dragged, return object with highest zscore"""
         frontmost_object = None
         highest_zscore = -1
-        for key in self.state.sym_objects:
-            object = self.state.sym_objects[key]
+        for key in self.state.symObjects:
+            object = self.state.symObjects[key]
             #if two objects are related
             if self != object and not self.isAncestor(object) and not\
                 self.isDescendant(object):
@@ -614,7 +615,7 @@ class SymObject(QGraphicsItemGroup):
         while current_item.parentName:
             if current_item.parentName == item.name:
                 return True
-            current_item = self.state.sym_objects[current_item.parentName]
+            current_item = self.state.symObjects[current_item.parentName]
         return False
 
     def isDescendant(self, item):
@@ -622,7 +623,7 @@ class SymObject(QGraphicsItemGroup):
         if item.name in self.connectedObjects:
             return True
         for child_name in self.connectedObjects:
-            if self.state.sym_objects[child_name].isDescendant(item):
+            if self.state.symObjects[child_name].isDescendant(item):
                 return True
         return False
 
@@ -688,7 +689,7 @@ class SymObject(QGraphicsItemGroup):
 
         # recursively traverse upwards and resize each parent
         if item.parentName:
-            item.resizeUIObject(self.state.sym_objects[item.parentName], \
+            item.resizeUIObject(self.state.symObjects[item.parentName], \
             1, size)
 
         self.moveUIObject()
@@ -697,7 +698,7 @@ class SymObject(QGraphicsItemGroup):
         item.movePorts()
         self.modifyConnections(item, item)
         self.updateChildrenConnections(item, item)
-        self.state.line_drawer.update()
+        self.state.lineDrawer.update()
 
     def resizeNeeded(self, item):
         """determines if a resize is needed by calculating ratio of children
@@ -706,7 +707,7 @@ class SymObject(QGraphicsItemGroup):
         child_area = 0
         resize_threshold = .4
         for object_name in item.connectedObjects:
-            object_rect = self.state.sym_objects[object_name].rect.rect()
+            object_rect = self.state.symObjects[object_name].rect.rect()
             child_area += object_rect.width() * object_rect.height()
 
         ratio = child_area / parent_area
@@ -723,7 +724,7 @@ class SymObject(QGraphicsItemGroup):
         lowest = item
         y_coord = item.scenePos().y() + item.height
         for child in self.connectedObjects:
-            cur_child = self.state.sym_objects[child]
+            cur_child = self.state.symObjects[child]
             if (cur_child.scenePos().y() + cur_child.height > y_coord):
                 y_coord = cur_child.scenePos().y() + cur_child.height
                 lowest = cur_child
@@ -735,7 +736,7 @@ class SymObject(QGraphicsItemGroup):
         rightmost = item
         x_coord = item.scenePos().x() + item.width
         for child in self.connectedObjects:
-            cur_child = self.state.sym_objects[child]
+            cur_child = self.state.symObjects[child]
             if (cur_child.scenePos().x() + cur_child.width > x_coord):
                 x_coord = cur_child.scenePos().x() + cur_child.width
                 rightmost = cur_child
@@ -747,16 +748,16 @@ class SymObject(QGraphicsItemGroup):
         it so they move as one"""
 
         for child_name in self.connectedObjects:
-            self.addToGroup(self.state.sym_objects[child_name])
+            self.addToGroup(self.state.symObjects[child_name])
             #attach descendants
-            self.state.sym_objects[child_name].attachChildren()
+            self.state.symObjects[child_name].attachChildren()
 
     def detachChildren(self):
         """detaches children to allow for independent movement"""
 
         for child_name in self.connectedObjects:
-            self.removeFromGroup(self.state.sym_objects[child_name])
-            self.state.sym_objects[child_name].detachChildren()
+            self.removeFromGroup(self.state.symObjects[child_name])
+            self.state.symObjects[child_name].detachChildren()
 
     def updateName(self, newName):
         """updates a symobjects name"""
@@ -767,22 +768,22 @@ class SymObject(QGraphicsItemGroup):
         # if sym object has a parent, change current sym object's name in
         # parent's list of child objects
         if self.parentName:
-            self.state.sym_objects[self.parentName].connectedObjects.\
+            self.state.symObjects[self.parentName].connectedObjects.\
                                                             remove(self.name)
-            self.state.sym_objects[self.parentName].connectedObjects.\
+            self.state.symObjects[self.parentName].connectedObjects.\
                                                             append(newName)
 
         # if sym object is a parent, change the parent name of all of its
         # children
         if self.connectedObjects:
             for child_name in self.connectedObjects:
-                self.state.sym_objects[child_name].parentName = newName
+                self.state.symObjects[child_name].parentName = newName
 
         # update the current object's name in each of its connections'
         # connection list
         for ui_connection in self.uiConnections:
             connected_object_name = ui_connection[1]
-            connected_object = self.state.sym_objects[connected_object_name]
+            connected_object = self.state.symObjects[connected_object_name]
             for connection in connected_object.uiConnections:
                 if connection[1] == self.name:
                     value = connected_object.uiConnections[connection]
@@ -792,9 +793,9 @@ class SymObject(QGraphicsItemGroup):
                     connected_object.uiConnections[new_key] = value
 
         # update member variable
-        del self.state.sym_objects[self.name]
+        del self.state.symObjects[self.name]
         self.name = newName
-        self.state.sym_objects[newName] = self
+        self.state.symObjects[newName] = self
         self.state.addToHistory()
 
 
@@ -805,7 +806,7 @@ class SymObject(QGraphicsItemGroup):
         if not child.name in self.connectedObjects:
             self.connectedObjects.append(child.name)
         child.resizeUIObject(self, 1, child.width)
-        for object in self.state.sym_objects.values():
+        for object in self.state.symObjects.values():
             object.setZValue(object.z)
 
     def resizeParent(self, child):
@@ -818,7 +819,7 @@ class SymObject(QGraphicsItemGroup):
         self.movePorts()
         self.modifyConnections(self, self)
         self.updateChildrenConnections(self, self)
-        self.state.line_drawer.update()
+        self.state.lineDrawer.update()
 
     def removeUIObjects(self):
         '''disconnect all the symobjects components before it is resized'''
@@ -862,7 +863,7 @@ class SymObject(QGraphicsItemGroup):
         self.height = self.rect.rect().height()
         self.x = self.sceneCoords().left()
         self.y = self.sceneCoords().bottom()
-        self.state.line_drawer.update()
+        self.state.lineDrawer.update()
 
     def interactiveResize(self, mousePos, scenePos):
         """
@@ -993,7 +994,7 @@ class SymObject(QGraphicsItemGroup):
         painter.setPen(QPen(QColor(0, 0, 0, 255), 1.0, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
         for handle, rect in self.handles.items():
             if self.handleSelected is None or handle == self.handleSelected:
-                if self in self.state.selected_sym_objects:
+                if self in self.state.selectedSymObjects:
                     painter.drawEllipse(rect)
         self.modifyConnections(self, self)
         self.updateChildrenConnections(self, self)
