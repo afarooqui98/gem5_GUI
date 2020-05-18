@@ -386,6 +386,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             self.copy_sym_object(selectedObject)
         for selectedObject in self.state.copied_objects:
             self.copyConnection(selectedObject)
+
         self.state.copyState = False
         self.state.removeHighlight()
         del self.state.copied_objects[:]
@@ -565,8 +566,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.mostRecentSaved = True
         self.state.addToHistory()
 
-    # clear out existing objects and wires
     def clearScene(self):
+    """clear graphic scene"""
         for object in self.state.sym_objects.values():
             for name, connection in object.ui_connections.items():
                 if connection.line:
@@ -577,9 +578,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.sym_objects.clear()
 
-
-    #loads objects into scene from file
     def populateScene(self, data):
+    """load object from ui file to scene"""
+    
         # execute any code saved for user-def simobjects
         imported_modules = data['code']
         if len(imported_modules) > 1: #check if any exist
@@ -596,8 +597,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         self.state.line_drawer.update()
 
-    #loads objects into scene from history
     def populateSceneFromHistory(self, data):
+    """load objects from history into graphics scene"""
         z_score = 0
         while z_score in data:
             cur_z_array = data[z_score]
