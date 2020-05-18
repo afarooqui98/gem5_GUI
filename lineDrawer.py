@@ -87,12 +87,12 @@ class LineDrawer(QWidget):
         key = [None, None]
         for sym_object in self.state.sym_objects.values():
             count = 0
-            delete_button_height = sym_object.delete_button.boundingRect().\
+            delete_button_height = sym_object.deleteButton.boundingRect().\
                                                                     height()
             next_y = delete_button_height
-            for name, port, _ in sym_object.ui_ports:
+            for name, port, _ in sym_object.uiPorts:
                 # change keys depending on where ports end up
-                num_ports = len(sym_object.ui_ports)
+                num_ports = len(sym_object.uiPorts)
                 key[0] = sym_object.mapToScene(sym_object.boundingRect()).boundingRect().left() + sym_object.rect.boundingRect().width() * 3 / 4
                 key[1] = sym_object.mapToScene(sym_object.boundingRect()).boundingRect().top() + next_y
                 if key[0] < parent_loc.x() and \
@@ -122,13 +122,13 @@ class LineDrawer(QWidget):
 
         key1 = ("parent", child.name, parent_port_name, child_port_name)
         key2 = ("child", parent.name, child_port_name, parent_port_name)
-        if portsCompatible(parent.instance_ports[parent_port_name]['Value'],
-            child.instance_ports[child_port_name]['Value']):
-            parent.ui_connections[key1] = Connection(self.pos1, self.pos2,
+        if portsCompatible(parent.instancePorts[parent_port_name]['Value'],
+            child.instancePorts[child_port_name]['Value']):
+            parent.uiConnections[key1] = Connection(self.pos1, self.pos2,
                 parent_port_num, child_port_num)
-            child.ui_connections[key2] = Connection(self.pos1, self.pos2,
+            child.uiConnections[key2] = Connection(self.pos1, self.pos2,
                 parent_port_num, child_port_num)
-            parent.instance_ports[parent_port_name]['Value'] = str(child.name) + "." + \
+            parent.instancePorts[parent_port_name]['Value'] = str(child.name) + "." + \
                 str(child_port_name)
             self.state.addToHistory()
             return 0

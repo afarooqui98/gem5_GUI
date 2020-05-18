@@ -142,12 +142,12 @@ def setParamValue(simobject, symobject, param, param_info, m5_children):
                 result, found = param_info["Default"].find(simobject)
                 if not found:
                     logging.debug("Proxy not found given param " + param \
-                    + " for " + symObject.component_name)
+                    + " for " + symObject.componentName)
                 else:
                     param_info["Value"] = result
                 setattr(simobject, param, param_info["Value"])
         else:
-            if str(param_info["Value"]) in symobject.connected_objects:
+            if str(param_info["Value"]) in symobject.connectedObjects:
                 logging.error("object exists and can be parameterized")
 
 def traverseParams(sym_catalog, symobject, simobject):
@@ -158,14 +158,14 @@ def traverseParams(sym_catalog, symobject, simobject):
     # Note: this is done alongside setting parameters in case a parameter
     #   is a simobject, in which case it would look at the child objects
     m5_children = []
-    for child in symobject.connected_objects:
+    for child in symobject.connectedObjects:
         sym = sym_catalog[child].name
-        sim = sym_catalog[child].sim_object_instance
+        sim = sym_catalog[child].simObjectInstance
         setattr(simobject, sym, sim)
         m5_children.append((sym, sim))
 
     # Setting the paramerters for the object instance
-    for param, param_info in symobject.instance_params.items():
+    for param, param_info in symobject.instanceParams.items():
         setParamValue(simobject, symobject, param, param_info, m5_children)
 
     # Recurse for the objects children
@@ -180,13 +180,13 @@ def setPortValue(port, port_info, sym_catalog, simobject):
         values = port_info["Value"].split(".")
         #set port value, ex: values = ['system', 'system_port']
         setattr(simobject, port,\
-            getattr(sym_catalog[values[0]].sim_object_instance,values[1]))
+            getattr(sym_catalog[values[0]].simObjectInstance,values[1]))
     else:
         logging.debug("Port value for " + port + " is not set")
 
 def traversePorts(sym_catalog, symobject, simobject):
     """Traverse object tree starting at simobject and set ports recursively"""
-    for port, port_info in symobject.instance_ports.items():
+    for port, port_info in symobject.instancePorts.items():
         if isinstance(simobject, list): #for vector param value
             for i in range(len(simobject)):
                 setPortValue(port, port_info, sym_catalog, simobject[i])
@@ -195,7 +195,7 @@ def traversePorts(sym_catalog, symobject, simobject):
             setPortValue(port, port_info, sym_catalog, simobject)
 
     #set ports for children
-    for child in symobject.connected_objects:
+    for child in symobject.connectedObjects:
         traversePorts(sym_catalog, sym_catalog[child],\
             getattr(simobject, child))
 
@@ -206,7 +206,7 @@ def traverse_hierarchy_root(sym_catalog, symroot):
         instantiated objs"""
     simroot = None
     try:
-        root = symroot.sim_object_instance
+        root = symroot.simObjectInstance
         name, simroot = traverseParams(sym_catalog, symroot, root)
         name, simroot = traversePorts(sym_catalog, symroot, simroot)
     except:
@@ -232,7 +232,7 @@ def get_debug_flags():
     try:
         return m5.debug.flags
     except:
-        e = sys.exc_info()[0]
+        e = simObjectInstance
         logging.error("Erorr returning debug flags %s" % e.__name__)
 
 def instantiate_model():

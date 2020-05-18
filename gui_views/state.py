@@ -49,7 +49,7 @@ class State():
     # draws each line in lines using the QPen p
     def drawLines(self, p):
         for object in self.sym_objects.values():
-            for name, connection in object.ui_connections.items():
+            for name, connection in object.uiConnections.items():
                 if name[0] == "parent" and name[1] in self.sym_objects: #draw line once
                     self.drawConnection(p, connection, name, object.name)
 
@@ -87,7 +87,7 @@ class State():
                 else:
                     sym_object.rect.setBrush(QColor("indianred"))
 
-                sym_object.delete_button.hide()
+                sym_object.deleteButton.hide()
 
 
     def updateObjs(self, imported_catalog, imported_instances, filename):

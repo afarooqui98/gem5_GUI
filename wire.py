@@ -55,10 +55,10 @@ class Wire(QGraphicsItemGroup):
                                 + "." + self.parent_key[3] + "?")
         # if yes, delete
         if dialog.exec_():
-            parent.instance_ports[self.parent_key[2]]['Value'] = parent.instance_ports[self.parent_key[2]]['Default']
-            child.instance_ports[self.child_key[2]]['Value'] = child.instance_ports[self.child_key[2]]['Default']
-            del parent.ui_connections[self.parent_key]
-            del child.ui_connections[self.child_key]
+            parent.instancePorts[self.parent_key[2]]['Value'] = parent.instancePorts[self.parent_key[2]]['Default']
+            child.instancePorts[self.child_key[2]]['Value'] = child.instancePorts[self.child_key[2]]['Default']
+            del parent.uiConnections[self.parent_key]
+            del child.uiConnections[self.child_key]
             self.state.scene.removeItem(self)
             self.state.addToHistory()
 
@@ -70,8 +70,7 @@ class Wire(QGraphicsItemGroup):
         # child_port = self.parent_key[3]
         #
         # print("parent: " + parent.name)
-        # print("port: " + parent.instance_ports[parent_port]['Description'])
+        # print("port: " + parent.instancePorts[parent_port]['Description'])
         #
         # print("child: " + child.name)
-        # print("port: " + child.instance_ports[child_port]['Description'])
-
+        # print("port: " + child.instancePorts[child_port]['Description'])

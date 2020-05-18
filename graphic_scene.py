@@ -51,11 +51,11 @@ class GraphicsScene(QGraphicsScene):
 
         new_object = SymObject(x, y, width, height, self, component_name, name,
             True, self.state)
-        new_object.instance_params = parameters
-        new_object.connected_objects = connected_objects
-        new_object.parent_name = parent
+        new_object.instanceParams = parameters
+        new_object.connectedObjects = connected_objects
+        new_object.parentName = parent
         new_object.z = z
-        new_object.instance_ports = convert(newObject["ports"])
+        new_object.instancePorts = convert(newObject["ports"])
 
         new_object_connections = {}
 
@@ -72,7 +72,7 @@ class GraphicsScene(QGraphicsScene):
                 connection["key"][2], connection["key"][3])
             new_object_connections[key] = new_connection
 
-        new_object.ui_connections = new_object_connections
+        new_object.uiConnections = new_object_connections
 
         # add new object to backend datastructures
         self.state.sym_objects[name] = new_object
@@ -106,7 +106,7 @@ class GraphicsScene(QGraphicsScene):
         if component_name == "Root":
             #user created a root object, can instantiate now
             self.state.mainWindow.buttonView.instantiate.setEnabled(True)
-        new_object.delete_button.show()
+        new_object.deleteButton.show()
         new_object.rect.setBrush(QColor("Green"))
 
         self.addItem(new_object)

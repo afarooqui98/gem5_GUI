@@ -91,7 +91,7 @@ class CatalogView(): #dropdown and search bar
         #modify state to accomodate the new object
         new_object = \
             self.state.scene.addObjectToScene("component", item.text(0), name)
-        new_object.instance_params = \
+        new_object.instanceParams = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['params'])
         new_object.instance_ports = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
@@ -109,9 +109,9 @@ class CatalogView(): #dropdown and search bar
             # need to set initial position of new object to force resize and
             # make sure there is enough space to fit object
             hasChildren = False
-            if new_parent.connected_objects:
+            if new_parent.connectedObjects:
                 hasChildren = True
-                lastChild = self.state.sym_objects[new_parent.connected_objects[-1]]
+                lastChild = self.state.sym_objects[new_parent.connectedObjects[-1]]
                 child.setPos(lastChild.scenePos().x() + 10, lastChild.scenePos().y() + 10)
             # configure child as a UI subobject of parent
             new_parent.addSubObject(child)
@@ -132,13 +132,13 @@ class CatalogView(): #dropdown and search bar
             self.state.removeHighlight()
             child.rect.setBrush(QColor("Green"))
             self.state.selected_sym_objects.append(child)
-            self.state.mainWindow.populateAttributes(None, child.component_name,
+            self.state.mainWindow.populateAttributes(None, child.componentName,
                                                     False)
 
         self.state.mostRecentSaved = False
         self.state.addToHistory()
         #allow instantiation ONLY when root is on the canvas
-        #if self.state.selected_sym_objects.component_name == "Root":
+        #if self.state.selected_sym_objects.componentName == "Root":
         #    self.state.mainWindow.buttonView.exportButton.setEnabled(True)
 
     # make tree view searchable

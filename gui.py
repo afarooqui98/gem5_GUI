@@ -82,9 +82,9 @@ class MainWindow(QMainWindow):
         combo_box = QComboBox()
         # Create list for dropdown including the default value
         connected_objects = copy.deepcopy(\
-            self.state.selected_sym_objects[0].connected_objects)
+            self.state.selected_sym_objects[0].connectedObjects)
         # Check if the simobject matches the type for the param
-        sim_obj_type = type(self.state.sym_objects[x].sim_object_instance)
+        sim_obj_type = type(self.state.sym_objects[x].simObjectInstance)
         dropdown_list = []
         if len(connected_objects) > 0:
             dropdown_list = [obj for obj in connected_objects if \
@@ -162,9 +162,9 @@ class MainWindow(QMainWindow):
         else:
             # only load from param list if there is a sym object in the context
             if len(self.state.selectedSymObjects) == 1 or \
-                self.state.selected_sym_objects[0].component_name == name:
+                self.state.selected_sym_objects[0].componentName == name:
                 self.attributes = \
-                    self.state.selected_sym_objects[0].instance_params
+                    self.state.selected_sym_objects[0].instanceParams
             else: # TODO: check when would this branch happen??
                 logging.debug("filling in name branch")
                 self.attributes = self.catalog[name]
@@ -183,7 +183,7 @@ class MainWindow(QMainWindow):
             cur_object = self.state.selected_sym_objects[0]
             self.addRow("Name", cur_object.name, is_tree_widget_click, False)
             self.addRow("Child Objects", \
-                        ", ".join(cur_object.connected_objects), \
+                        ", ".join(cur_object.connectedObjects), \
                         is_tree_widget_click, False)
 
         self.loadAttributes(item, name)

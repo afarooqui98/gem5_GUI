@@ -276,13 +276,13 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
             for object_name in importedObjects:
                 object = self.state.sym_objects[object_name]
-                for connection in object.ui_connections.keys():
+                for connection in object.uiConnections.keys():
                     # if an object required for a connection has not been
                     # imported, delete the connection
                     if connection[1] not in importedObjects:
-                        del object.ui_connections[connection]
+                        del object.uiConnections[connection]
                     else:
-                        connection_obj = object.ui_connections[connection]
+                        connection_obj = object.uiConnections[connection]
                         # set new position's for each connection based on
                         # parent's posiiton
                         new_parent_endpoint = \
@@ -312,7 +312,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     def createChildList(self, object, subObjects):
         """create list of children given a parent"""
-        for child_name in object.connected_objects:
+        for child_name in object.connectedObjects:
             child = self.state.sym_objects[child_name]
             if not child in subObjects:
                 subObjects.append(child)
@@ -347,7 +347,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             self.addChildren(selectedObject)
 
     def addChildren(self, object):
-        for child_name in object.connected_objects:
+        for child_name in object.connectedObjects:
             child = self.state.sym_objects[child_name]
             if not child in self.state.copied_objects:
                 self.state.copied_objects.append(child)
@@ -370,28 +370,28 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def copy_sym_object(self, selectedObject):
         object_name = selectedObject.name + "_copy"
         new_object = self.state.scene.addObjectToScene("component",
-                                selectedObject.component_name, object_name)
+                                selectedObject.componentName, object_name)
         #copy over parent - child relationship info
-        if selectedObject.parent_name:
-            parent_name = selectedObject.parent_name + "_copy"
+        if selectedObject.parentName:
+            parent_name = selectedObject.parentName + "_copy"
             if parent_name in self.state.sym_objects:
                 parent = self.state.sym_objects[parent_name]
                 parent.addSubObject(new_object)
-                new_object.parent_name = parent_name
+                new_object.parentName = parent_name
 
         #copy backend info
-        new_object.instance_ports = copy.deepcopy(selectedObject.instance_ports)
-        new_object.instance_params = \
-            copy.deepcopy(selectedObject.instance_params)
+        new_object.instancePorts = copy.deepcopy(selectedObject.instancePorts)
+        new_object.instanceParams = \
+            copy.deepcopy(selectedObject.instanceParams)
         new_object.SimObject = \
-            copy.deepcopy(self.state.instances[new_object.component_name])
+            copy.deepcopy(self.state.instances[new_object.componentName])
 
         #calculate z value
         current_object_name = selectedObject.name
         new_object.z = 0
-        while self.state.sym_objects[current_object_name].parent_name:
+        while self.state.sym_objects[current_object_name].parentName:
             current_object_name = \
-                self.state.sym_objects[current_object_name].parent_name
+                self.state.sym_objects[current_object_name].parentName
             new_object.z += 1
         new_object.initPorts()
 
@@ -401,19 +401,19 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def copyConnection(self, selectedObject):
         object_name = selectedObject.name + "_copy"
         new_object = self.state.sym_objects[object_name]
-        delete_button_height = new_object.delete_button.boundingRect().height()
-        num_ports = len(new_object.instance_ports)
+        delete_button_height = new_object.deleteButton.boundingRect().height()
+        num_ports = len(new_object.instancePorts)
         y_offset = (new_object.height - delete_button_height) / num_ports
         new_x = new_object.scenePos().x() + new_object.width * 7 / 8
-        for name, connection in selectedObject.ui_connections.items():
+        for name, connection in selectedObject.uiConnections.items():
             if self.state.sym_objects[name[1]] not in self.state.copied_objects:
                 continue
             new_y = delete_button_height
 
             object_name2 = self.state.sym_objects[name[1]].name + "_copy"
             object2 = self.state.sym_objects[object_name2]
-            delete_button_height2 = object2.delete_button.boundingRect().height()
-            num_ports2 = len(object2.instance_ports)
+            delete_button_height2 = object2.deleteButton.boundingRect().height()
+            num_ports2 = len(object2.instancePorts)
             y_offset2 = (object2.height - delete_button_height2) / num_ports2
             new_x2 = object2.scenePos().x() + object2.width * 7 / 8
             new_y2 = delete_button_height2
@@ -426,9 +426,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 new_coords2 = QPointF(new_x2, new_y2)
 
                 key = ("parent", object_name2, name[2], name[3])
-                new_object.ui_connections[key] = Connection(new_coords, new_coords2,
+                new_object.uiConnections[key] = Connection(new_coords, new_coords2,
                     connection.parent_port_num, connection.child_port_num)
-                new_object.instance_ports[name[2]]['Value'] = str(object_name2) + "." + \
+                new_object.instancePorts[name[2]]['Value'] = str(object_name2) + "." + \
                     str(name[3])
             else:
                 new_y += new_object.scenePos().y() + connection.child_port_num \
@@ -438,7 +438,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 new_coords = QPointF(new_x, new_y)
                 new_coords2 = QPointF(new_x2, new_y2)
                 key = ("child", object_name2, name[2], name[3])
-                new_object.ui_connections[key] = Connection(new_coords, new_coords2,
+                new_object.uiConnections[key] = Connection(new_coords, new_coords2,
                     connection.parent_port_num, connection.child_port_num)
 
 
@@ -449,7 +449,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.populateSceneFromHistory(self.state.history[self.state.history_index])
         if len(self.state.selected_sym_objects):
             self.state.mainWindow.populateAttributes(None,
-                self.state.selected_sym_objects[0].component_name, False)
+                self.state.selected_sym_objects[0].componentName, False)
         if not self.state.history_index:
             self.undo.setEnabled(False)
         self.redo.setEnabled(True)
@@ -461,7 +461,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.populateSceneFromHistory(self.state.history[self.state.history_index])
         if len(self.state.selected_sym_objects):
             self.state.mainWindow.populateAttributes(None,
-                self.state.selected_sym_objects[0].component_name, False)
+                self.state.selected_sym_objects[0].componentName, False)
         if self.state.history_index == len(self.state.history) - 1:
             self.redo.setEnabled(False)
         self.undo.setEnabled(True)
@@ -483,7 +483,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             self.simulate.setEnabled(True)
             self.save_button_pressed() #want to save before instantiation
             for object in self.state.sym_objects.values():
-                if object.component_name == "Root":
+                if object.componentName == "Root":
                     root_name , root = traverse_hierarchy_root(\
                                                 self.state.sym_objects, object)
                     err = instantiate_model() #actual m5 instatiation
@@ -543,12 +543,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     # clear out existing objects and wires
     def clearScene(self):
         for object in self.state.sym_objects.values():
-            for name, connection in object.ui_connections.items():
+            for name, connection in object.uiConnections.items():
                 if connection.line:
                     self.state.scene.removeItem(connection.line)
 
             self.state.scene.removeItem(object)
-            object.ui_connections.clear()
+            object.uiConnections.clear()
 
         self.state.sym_objects.clear()
 
@@ -646,66 +646,66 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             newObject["z"] = object.z
             newObject["width"] = object.width
             newObject["height"] = object.height
-            newObject["component_name"] = object.component_name
+            newObject["component_name"] = object.componentName
             newObject["name"] = object.name
-            newObject["parent_name"] = object.parent_name
+            newObject["parent_name"] = object.parentName
 
             params = {}
             #Storing the parameters
-            for param in object.instance_params:
+            for param in object.instanceParams:
                 params[str(param)] = {}
 
                 # TODO: Insert err message here if a parameter has not been set
-                if object.instance_params[param]["Value"] is None:
+                if object.instanceParams[param]["Value"] is None:
                     logging.error("Error must set required parameter")
                     params[str(param)]["Value"] = None
 
                 #Only need to store the values of parameters changed for now
-                if object.instance_params[param]["Default"] != \
-                    object.instance_params[param]["Value"]:
-                    param_type = type(object.instance_params[param]["Value"])
+                if object.instanceParams[param]["Default"] != \
+                    object.instanceParams[param]["Value"]:
+                    param_type = type(object.instanceParams[param]["Value"])
                     if (param_type == str or param_type == int or \
                             param_type == bool or param_type == unicode or \
                             param_type == list):
                         params[str(param)]["Value"] = \
-                            object.instance_params[param]["Value"]
+                            object.instanceParams[param]["Value"]
                     else:
                         # weird case if a value is a class but shouldn't really
                         #   hit this case since all user inputs are strings
                         params[str(param)]["Value"] = \
-                            object.instance_params[param]["Value"].__dict__
+                            object.instanceParams[param]["Value"].__dict__
 
             newObject["parameters"] = params
 
             ports = {}
-            for port in object.instance_ports.keys():
+            for port in object.instancePorts.keys():
                 ports[port] = {}
-                if isinstance(object.instance_ports[port]["Value"], str):
+                if isinstance(object.instancePorts[port]["Value"], str):
                     ports[port]["Value"] = \
-                        str(object.instance_ports[port]["Value"])
+                        str(object.instancePorts[port]["Value"])
                 else:
                     ports[port]["Value"] = None
 
             newObject["ports"] = ports
-            newObject["connected_objects"] = copy.copy(object.connected_objects)
+            newObject["connected_objects"] = copy.copy(object.connectedObjects)
 
             connections = []
 
-            for c in object.ui_connections:
+            for c in object.uiConnections:
                 newConnection = {}
                 newConnection["key"] = c
                 newConnection["parent_endpoint_x"] = \
-                        object.ui_connections[c].parent_endpoint.x()
+                        object.uiConnections[c].parent_endpoint.x()
                 newConnection["parent_endpoint_y"] = \
-                        object.ui_connections[c].parent_endpoint.y()
+                        object.uiConnections[c].parent_endpoint.y()
                 newConnection["child_endpoint_x"] = \
-                        object.ui_connections[c].child_endpoint.x()
+                        object.uiConnections[c].child_endpoint.x()
                 newConnection["child_endpoint_y"] = \
-                        object.ui_connections[c].child_endpoint.y()
+                        object.uiConnections[c].child_endpoint.y()
                 newConnection["parent_port_num"] = \
-                        object.ui_connections[c].parent_port_num
+                        object.uiConnections[c].parent_port_num
                 newConnection["child_port_num"] = \
-                        object.ui_connections[c].child_port_num
+                        object.uiConnections[c].child_port_num
                 connections.append(newConnection)
 
             newObject["connections"] = connections
