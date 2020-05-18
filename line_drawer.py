@@ -104,8 +104,9 @@ class LineDrawer(QWidget):
             for name, port, _ in sym_object.ui_ports:
                 # change keys depending on where ports end up
                 num_ports = len(sym_object.ui_ports)
-                key[0] = sym_object.mapToScene(sym_object.boundingRect()).boundingRect().left() + sym_object.rect.boundingRect().width() * 3 / 4
-                key[1] = sym_object.mapToScene(sym_object.boundingRect()).boundingRect().top() + next_y
+                key[0] = sym_object.sceneCoords().left() +
+                        sym_object.rect.boundingRect().width() * 3 / 4
+                key[1] = sym_object.sceneCoords().top() + next_y
                 if key[0] < parent_loc.x() and \
                         parent_loc.x() < key[0] + port.rect().width():
                     if key[1] < parent_loc.y() and \
@@ -137,11 +138,11 @@ class LineDrawer(QWidget):
         if portsCompatible(parent.instance_ports[parent_port_name]['Value'],
             child.instance_ports[child_port_name]['Value']):
             parent.ui_connections[key1] = Connection(self.pos1, self.pos2,
-                parent_port_num, child_port_num)
+                    parent_port_num, child_port_num)
             child.ui_connections[key2] = Connection(self.pos1, self.pos2,
-                parent_port_num, child_port_num)
-            parent.instance_ports[parent_port_name]['Value'] = str(child.name) + "." + \
-                str(child_port_name)
+                    parent_port_num, child_port_num)
+            parent.instance_ports[parent_port_name]['Value'] = \
+                    str(child.name) + "." + str(child_port_name)
             self.state.addToHistory()
             return 0
         else:
