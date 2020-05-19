@@ -589,10 +589,6 @@ class SymObject(QGraphicsItemGroup):
             self.setCursor(QCursor(Qt.PointingHandCursor))
         super(SymObject, self).mouseReleaseEvent(event)
 
-        # if object has not moved
-        if self.x == self.pos().x() and self.y == self.pos().y():
-            return
-
         self.setParentConnection()
         for object in self.state.symObjects.values():
             object.setZValue(object.z)
