@@ -96,10 +96,16 @@ class SymObject(QGraphicsItemGroup):
             self.y = y
             self.setPos(x, y)
             self.updateHandlesPos()
-            return
 
+        else:
+            self.placeNewObject()
+
+    def placeNewObject(self):
+        """ Find the coordinates and position to place the symobject based on
+            the scene """
         # set initial position to center of scene
-        self.setPos(scene.width() / 2 - width, scene.height() / 2 - height)
+        self.setPos(self.scene.width() / 2 - self.width,
+                    self.scene.height() / 2 -self.height)
 
         # iterate through existing objects and check if current object overlaps
         # with any of them
@@ -119,6 +125,7 @@ class SymObject(QGraphicsItemGroup):
         self.updateHandlesPos()
 
     def contextMenuEvent(self, event):
+        """ Create a context menu for the symo object """
         menu = QMenu()
         copy_action = menu.addAction("copy (Ctrl+C)")
         inspect_action = menu.addAction("inspect object")
@@ -128,19 +135,20 @@ class SymObject(QGraphicsItemGroup):
         elif selected_action == inspect_action:
             pass
 
-    def getParamInfo(self):
-        """Get additional info on params such as default values  after
+    def getParamDefaults(self):
+        """Get additional info on params such as default values after
         instantiating object. This information is held in a dictionary produced
         from calling enumerate_params method on instantiated object """
 
         #calling enumerate_params to get exact values for parameters
-        param_dict = self.simObjectInstance.enumerateParams()
+        enumerate_params_dict = self.simObjectInstance.enumerateParams()
 
         for param, value in self.instanceParams.items():
             if(isinstance(self.instanceParams[param]["Default"], AttrProxy)):
-                continue #want to skip proxy parameters, want to do this lazily
+                # want to skip proxy parameters, want to do this lazily
+                continue
 
-            if param_dict.get(param) == None:
+            if enumerate_params_dict.get(param) == None:
                 # Some parameters are included in the class but not in the
                 # actual parameters given in enumerateParams
                 continue
@@ -151,35 +159,33 @@ class SymObject(QGraphicsItemGroup):
                         self.instanceParams[param]["Default"]:
                     continue
 
-                if param_dict[param].default_val != "":
+                if enumerate_params_dict[param].default_val != "":
                     #if there is a default value
-                    default = param_dict[param].default_val
+                    default = enumerate_params_dict[param].default_val
                     self.instanceParams[param]["Default"] = default
                     self.instanceParams[param]["Value"] = default
                 else:
                     continue
 
-    def load_instantiate(self):
-        """Instantiation and some paramter/port info collection occurs here
-        when an object is loaded from a model file """
-
-        if self.componentName == "Root":
-            self.simObjectInstance = getRoot()
-        else:
-            self.simObjectInstance = self.simObject()
-        param_dict = self.simObjectInstance._params
+    def refreshPortInfo(self):
+        """ Get port info on simobject from m5 and update everything
+            in instancePorts except for values the user inputted """
         port_dict = getPortInfo(self.simObjectInstance)
-
-        # Some parameters are included in the class but not in the actual
-        # instanceParams given in enumerateParams
-        weird_params = []
-
         for port, port_info in self.instancePorts.items():
             port_info["Description"] = port_dict[port]["Description"]
             port_info["Default"] = port_dict[port]["Default"]
             port_info["Type"] = port_dict[port]["Type"]
             if port_info["Value"] == None:
                 port_info["Value"] = port_dict.get(port) #load default port
+
+    def refreshParamInfo(self):
+        """ Get param info on simobject from m5 and update everything
+            in instanceParams except for values the user inputted """
+        param_dict = getParamInfo(self.simObjectInstance)
+
+        # Some parameters are included in the class but not in the actual
+        # instanceParams given in enumerateParams
+        weird_params = []
 
         for param, param_info in self.instanceParams.items():
             if param_dict.get(param) == None:
@@ -188,17 +194,18 @@ class SymObject(QGraphicsItemGroup):
 
             #Check is set since some of the types for parametrs are
             # VectorParam objs
-            if inspect.isclass(param_dict[param].ptype):
-                self.instanceParams[param]["Type"] = param_dict[param].ptype
+            if inspect.isclass(param_dict[param]["Type"]):
+                self.instanceParams[param]["Type"] = param_dict[param]["Type"]
             else:
                 self.instanceParams[param]["Type"] = \
-                    type(param_dict[param].ptype)
+                    type(param_dict[param]["Type"])
 
-            self.instanceParams[param]["Description"] = param_dict[param].desc
+            self.instanceParams[param]["Description"] = \
+                param_dict[param]["Description"]
 
-            if hasattr(param_dict[param], 'default'):
+            if "Default" in param_dict[param]:
                 self.instanceParams[param]["Default"] = \
-                    param_dict[param].default
+                    param_dict[param]["Default"]
             else:
                 self.instanceParams[param]["Default"] = None
 
@@ -210,36 +217,50 @@ class SymObject(QGraphicsItemGroup):
 
         for i in range(len(weird_params)):
             del self.instanceParams[weird_params[i]]
+        self.getParamDefaults() # use enumerateParams to assign defaults
 
-        self.getParamInfo() #enumerate over params to assign default values
-
-    def instantiateSimObject(self):
-        """ Creates an instantiated object for the symobject and gets any new
-        info on the instanceParams """
+    def initSimObject(self):
+        """ Calls constructor on simobject instance """
         if self.componentName == "Root":
             self.simObjectInstance = getRoot()
         else:
             self.simObjectInstance = self.simObject()
-        self.getParamInfo()
+
+    def instantiateSavedObj(self):
+        """Instantiation and some paramter/port info collection occurs here
+        when an object is loaded from a model file """
+        self.initSimObject()
+        self.refreshPortInfo()
+        self.refreshParamInfo()
+
+    def instantiateSimObject(self):
+        """ Creates an instantiated object for the symobject and gets any new
+        info on the instanceParams """
+        self.initSimObject()
+        self.getParamDefaults()
 
     def initPorts(self):
         """Create the display for the ports on the symobjects"""
         del self.uiPorts[:]
+        # place the port boxes at the righmost 1/4 of the symobject
         x = self.sceneCoords().left() + \
             self.rect.boundingRect().width() * 3 / 4
 
         num_ports = len(self.instancePorts)
         delete_button_height = self.deleteButton.boundingRect().height()
-        next_y = delete_button_height
+        next_y = delete_button_height # place the ports under the delete button
         port_scale_factor = 30
 
         for sim_object_instance_port in sorted(self.instancePorts):
-            y = self.sceneCoords().top() + next_y
-            port_box = QGraphicsRectItem(x, y, \
+            # create dimensions for box representing p=the port
+            curr_y = self.sceneCoords().top() + next_y
+            port_box = QGraphicsRectItem(x, curr_y, \
                 self.rect.boundingRect().width() / 4, \
                 (self.rect.boundingRect().height() - \
                 delete_button_height) / num_ports)
             self.addToGroup(port_box)
+
+            # Add text and font within the box
             port_name = QGraphicsTextItem(sim_object_instance_port)
             font = QFont()
             font.setPointSize(self.rect.boundingRect().width() / \
@@ -248,11 +269,17 @@ class SymObject(QGraphicsItemGroup):
             port_name.setPos(port_box.boundingRect().center() - \
                 port_name.boundingRect().center())
             self.addToGroup(port_name)
+
+            # store pointers to these port graphics items
             self.uiPorts.append((sim_object_instance_port, \
                 port_box, port_name))
-            next_y += (self.rect.boundingRect().height() - delete_button_height) / num_ports
+
+            # get next y position of the nect port
+            height =  self.rect.boundingRect().height()
+            next_y += (height - delete_button_height) / num_ports
 
     def movePorts(self):
+        """ Used to refresh the port boxes on the sym objecy graphic """
         for port in self.uiPorts:
             port_box = port[1]
             port_name = port[2]
@@ -260,7 +287,7 @@ class SymObject(QGraphicsItemGroup):
             self.state.scene.removeItem(port_box)
             self.removeFromGroup(port_name)
             self.state.scene.removeItem(port_name)
-        self.initPorts()
+        self.initPorts() #recreate the port boxes
 
     def initUIObject(self, object, x, y):
         """creates the QGraphicsItem that shows up in the scene"""
@@ -270,15 +297,16 @@ class SymObject(QGraphicsItemGroup):
         object.rect.setBrush(QColor("White"))
 
         # textbox to display symObject name
-        object.rectText = QGraphicsTextItem(object.name + "::" +
-                                                        object.componentName)
+        display_name = object.name + "::" + object.componentName
+        object.rectText = QGraphicsTextItem(display_name)
         object.rectText.setPos(object.rect.boundingRect().topLeft())
         object.setupDynamicFonts()
 
         # create delete button
         object.deleteButton = QGraphicsTextItem('X')
-        object.deleteButton.setPos(object.rect.boundingRect().topRight() -
-                                object.deleteButton.boundingRect().topRight())
+        delete_pos = object.rect.boundingRect().topRight()\
+            - object.deleteButton.boundingRect().topRight()
+        object.deleteButton.setPos(delete_pos)
         object.deleteButton.hide()
 
         # set max width of name, 20 is the width of the delete button
@@ -287,7 +315,6 @@ class SymObject(QGraphicsItemGroup):
         # add objects created above to group
         object.addToGroup(object.rect)
         object.addToGroup(object.rectText)
-        # object.addToGroup(object.text)
         object.addToGroup(object.deleteButton)
 
         # set flags
