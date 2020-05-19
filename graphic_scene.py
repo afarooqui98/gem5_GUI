@@ -86,7 +86,7 @@ class GraphicsScene(QGraphicsScene):
         self.setSymObjectConnections(sym_object, new_object)
         sym_object.initPorts()
         # instantiate the simobject and set its parameters
-        sym_object.load_instantiate()
+        sym_object.instantiateSavedObj()
 
         # add new object to backend datastructures
         self.state.symObjects[name] = sym_object
