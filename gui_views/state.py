@@ -15,46 +15,46 @@ from wire import *
 class State():
     def __init__(self, instances, catalog):
         """initialize state and backend datastructures"""
-        self.drag_state = True # User can drag the objects
-        self.select_state = True # User can select the objects
-        self.draw_wire_state = False # User can draw wires
-        self.sym_objects = {} # Map name to actual symobject (has coords)
-        self.selected_sym_objects = []
-        self.line_drawer = None
+        self.dragState = True # User can drag the objects
+        self.selectState = True # User can select the objects
+        self.drawWireState = False # User can draw wires
+        self.symObjects = {} # Map name to actual symobject (has coords)
+        self.selectedSymObjects = []
+        self.lineDrawer = None
         self.scene = None
         self.mainWindow = None
         self.instances = instances
         self.catalog = catalog
         self.fileName = None
         self.copyState = False
-        self.copied_objects = []
+        self.copiedObjects = []
         self.mostRecentSaved = True
         self.zoom = 1
 
         # Store imported code in state
-        self.imported_code = {}
-        self.imported_code['headers'] = "import m5, sys, os"
-        self.imported_code['headers'] += "\nfrom m5.objects import *"
-        self.imported_code['headers'] += "\nfrom common import SimpleOpts"
+        self.importedCode = {}
+        self.importedCode['headers'] = "import m5, sys, os"
+        self.importedCode['headers'] += "\nfrom m5.objects import *"
+        self.importedCode['headers'] += "\nfrom common import SimpleOpts"
         self.importedSymObjects = {}
-        self.object_clicked = 0
-        self.history_index = 0
+        self.objectClicked = 0
+        self.historyIndex = 0
         self.history = []
 
     def setSymObjectFlags(self):
-        """sets object flags in scene based on drag_state"""
-        for object in self.sym_objects.values():
-            object.setFlag(QGraphicsItem.ItemIsMovable, self.drag_state)
-            object.setFlag(QGraphicsItem.ItemIsSelectable, self.select_state)
-            object.setFlag(QGraphicsItem.ItemIsFocusable, self.drag_state)
-            object.setAcceptHoverEvents(self.drag_state)
-            object.rect.setAcceptHoverEvents(self.drag_state)
+        """sets object flags in scene based on dragState"""
+        for object in self.symObjects.values():
+            object.setFlag(QGraphicsItem.ItemIsMovable, self.dragState)
+            object.setFlag(QGraphicsItem.ItemIsSelectable, self.selectState)
+            object.setFlag(QGraphicsItem.ItemIsFocusable, self.dragState)
+            object.setAcceptHoverEvents(self.dragState)
+            object.rect.setAcceptHoverEvents(self.dragState)
 
     def drawLines(self, p):
         """draws each line in lines using the QPen p"""
-        for object in self.sym_objects.values():
+        for object in self.symObjects.values():
             for name, connection in object.uiConnections.items():
-                if name[0] == "parent" and name[1] in self.sym_objects: #draw line once
+                if name[0] == "parent" and name[1] in self.symObjects: #draw line once
                     self.drawConnection(p, connection, name, object.name)
 
     def drawConnection(self, p, connection, parent_key, parent_name):
@@ -65,9 +65,9 @@ class State():
             self.scene.removeItem(connection.line)
 
         # instantiate a new line with connection coordinates
-        line = QLineF(connection.parent_endpoint.x(), \
-                connection.parent_endpoint.y(), connection.child_endpoint.x(), \
-                    connection.child_endpoint.y())
+        line = QLineF(connection.parentEndpoint.x(), \
+                connection.parentEndpoint.y(), connection.childEndpoint.x(), \
+                    connection.childEndpoint.y())
 
         # create a new wire object so it can register mouse clicks
         wire = Wire(line, p, self)
@@ -78,15 +78,15 @@ class State():
         connection.line = wire
 
         # set wire parameters that are needed for deletion
-        wire.parent_key = parent_key
-        wire.child_key = ("child", parent_name, parent_key[3], parent_key[2])
+        wire.parentKey = parent_key
+        wire.childKey = ("child", parent_name, parent_key[3], parent_key[2])
 
         connection.line.setZValue(1000)
 
     def removeHighlight(self):
         """clear the highlight from any selected object"""
-        if len(self.selected_sym_objects):
-            for sym_object in self.selected_sym_objects:
+        if len(self.selectedSymObjects):
+            for sym_object in self.selectedSymObjects:
                 # sets the incomplete variable of all sym objects
                 sym_object.setIncomplete()
                 if not sym_object.incomplete:
@@ -104,18 +104,18 @@ class State():
             return
 
         # Start to keep track of the imported objects
-        if filename not in self.imported_code:
-            self.imported_code[filename] = {}
+        if filename not in self.importedCode:
+            self.importedCode[filename] = {}
 
         #Check if there are any duplicates in the imported objects
         for name in imported_instances.keys():
             if name in self.instances:
                 imported_catalog[filename].pop(name, None)
                 imported_instances.pop(name, None)
-            elif name not in self.imported_code[filename]:
+            elif name not in self.importedCode[filename]:
                 #Store the src code in state
                 src_code = inspect.getsource(imported_instances[name])
-                self.imported_code[filename][name] = src_code
+                self.importedCode[filename][name] = src_code
 
         self.catalog.update(imported_catalog)
         self.instances.update(imported_instances)
@@ -127,13 +127,13 @@ class State():
 
     def highlightIncomplete(self):
         """color the object red if a parameter is not set"""
-        for object in self.sym_objects.values():
+        for object in self.symObjects.values():
             object.setIncomplete()
             if object.incomplete:
                 object.rect.setBrush(QColor("indianred"))
 
     def addToHistory(self):
-        state_pos = len(self.history) - self.history_index - 1
+        state_pos = len(self.history) - self.historyIndex - 1
 
         # not most current state
         if state_pos > 0:
@@ -141,11 +141,11 @@ class State():
             for i in range(state_pos):
                 self.history.pop()
 
-        history = self.mainWindow.buttonView.getOutputData(self.sym_objects)
+        history = self.mainWindow.buttonView.getOutputData(self.symObjects)
         self.history.append(history)
 
-        self.history_index = len(self.history) - 1
-        if self.history_index:
+        self.historyIndex = len(self.history) - 1
+        if self.historyIndex:
             self.mainWindow.buttonView.undo.setEnabled(True)
             self.mainWindow.buttonView.redo.setEnabled(False)
             self.mostRecentSaved = False

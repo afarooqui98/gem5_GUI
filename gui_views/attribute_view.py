@@ -76,7 +76,7 @@ class AttributeView(): #table view for parameters, as well as the description
             self.attributeTable.item(currentRow, currentColumn - 1).text() == "Child Objects":
             return
 
-        if len(self.state.selected_sym_objects) != 1 or not item or \
+        if len(self.state.selectedSymObjects) != 1 or not item or \
          self.attributeTable.item(0,0).text() != "Name" or \
          currentColumn == 0:
              return
@@ -89,7 +89,7 @@ class AttributeView(): #table view for parameters, as well as the description
     def modifyParam(self, currentAttribute, updatedValue):
         """Given the current Attribute(param) and a new value entered in the
             gui, update the current symobject's value for the parameter"""
-        instance_params = self.state.selected_sym_objects[0].instanceParams
+        instance_params = self.state.selectedSymObjects[0].instanceParams
         # if the value is name or connected objects, set the param instead of
         # the dict
         if currentAttribute not in instance_params:
@@ -97,7 +97,7 @@ class AttributeView(): #table view for parameters, as well as the description
             #TODO look into this check, it seems like we do not need it
             if "Value" not in instance_params[currentAttribute]:
                 catalog = self.state.catalog
-                name = self.state.selected_sym_objects[0].componentName
+                name = self.state.selectedSymObjects[0].componentName
                 instance_params[currentAttribute]["Value"] = updatedValue
                 instance_params[currentAttribute]["Type"] = \
                     catalog["SimObject"][name]['ports'][currentAttribute]['Type']
@@ -108,7 +108,7 @@ class AttributeView(): #table view for parameters, as well as the description
         self.state.highlightIncomplete()
 
         # remove highlight for object if it is complete now
-        object = self.state.selected_sym_objects[0]
+        object = self.state.selectedSymObjects[0]
         if not object.incomplete:
             object.rect.setBrush(QColor("Green"))
 
@@ -130,15 +130,15 @@ class AttributeView(): #table view for parameters, as well as the description
         # if the value is name or connected objects, set the param instead of
         # the dict
         if currentAttribute == "Name":
-            self.state.selected_sym_objects[0].updateName(currentValue)
-            current_x = self.state.selected_sym_objects[0].x
-            current_y = self.state.selected_sym_objects[0].y
-            current_name = self.state.selected_sym_objects[0].name
+            self.state.selectedSymObjects[0].updateName(currentValue)
+            current_x = self.state.selectedSymObjects[0].x
+            current_y = self.state.selectedSymObjects[0].y
+            current_name = self.state.selectedSymObjects[0].name
 
-            self.state.sym_objects[current_name] = self.state.selected_sym_objects[0]
+            self.state.symObjects[current_name] = self.state.selectedSymObjects[0]
         # elif currentAttribute == "Child Objects":
-        #     self.state.selected_sym_objects[0].connectedObjects = currentValue
-        #     self.state.line_drawer.connectSubObject(self.state.selected_sym_objects[0].name,
+        #     self.state.selectedSymObjects[0].connectedObjects = currentValue
+        #     self.state.lineDrawer.connectSubObject(self.state.selectedSymObjects[0].name,
         #                                         currentValue)
         else:
             self.modifyParam(currentAttribute, currentValue)

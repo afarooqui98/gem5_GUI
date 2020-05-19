@@ -49,14 +49,14 @@ class CatalogView(): #dropdown and search bar
             # if the same object has already been imported, copy and paste it
             if item.text(0) in self.state.importedSymObjects and \
                     self.state.importedSymObjects[item.text(0)]["parent"].name \
-                                                    in self.state.sym_objects:
+                                                    in self.state.symObjects:
 
-                del self.state.selected_sym_objects[:]
-                self.state.selected_sym_objects.append(\
+                del self.state.selectedSymObjects[:]
+                self.state.selectedSymObjects.append(\
                         self.state.importedSymObjects[item.text(0)]["parent"])
-                self.state.mainWindow.buttonView.copy_button_pressed()
-                self.state.mainWindow.buttonView.paste_button_pressed()
-                del self.state.selected_sym_objects[:]
+                self.state.mainWindow.buttonView.copyButtonPressed()
+                self.state.mainWindow.buttonView.pasteButtonPressed()
+                del self.state.selectedSymObjects[:]
                 return
             else:
                 filename = self.state.importedSymObjects[item.text(0)]["file"]
@@ -68,7 +68,7 @@ class CatalogView(): #dropdown and search bar
         if not ok:
             return
 
-        if name in self.state.sym_objects:
+        if name in self.state.symObjects:
             ok = QMessageBox.about(self.state.mainWindow, "Error", \
                             "SimObject with name: " + name + " already exists!")
             if not ok:
@@ -77,8 +77,8 @@ class CatalogView(): #dropdown and search bar
 
         new_parent = None
 
-        if len(self.state.selected_sym_objects) == 1:
-            new_parent = self.state.selected_sym_objects[0]
+        if len(self.state.selectedSymObjects) == 1:
+            new_parent = self.state.selectedSymObjects[0]
 
             # confirm that user wants to add a subobject to selected object
             dialog = addChildDialog("Add " + name + " as child of " + \
@@ -88,7 +88,7 @@ class CatalogView(): #dropdown and search bar
 
         self.state.removeHighlight()
 
-        del self.state.selected_sym_objects[:]
+        del self.state.selectedSymObjects[:]
 
         #modify state to accomodate the new object
         # print(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
@@ -96,7 +96,7 @@ class CatalogView(): #dropdown and search bar
             self.state.scene.addObjectToScene("component", item.text(0), name)
         new_object.instanceParams = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['params'])
-        new_object.instance_ports = \
+        new_object.instancePorts = \
             copy.deepcopy(self.catalog[item.parent().text(0)][item.text(0)]['ports'])
         new_object.initPorts()
 
@@ -108,14 +108,14 @@ class CatalogView(): #dropdown and search bar
 
         # if sub object is being added through catalog
         if new_parent:
-            child = self.state.selected_sym_objects[0]
+            child = self.state.selectedSymObjects[0]
 
             # need to set initial position of new object to force resize and
             # make sure there is enough space to fit object
             hasChildren = False
             if new_parent.connectedObjects:
                 hasChildren = True
-                lastChild = self.state.sym_objects[new_parent.connectedObjects[-1]]
+                lastChild = self.state.symObjects[new_parent.connectedObjects[-1]]
                 child.setPos(lastChild.scenePos().x() + 10, lastChild.scenePos().y() + 10)
 
             # configure child as a UI subobject of parent
@@ -136,7 +136,7 @@ class CatalogView(): #dropdown and search bar
 
             self.state.removeHighlight()
             child.rect.setBrush(QColor("Green"))
-            self.state.selected_sym_objects.append(child)
+            self.state.selectedSymObjects.append(child)
             self.state.mainWindow.populateAttributes(None, child.componentName,
                                                     False)
 

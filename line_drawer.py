@@ -30,11 +30,11 @@ class LineDrawer(QWidget):
     # if clicking anywhere on the scene, unhighlight the currently selected
     # object and clear the attribute table
     def mousePressEvent(self, event):
-        if self.state.draw_wire_state:
+        if self.state.drawWireState:
             self.pos1 = event.pos()
         else:
             self.state.removeHighlight()
-            del self.state.selected_sym_objects[:]
+            del self.state.selectedSymObjects[:]
             table = self.state.mainWindow.attributeView.attributeTable
             table.clear()
             table.setRowCount(0)
@@ -42,7 +42,7 @@ class LineDrawer(QWidget):
     def mouseMoveEvent(self, event):
         """if we are drawing a line, delete previous line and redraw to current
         mouse position"""
-        if self.state.draw_wire_state and self.pos1:
+        if self.state.drawWireState and self.pos1:
             self.pos2 = event.pos()
             line = self.state.scene.addLine(self.pos1.x(), self.pos1.y(), \
                          self.pos2.x(), self.pos2.y(), self.pen)
@@ -55,7 +55,7 @@ class LineDrawer(QWidget):
 
     def mouseReleaseEvent(self, event):
         """check if a valid connection was made, reset line drawing variables"""
-        if self.state.draw_wire_state and self.pos1 and self.pos2:
+        if self.state.drawWireState and self.pos1 and self.pos2:
             valid_connection = self.setObjectConnection()
             self.pos1 = None
             self.pos2 = None
@@ -82,7 +82,7 @@ class LineDrawer(QWidget):
         paste_action = menu.addAction("paste (Ctrl+v)")
         selected_action = menu.exec_(QCursor.pos())
         if selected_action == paste_action:
-            self.state.mainWindow.buttonView.paste_button_pressed()
+            self.state.mainWindow.buttonView.pasteButtonPressed()
 
     def setObjectConnection(self):
         """Sets up connection objects, calculates line positions"""
@@ -96,7 +96,7 @@ class LineDrawer(QWidget):
         child_port_num = 0
         child_port_name = None
         key = [None, None]
-        for sym_object in self.state.sym_objects.values():
+        for sym_object in self.state.symObjects.values():
             count = 0
             delete_button_height = sym_object.deleteButton.boundingRect().\
                                                                     height()
@@ -104,7 +104,7 @@ class LineDrawer(QWidget):
             for name, port, _ in sym_object.uiPorts:
                 # change keys depending on where ports end up
                 num_ports = len(sym_object.uiPorts)
-                key[0] = sym_object.sceneCoords().left() +
+                key[0] = sym_object.sceneCoords().left() + \
                         sym_object.rect.boundingRect().width() * 3 / 4
                 key[1] = sym_object.sceneCoords().top() + next_y
                 if key[0] < parent_loc.x() and \
