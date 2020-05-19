@@ -976,7 +976,7 @@ class SymObject(QGraphicsItemGroup):
         rect.setRight(boundingRect.right() - offset)
         self.rect.setRect(rect)
 
-    def moveBottomeLeft(self, mousePos, offset, boundingRect, rect, diff):
+    def moveBottomLeft(self, mousePos, offset, boundingRect, rect, diff):
         """ Resizing by dragging the bottom left corner of the symobject """
         fromX = self.mousePressRect.left()
         fromY = self.mousePressRect.bottom()
@@ -990,7 +990,7 @@ class SymObject(QGraphicsItemGroup):
         rect.setBottom(boundingRect.bottom() - offset)
         self.rect.setRect(rect)
 
-    def moveBottomeMiddle(self, mousePos, offset, boundingRect, rect, diff):
+    def moveBottomMiddle(self, mousePos, offset, boundingRect, rect, diff):
         """ Resizing by dragging the bottom middle of the symobject """
         fromY = self.mousePressRect.bottom()
         toY = fromY + mousePos.y() - self.mousePressPos.y()
@@ -999,7 +999,7 @@ class SymObject(QGraphicsItemGroup):
         rect.setBottom(boundingRect.bottom() - offset)
         self.rect.setRect(rect)
 
-    def moveBottomeRight(self, mousePos, offset, boundingRect, rect, diff):
+    def moveBottomRight(self, mousePos, offset, boundingRect, rect, diff):
         """ Resizing by dragging the bottom right corner of the symobject """
         fromX = self.mousePressRect.right()
         fromY = self.mousePressRect.bottom()
@@ -1033,11 +1033,11 @@ class SymObject(QGraphicsItemGroup):
         elif self.handleSelected == self.handleMiddleRight:
             self.moveMiddleRight(mousePos, offset, boundingRect, rect, diff)
         elif self.handleSelected == self.handleBottomLeft:
-            self.moveBottomeLeft(mousePos, offset, boundingRect, rect, diff)
+            self.moveBottomLeft(mousePos, offset, boundingRect, rect, diff)
         elif self.handleSelected == self.handleBottomMiddle:
-            self.moveBottomeMiddle(mousePos, offset, boundingRect, rect, diff)
+            self.moveBottomMiddle(mousePos, offset, boundingRect, rect, diff)
         elif self.handleSelected == self.handleBottomRight:
-            self.moveBottomeRight(mousePos, offset, boundingRect, rect, diff)
+            self.moveBottomRight(mousePos, offset, boundingRect, rect, diff)
 
         self.updateHandlesPos()
         self.moveUIObject()
