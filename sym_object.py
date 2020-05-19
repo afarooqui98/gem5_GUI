@@ -412,6 +412,7 @@ class SymObject(QGraphicsItemGroup):
         # delete ui object
         self.state.scene.removeItem(self)
         self.deleteBackend()
+        del self.state.selectedSymObjects[:]
         self.state.addToHistory()
 
     def deleteBackend(self):
