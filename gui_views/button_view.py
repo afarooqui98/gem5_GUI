@@ -58,6 +58,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         saveAction.triggered.connect(self.saveButtonPressed)
         saveAsAction.triggered.connect(self.saveAsUIButtonPressed)
         openAction.triggered.connect(self.openUIButtonPressed)
+        exportAction.triggered.connect(self.exportObjectButtonPressed)
         importAction.triggered.connect(self.importObjectButtonPressed)
 
         fileMenu = mainMenu.addMenu('File')
@@ -195,7 +196,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         """ Event handler which proxies toggling the debug widget"""
         self.state.mainWindow.toggleDebug()
 
-    def export_object_button_pressed(self):
+    def exportObjectButtonPressed(self):
         """export details of selected object and its children"""
 
         if len(self.state.selectedSymObjects) != 1:
