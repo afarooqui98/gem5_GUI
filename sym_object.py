@@ -162,7 +162,6 @@ class SymObject(QGraphicsItemGroup):
     def load_instantiate(self):
         """Instantiation and some paramter/port info collection occurs here
         when an object is loaded from a model file """
-
         if self.componentName == "Root":
             self.simObjectInstance = getRoot()
         else:
@@ -173,13 +172,12 @@ class SymObject(QGraphicsItemGroup):
         # Some parameters are included in the class but not in the actual
         # instanceParams given in enumerateParams
         weird_params = []
-
         for port, port_info in self.instancePorts.items():
             port_info["Description"] = port_dict[port]["Description"]
             port_info["Default"] = port_dict[port]["Default"]
             port_info["Type"] = port_dict[port]["Type"]
             if port_info["Value"] == None:
-                port_info["Value"] = port_dict.get(port) #load default port
+                port_info["Value"] = port_dict[port]["Default"] #load default port
 
         for param, param_info in self.instanceParams.items():
             if param_dict.get(param) == None:
