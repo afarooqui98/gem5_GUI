@@ -141,14 +141,15 @@ system.mem_ctrl = DDR3_1600_8x8()
 system.mem_ctrl.range = system.mem_ranges[0]
 system.mem_ctrl.port = system.membus.master
 
-# Create a process for a simple "Hello World" application
-process = Process()
-# Set the command
-# cmd is a list which begins with the executable (like argv)
-process.cmd = [binary]
-# Set the cpu to use the process as its workload and create thread contexts
-system.cpu[0].workload = process
-system.cpu[0].createThreads()
+for i,cpu in enumerate(system.cpu):
+    # Create a process for a simple "Hello World" application
+    process = Process(pid=100+i)
+    # Set the command
+    # cmd is a list which begins with the executable (like argv)
+    process.cmd = [binary]
+    # Set the cpu to use the process as its workload and create thread contexts
+    cpu.workload = process
+    cpu.createThreads()
 
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
