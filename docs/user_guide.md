@@ -71,6 +71,8 @@ This user guide is meant for both existing gem5 users looking to develop simulat
 
 ## Overview
 
+**![](https://photos.app.goo.gl/3xyf8FDsERE6aUqq5)**
+
 ### 2.1 Background
 
 Currently, gem5 is a highly active open source project that simulates different experiments in Computer Architecture. The maintainers of gem5 originally developed this project for computer architecture research in academia. However, this project&#39;s scope can be extended to computer system design, industry research, and for students in architecture classes. The current software allows users to configure architectural models through python scripts. To make gem5 more accessible and allow new users to utilize all of its capabilities, we created a user interface that will allow such ease of use and functionality.
