@@ -71,7 +71,7 @@ This user guide is meant for both existing gem5 users looking to develop simulat
 
 ## Overview
 
-**![](https://photos.app.goo.gl/3xyf8FDsERE6aUqq5)**
+**![](https://drive.google.com/open?id=1k19OImpPUtAtYxroavll1sxsn8qkIo1Z)**
 
 ### 2.1 Background
 
