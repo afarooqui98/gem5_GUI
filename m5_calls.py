@@ -25,7 +25,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# Authors: Jason Lowe-Power
 
 import inspect
 import logging
@@ -43,7 +42,6 @@ from m5.objects import *
 from m5.params import *
 from m5.proxy import AttrProxy
 
-#TODO: unit test
 def portsCompatible(parent, child):
     """ Checks if two port values are compatible for connections """
     compatible = False
@@ -54,7 +52,6 @@ def portsCompatible(parent, child):
         logging.error("Error on port connection %s" % e.__name__)
     return compatible
 
-#TODO: unit test
 def getPortInfo(m5_object):
     """ Given a gem5 object class create a dictionary containing info on
         the objects ports"""
@@ -65,7 +62,6 @@ def getPortInfo(m5_object):
         port_dict[port_name] = port_attr
     return port_dict
 
-#TODO: unit test
 def getParamInfo(m5_object):
     """ Given a gem5 object class create a dictionary containing info on
         the objects parameter."""
@@ -262,7 +258,6 @@ def get_imported_obs(obj_clss, filename):
             instances[name] = cls
     return mini_tree, instances
 
-#TODO: unit test
 def get_debug_flags():
     try:
         return m5.debug.flags
@@ -270,7 +265,6 @@ def get_debug_flags():
         e = simObjectInstance
         logging.error("Erorr returning debug flags %s" % e.__name__)
 
-#TODO: unit test
 def instantiate_model():
     """ Instantiate the model on the gui """
     try:
@@ -281,7 +275,6 @@ def instantiate_model():
         logging.error("Instantiate error on proxy param by %s" % e.__name__)
         return True
 
-#TODO: unit test
 def simulate():
     """ Simulate the model on the gui """
     try:
@@ -294,7 +287,6 @@ def simulate():
         logging.error("Simulation error caused by %s" % e.__name__)
         return True
 
-#TODO: unit test
 def getRoot():
     """ Singleton type fn for Root simobject instance """
     logging.debug("finding root inst")
