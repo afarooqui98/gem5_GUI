@@ -5,16 +5,16 @@
 
 ### Background and Motivation
 
-The current state of gem5 requires development of python scripts to define and generate different architectures. This can be tedious to develop since the user flow can result in less visual thinking. We want a tool to have a better user flow to allow developers to create and tweak these models in a visual manner, much like Chisel. To make gem5 more accessible and allow new users to utilize all of its capabilities, we created a user interface that will allow such ease of use and functionality.
+The current state of gem5 requires the development of python scripts to define and generate different architectures. This can be tedious to develop since the user flow can result in less visual thinking. We want a tool to have a better user flow to allow developers to create and tweak these models in a visual manner, much like Chisel. To make gem5 more accessible and allow new users to utilize all of its capabilities, we created a user interface that will allow such ease of use and functionality.
 
 
 ### Description
 
-We developed a user interface that allows users to search for simobjects in the left hand catalog, place them in the canvas, and move them around to create an architectural hierarchy that can be instantiated and simulated. Selecting an object allows a user to modify parameters in the attribute table on the bottom left. Placing objects inside other objects establishes a parent-child relationship. Drawing wires using the wire tool allows for port connections between objects.
+We developed a user interface that allows users to search for simobjects in the left-hand catalog, place them in the canvas, and move them around to create an architectural hierarchy that can be instantiated and simulated. Selecting an object allows a user to modify parameters in the attribute table on the bottom left. Placing objects inside other objects establishes a parent-child relationship. Drawing wires using the wire tool allows for port connections between objects.
 
 ### Approach
 
-The image below was our initial diagramming of the basic structure of the GUI, as well as a very high level overview of interaction with our &quot;back-end&quot;, which in this case was the gem5 repository. Our GUI had a distinct front-end and back-end, which are linked by a State class and the SymObject class.
+The image below was our initial diagramming of the basic structure of the GUI, as well as a very high-level overview of interaction with our &quot;back-end&quot;, which in this case was the gem5 repository. Our GUI had a distinct front-end and back-end, which are linked by a State class and the SymObject class.
 
  ![](https://lh3.googleusercontent.com/wjVauYFnztL0aIxrHWjf-dgybE87O4_nTb2dcB3mOpZezpZfnenHZ8csDD0EOwaGaCWd_c1Ysb6HSWvdz-mbfKwMAkVXUMrjLwsyyg4A2aR-Pl3OSn_T2r-zHbBRMiNR1s6pEdnF)
 
@@ -27,7 +27,7 @@ We decided to develop the GUI using just Python. So the natural choice was to us
 
 ### 1. Prerequisites
 
-gem5 requires the linux operating system to run, so the GUI does not support cross platform development. You need to have a compiled gem5 installation on your machine as well. Visit [gem5 download](http://www.m5sim.org/Download) for instructions on how to setup gem5.
+gem5 requires the Linux operating system to run, so the GUI does not support cross-platform development. You need to have a compiled gem5 installation on your machine as well. Visit [gem5 download](http://www.m5sim.org/Download) for instructions on how to setup gem5.
 
 ### 2. Basic Setup
 
@@ -53,12 +53,12 @@ Attached below is a view of the GUI on successful launch:
 
 On the left side lies the **catalog view** as well as the **attribute view**.
 
-The former is used to select a SimObject, and the latter will be used to configure a selected SimObject. The majority of the screen is populated by the **canvas**. This is where most of the user interaction will occur, and where users will build their system. The menu bar contains multiple convenience functions typical to GUI software, from copy-pasting to file saving, but there are also tabs for **debugging** , **running** , and **importing**. These are key functions of the GUI that work in tandem with gem5 to provide the users with the ability to check their system configuration, import both ui objects and configured subclasses, and instantiate their systems. Underneath the top menu is a button that allows the user to draw ports between objects
+The former is used to select a SimObject, and the latter will be used to configure a selected SimObject. The majority of the screen is populated by the **canvas**. This is where most of the user interaction will occur, and where users will build their system. The menu bar contains multiple convenience functions typical to GUI software, from copy-pasting to file saving, but there are also tabs for **debugging** , **running** , and **importing**. These are key functions of the GUI that work in tandem with gem5 to provide the users with the ability to check their system configuration, import both UI objects and configured subclasses, and instantiate their systems. Underneath the top menu is a button that allows the user to draw ports between objects
 
 ### Catalog View
 **![](https://lh5.googleusercontent.com/iv-iXWbl-zvDkwHlkJ9Adlp4xjj-vP9g_kb4yZYRMtSTrtOUnrlsVTdY73JieBOCWHBDno7JHm0YxuohtawUyQ5tb1EjewX45XU6Q5Z8NOC8WoIYGeZECXX4tcqR5dfbEmMt7Hp6 )**
 
-The catalog holds all the available SimObjects. Users can maneuver the tree view by specific category or search for an object at the top search bar. Double clicking an object places what we call a SymObject on the canvas. This is a GUI representation of an m5 SimObject that allows a user to interact with it in a tactile way.
+The catalog holds all the available SimObjects. Users can maneuver the tree view by a specific category or search for an object at the top search bar. Double clicking an object places what we call a SymObject on the canvas. This is a GUI representation of an m5 SimObject that allows a user to interact with it in a tactile way.
 
 ### Attribute Table
 
@@ -68,17 +68,17 @@ Selecting an object brings up its attribute table. This table lists the object n
 
 ### Wiring
 
-To enable wire drawing, click the wire icon between the menu and the catalog. While in wire drawing mode, objects cannot be interacted with. Clicking this button changes the cursor to a cross hair, allowing the user to connect ports with wires. Failing to connect two ports or connecting incompatible ports will result in an error message. Right clicking a wire brings up a context menu, which will allow for deletion and inspection (printing information about the end connections).
+To enable wire drawing, click the wire icon between the menu and the catalog. While in wire drawing mode, objects cannot be interacted with. Clicking this button changes the cursor to a crosshair, allowing the user to connect ports with wires. Failing to connect two ports or connecting incompatible ports will result in an error message. Right-clicking a wire brings up a context menu, which will allow for deletion and inspection (printing information about the end connections).
 
 **![](https://lh5.googleusercontent.com/k3X4PbsV-p_0oNeMGzexuSvBhwoxifQ28G0GGwRPh3QdDB7Q_zl1dCq-dSx7yF7OOA5lsIbB2maPyrQl_yaHlal2H-QIfMKeph4FpgnbwPfTdk0qWnVR9CFmdGq7VeEDV1wT5I9Q)**
 
 ### Context
 
-An important part of understanding the gem5 GUI is the way user context works. Whenever an object is created or selected, it is set as the current selected SymObject. Objects that are selected are typically highlighted green, unless there are required attributes that need to be set by the user; then, the object is red. Any time an object is selected, the user can move it around freely and resize it in the canvas, and its attributes are populated in the attribute table. Finally, it&#39;s important to note that wiring _is not_ dependent on the current context, so any ports for any objects may be connected to others regardless of whether they are in context.
+An important part of understanding the gem5 GUI is the way user context works. Whenever an object is created or selected, it is set as the current selected SymObject. Objects that are selected are typically highlighted green unless there are required attributes that need to be set by the user; then, the object is red. Any time an object is selected, the user can move it around freely and resize it in the canvas, and its attributes are populated in the attribute table. Finally, it&#39;s important to note that wiring _is not_ dependent on the current context, so any ports for any objects may be connected to others regardless of whether they are in context.
 
 ### Menu Overview
 
-The menu contains tools to interact with the GUI. Most of these correspond to self explanatory standard window functionality, and all options in the menu correspond to a keyboard shortcut.
+The menu contains tools to interact with the GUI. Most of these correspond to self-explanatory standard window functionality, and all options in the menu correspond to a keyboard shortcut.
 
 ### Run
 
@@ -101,7 +101,7 @@ Under file, we have import and export UI object, which allow users to save and l
 
 **![](https://lh6.googleusercontent.com/4ZZ0gDvbqz6o9YIB4-pHTZUBB2Cpxwd7CnC2szd_-dy-fO88NMUCzU1I6YmRTR_oSYgk5wgHl8gce3AAXd3RF7iRJcIZ9mU-qgJyBx13WN-7Ploe03yXLUQHQBnSpfUOaNo-AJoB)**
 
-Users can import custom SimObjects, which are python classes inherited from base SimObjects. These imports appear under the catalog, and can be similarly added to the GUI just like regular objects. Imported SimObjects are saved as part of a .ui file, so you do not need to import again when opening a .ui file with imported SimObjects.
+Users can import custom SimObjects, which are python classes inherited from base SimObjects. These imports appear under the catalog and can be similarly added to the GUI just like regular objects. Imported SimObjects are saved as part of a .ui file, so you do not need to import again when opening a .ui file with imported SimObjects.
 
 ## Future
 
