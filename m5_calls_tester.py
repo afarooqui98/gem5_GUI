@@ -43,15 +43,34 @@ class M5CallTester():
             print([cey for cey in object._params.keys()])
         return (len(param_info) == len(object._params))
 
+    def setParamValueTest(self, object):
+        param_info = getParamInfo(object)
+        for key1, key2 in zip(param_info.keys(), object._params.keys()):
+            if type(key1) != type(key2):
+                print("type mismatch found")
+                return False
+        return True
+
+    def setPortValueTest(self, object):
+        port_info = getPortInfo(object)
+        for key1, key2 in zip(port_info.keys(), object._ports.keys()):
+            if type(key1) != type(key2):
+                print("port type mismatch found")
+                return False
+        return True
 
 tester = M5CallTester()
 print(tester.catalogTest())
 for key, value in tester.catalog[1].items():
     if not tester.objectTest(value):
         print(value)
-    if not tester.portTest(value):
+    if tester.portTest(value):
+        tester.setPortValueTest(value)
+    else:
         print("Port")
         print(value)
-    if not tester.paramTest(value):
+    if tester.paramTest(value):
+        tester.setParamValueTest(value)
+    else:
         print("Param")
         print(value)
