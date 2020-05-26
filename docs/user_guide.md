@@ -71,7 +71,7 @@ This user guide is meant for both existing gem5 users looking to develop simulat
 
 ## Overview
 
-![](https://lh3.googleusercontent.com/pw/ACtC-3drzy2KoF3FF_Fh9wcNCrzc8wehzVWXVtr5byCjI9m6KHNo81HS6l2EAefOOm745CrSMZIK2WORqJnqEZ2yyt8fY7ffoORGWCJTPHX-_9mAq2Cyol3jRKUuyEZfIdNPY_PKsquUnau7x6r65yWVJBta=w640-h419-no)
+![](https://cdn.fbsbx.com/v/t59.2708-21/100914476_177123480350163_4173079852171132928_n.gif?_nc_cat=106&_nc_sid=041f46&_nc_ohc=7tJE3wy0YPAAX-M2Pxs&_nc_ht=cdn.fbsbx.com&oh=173b2536760b7a324eb0ad9e959a22f9&oe=5ECEF05B)
 
 ### 2.1 Background
 
