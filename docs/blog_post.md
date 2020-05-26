@@ -5,8 +5,6 @@
 
 ### Background and Motivation
 
-Currently, gem5 is a highly active open source project that simulates different experiments in Computer Architecture. The maintainers of gem5 originally developed this project for computer architecture research in academia. However, this project&#39;s scope can be extended to computer system design, industry research, and for students in architecture classes. 
-
 The current state of gem5 requires development of python scripts to define and generate different architectures. This can be tedious to develop since the user flow can result in less visual thinking. We want a tool to have a better user flow to allow developers to create and tweak these models in a visual manner, much like Chisel. To make gem5 more accessible and allow new users to utilize all of its capabilities, we created a user interface that will allow such ease of use and functionality.
 
 
@@ -14,20 +12,11 @@ The current state of gem5 requires development of python scripts to define and g
 
 We developed a user interface that allows users to search for simobjects in the left hand catalog, place them in the canvas, and move them around to create an architectural hierarchy that can be instantiated and simulated. Selecting an object allows a user to modify parameters in the attribute table on the bottom left. Placing objects inside other objects establishes a parent-child relationship. Drawing wires using the wire tool allows for port connections between objects.
 
-### High Level Goals
-During the planning phase of our project we came up with distinct goals to make developing gem5 models easier using the GUI:
- - Being able to drag and drop new SimObjects into a model and connect them with wires
- - Modify simobject parameters to easily configure systems
- - Run simulations from the GUI directly via a one click simulation button
- - Save model files and access them later
-
 ### Approach
 
-The image below was our initial diagramming of the basic structure of the GUI, as well as a very high level overview of interaction with our &quot;back-end&quot;, which in this case was the gem5 repository. Our GUI had a distinct front-end and back-end, which were linked by a State class and the SymObject class.
+The image below was our initial diagramming of the basic structure of the GUI, as well as a very high level overview of interaction with our &quot;back-end&quot;, which in this case was the gem5 repository. Our GUI had a distinct front-end and back-end, which are linked by a State class and the SymObject class.
 
-Front-end: The primary UI interaction and design comprise the front end. Dragging and dropping objects, selecting them, and highlighting multiple objects are all part of the front-end. The classes that encapsulate this behavior are LineDrawer, which allows the user to draw ports between objects, GraphicScene, which allows the interaction between the SymObject instances, and multiple different View classes that represent each portion of the user interface. The State class is used to maintain real-time information about the context of the GUI that is accessible across files. As most of the objects built were subclassed from PySide, most of these objects were either QWidgets or QMainWindows.
-
-Back-end: The front and back-end are quite tightly coupled. Any of the objects selected and dragged to the canvas are mapped to &quot;SimObjects.&quot; These &quot;SimObjects&quot; define the schema and function of a particular computer architectural entity, like a CPU, for example. This list of objects will be colloquially known as the &quot;catalog&quot; which dynamically loads all of the SimObjects at program initialization from APIs built to interact with gem5. Users are then able to select the component they want from a categorized and searchable menu. Each selected object will be its own instance of a specific SimObject. Each of these objects contain varying parameters including some of which that have default values and some that need to be filled in. The description of the objects and their parameters are also loaded from the gem5 repository and can be viewed via tooltips. Furthermore, users can use this tool to save their work and subsequently export to a file format suited for running in the gem5 simulation environment. ![](https://lh3.googleusercontent.com/wjVauYFnztL0aIxrHWjf-dgybE87O4_nTb2dcB3mOpZezpZfnenHZ8csDD0EOwaGaCWd_c1Ysb6HSWvdz-mbfKwMAkVXUMrjLwsyyg4A2aR-Pl3OSn_T2r-zHbBRMiNR1s6pEdnF)
+ ![](https://lh3.googleusercontent.com/wjVauYFnztL0aIxrHWjf-dgybE87O4_nTb2dcB3mOpZezpZfnenHZ8csDD0EOwaGaCWd_c1Ysb6HSWvdz-mbfKwMAkVXUMrjLwsyyg4A2aR-Pl3OSn_T2r-zHbBRMiNR1s6pEdnF)
 
 ### Technical Specifications
 
@@ -66,7 +55,7 @@ On the left side lies the **catalog view** as well as the **attribute view**.
 
 The former is used to select a SimObject, and the latter will be used to configure a selected SimObject. The majority of the screen is populated by the **canvas**. This is where most of the user interaction will occur, and where users will build their system. The menu bar contains multiple convenience functions typical to GUI software, from copy-pasting to file saving, but there are also tabs for **debugging** , **running** , and **importing**. These are key functions of the GUI that work in tandem with gem5 to provide the users with the ability to check their system configuration, import both ui objects and configured subclasses, and instantiate their systems. Underneath the top menu is a button that allows the user to draw ports between objects
 
-### Catalog View 
+### Catalog View
 **![](https://lh5.googleusercontent.com/iv-iXWbl-zvDkwHlkJ9Adlp4xjj-vP9g_kb4yZYRMtSTrtOUnrlsVTdY73JieBOCWHBDno7JHm0YxuohtawUyQ5tb1EjewX45XU6Q5Z8NOC8WoIYGeZECXX4tcqR5dfbEmMt7Hp6 )**
 
 The catalog holds all the available SimObjects. Users can maneuver the tree view by specific category or search for an object at the top search bar. Double clicking an object places what we call a SymObject on the canvas. This is a GUI representation of an m5 SimObject that allows a user to interact with it in a tactile way.
@@ -83,7 +72,7 @@ To enable wire drawing, click the wire icon between the menu and the catalog. Wh
 
 **![](https://lh5.googleusercontent.com/k3X4PbsV-p_0oNeMGzexuSvBhwoxifQ28G0GGwRPh3QdDB7Q_zl1dCq-dSx7yF7OOA5lsIbB2maPyrQl_yaHlal2H-QIfMKeph4FpgnbwPfTdk0qWnVR9CFmdGq7VeEDV1wT5I9Q)**
 
-### Context 
+### Context
 
 An important part of understanding the gem5 GUI is the way user context works. Whenever an object is created or selected, it is set as the current selected SymObject. Objects that are selected are typically highlighted green, unless there are required attributes that need to be set by the user; then, the object is red. Any time an object is selected, the user can move it around freely and resize it in the canvas, and its attributes are populated in the attribute table. Finally, it&#39;s important to note that wiring _is not_ dependent on the current context, so any ports for any objects may be connected to others regardless of whether they are in context.
 
@@ -97,7 +86,7 @@ The menu contains tools to interact with the GUI. Most of these correspond to se
 
 The run tab contains the instantiate and simulate option. Note that it is greyed out until a user drops in at least a root object to prevent the user from instantiating without a root. Once the instantiate button is pressed, the user _must_ save the file (since objects cannot be modified once instantiated), after which the results of instantiation are displayed on the command line. Once instantiation is executed, the user can interact with the simulate button, which will again show output on the command line.
 
-### Debug 
+### Debug
 **![](https://lh4.googleusercontent.com/Plh1yAE1Sx3wgVY3w-fHRgmEh1ZyY2uCe0O2SX1984lYe4kgiUJH-C6_2aLZngWX0-eraXf8m--xC--ouErySfQJFGbAkLe-TuzNa3O5QKRf6F-UAThoJ5oyWi0KRsgLLH6LQVU2)**
 
 By pressing the Debug button on the toolbar, the debug window will appear on the right side of the GUI. There will be two checkboxes: &quot;Log to File&quot; and &quot;Log to Stdout,&quot; with the former being set automatically. Logging to file will send debug and error messages to a file which can be renamed at any time in the text below. Logging to stdout will print these messages in the Terminal application running the GUI. Below these options is a table full of debug flags that are native to the gem5 system. These flags can be set and unset, and result in gem5 debug messages related to the flag set. They are also searchable by an accompanying search bar.
@@ -123,4 +112,3 @@ Over the development timeline, we faced roadblocks and came up with new ideas, s
 - Parameterize objects to allow for running multiple simulations in parallel and comparing results / identifying optimal parameter values
 
 Although we did our best to address bugs we came across during development and user testing, the fact of the matter is a sandbox application with few restrictions on the user such as this GUI will yield numerous bugs through unforeseen usage. If you come across a bug let us know by opening an [issue](https://github.com/afarooqui98/gem5_GUI/issues), submitting a [pull request](https://github.com/afarooqui98/gem5_GUI/pulls), or contacting us or the gem5 team directly. Please try to document the steps resulting in a fault, as well as including a screenshot of the terminal.
-
