@@ -44,13 +44,15 @@
 
 ### 1.1 README
 
-This user guide covers setup, installation, and usage of the gem5 GUI. The purpose of this guide is to provide users with a high-level understanding of the features and components of the GUI, answer any questions about its operation, and highlight any differences between the configuration scripts and simulation via the GUI.
+This user guide covers setup, installation, and usage of the gem5 GUI. The purpose of this guide is to provide users with a high-level understanding of the features and components of the GUI, answer any questions about its operation, and highlight differences between the configuring architectural simulations via scripts and via the gem5 GUI.
 
 ### 1.2 Audience
 
-This user guide is meant for both existing gem5 users looking to develop simulations using the GUI and new users who are unfamiliar with how gem5 works. For new users, highlighted terms and sections will indicate background information necessary for understanding the proper usage of the GUI. Experienced users can skip these sections.
+This user guide is meant for both existing gem5 users looking to develop simulations using the GUI [[Bobby] Do you really want to frame this as en entry point for beginners? I feel that's a bit out-of-scope. I'd make this more broad, something like "This user guide is intended for those who wish to carry out architectural simulations using gem5's GUI interface, as opposed to the use of configuration scripts"] and new users who are unfamiliar with how gem5 works]. For new users, highlighted terms and sections will indicate background information necessary for understanding the proper usage of the GUI. Experienced users can skip these sections.
 
 ### 1.3 Contact Us
+
+[[Bobby] Very brave of you... are you sure? :)]
 
 - Ahmed Farooqui
 
@@ -75,38 +77,51 @@ This user guide is meant for both existing gem5 users looking to develop simulat
 
 ### 2.1 Background
 
-Currently, gem5 is a highly active open source project that simulates different experiments in Computer Architecture. The maintainers of gem5 originally developed this project for computer architecture research in academia. However, this project&#39;s scope can be extended to computer system design, industry research, and for students in architecture classes. The current software allows users to configure architectural models through python scripts. To make gem5 more accessible and allow new users to utilize all of its capabilities, we created a user interface that will allow such ease of use and functionality.
+Currently, gem5 is an open source project used to simulate computer architecture. gem5 was originally developed for computer architecture research withinin academia. However, it has since been extended and found use in industry, full computer system design, and as an education tool for computer architecture students. Most gem5 development involves specifying architectural models via python scripts. Though powerful, this introduces a steep learning curve to the product. To make gem5 more accessible and user-friendly, we have created a graphical user interface for gem5; the details of which are outlined in this document.
 
 ### 2.2 Description
 
-We developed a user interface that allows users to search for simobjects in the left hand catalog, place them in the canvas, and move them around to create an architectural hierarchy that can be instantiated and simulated. Selecting an object allows a user to modify parameters in the attribute table on the bottom left. Placing objects inside other objects establishes a parent-child relationship. Drawing wires using the wire tool allows for port connections between objects.
+[[Bobby] I think we could afford to be more high-level here and save the details fo the exact layout for later in the document (the following "Approach" section and the "GUI overview" seems most appropriate for this). Very rough starting point: "We developed a user interface whichs allows users to search through a library of simobject, configure them, and place them in an architectural heirarchy to then be instantiate and simulated..."]
 
-### 2.3 Approach
+We developed a user interface that allows users to search for simobjects in a left hand catalog, place them in the canvas, and move them around to create an architectural hierarchy that can then be instantiated and simulated. Selecting an object allows a user to modify parameters in the attribute table on the bottom left. Placing objects inside other objects establishes a parent-child relationship. Drawing wires using the wire tool allows for port connections between objects.
+
+### 2.3 Approach [[Bobby] Can we rename this? This seems more like "Design" than approach]
+
+[[Bobby] Reading back over this (2nd pass), I still don't really know what this section is about. What's its purpose? What key points are we trying to communicate here? It seems redundant given the sections that follow it]
+
+[[Bobby] I'd rephrase this below. The diagram is helpful in describing your approach. I wouldn't cast it aside by mentioning it was a first-draft or some kind of diagram you found useful early on. You also slip into past tense here a lot ("Our GUI had a distinct front-end and back-end"), does it not so much anymore? If so, explain, or make it present tense --- likewise for elsewhere in the document if applicable]
 
 The image below was our initial diagramming of the basic structure of the GUI, as well as a very high level overview of interaction with our &quot;back-end&quot;, which in this case was the gem5 repository. Our GUI had a distinct front-end and back-end, which were linked by a State class and the SymObject class.
 
-Front-end: The primary UI interaction and design comprise the front end. Dragging and dropping objects, selecting them, and highlighting multiple objects are all part of the front-end. The classes that encapsulate this behavior are LineDrawer, which allows the user to draw ports between objects, GraphicScene, which allows the interaction between the SymObject instances, and multiple different View classes that represent each portion of the user interface. The State class is used to maintain real-time information about the context of the GUI that is accessible across files. As most of the objects built were subclassed from PySide, most of these objects were either QWidgets or QMainWindows.
+Front-end: The primary UI interaction and design comprise the front end. Dragging and dropping objects, selecting them, and highlighting multiple objects are all part of the front-end. The classes that encapsulate this behavior are LineDrawers, which allow the user to draw ports between objects; GraphicScene, which allows the interaction between the SymObject instance; and multiple different View classes that represent each portion of the user interface. The State class is used to maintain real-time information about the context of the GUI that is accessible across files. As most of the objects built were subclassed from PySide, most of these objects were either QWidgets or QMainWindows.
 
-Back-end: The front and back-end are quite tightly coupled. Any of the objects selected and dragged to the canvas are mapped to &quot;SimObjects.&quot; These &quot;SimObjects&quot; define the schema and function of a particular computer architectural entity, like a CPU, for example. This list of objects will be colloquially known as the &quot;catalog&quot; which dynamically loads all of the SimObjects at program initialization from APIs built to interact with gem5. Users are then able to select the component they want from a categorized and searchable menu. Each selected object will be its own instance of a specific SimObject. Each of these objects contain varying parameters including some of which that have default values and some that need to be filled in. The description of the objects and their parameters are also loaded from the gem5 repository and can be viewed via tooltips. Furthermore, users can use this tool to save their work and subsequently export to a file format suited for running in the gem5 simulation environment. 
+Back-end: The front and back-end are tightly coupled. Any of the objects selected and dragged to the canvas are mapped to [[Bobby] You've mentioned SimObjects at least once before this point. Could we have a definition further up when it's first declared also?] &quot;SimObjects.&quot; These &quot;SimObjects&quot; define the schema and function of a particular computer architectural entity, like a CPU, for example. We refer to this list of objects as the &quot;catalog&quot; which dynamically loads all of the SimObjects at program initialization. Users are then able to select the component they want from the catelog via a categorized and searchable menu. Each selected object os its own instance of a specific SimObject. Each of these objects contain varying parameters including some that have default values and others that need to be specified by the user. The description of the objects and their parameters are also loaded from gem5 and can be viewed via tooltips. Furthermore, users can use the gem5 guo to save their work and subsequently export to a file format suited for running in the gem5 simulation environment. [[Bobby] Can you state what those file formats are?]. 
 ![](https://lh3.googleusercontent.com/wjVauYFnztL0aIxrHWjf-dgybE87O4_nTb2dcB3mOpZezpZfnenHZ8csDD0EOwaGaCWd_c1Ysb6HSWvdz-mbfKwMAkVXUMrjLwsyyg4A2aR-Pl3OSn_T2r-zHbBRMiNR1s6pEdnF)
 
 ### 2.4 Technical Specifications
 
 #### 2.4.1 PySide2
 
-We decided to develop the GUI using just Python. So the natural choice was to use the Python binding for QT, one of the most popular GUI development libraries. We chose PySide2 over PyQt5 since we would need a commercial license to release code under PyQt5.
+We decided to develop the GUI using Python. Therefore, the natural choice was to use the Python binding for QT, one of the most popular GUI development libraries. We chose PySide2 over PyQt5 as would require a commercial license for release.
 
 
 ## 3. Installation and Setup
 
 ### 3.1 Prerequisites
 
-gem5 requires the linux operating system to run, so the GUI does not support cross platform development. You need to have a compiled gem5 installation on your machine as well. Visit [gem5 download](http://www.m5sim.org/Download) for instructions on how to setup gem5.
+[[Bobby] This reads a bit 'clunky' to me. Consider rephrasing to something like "The gem5 GUI builds atop gem5. gem5 must be compiled and run within a linux operating system..."
+
+gem5 requires the linux operating system to run, [[Bobby] Let's not undersell ourselves, this is gem5 restriction, not specifically one with the GUI] ~~so the GUI does not support cross platform developmen~~. You need to have a compiled gem5 installation on your machine as well. Visit [gem5 download](http://www.m5sim.org/Download) for instructions on how to setup gem5.
+
+[[Bobby] Please don't reference m5sim.org. It's ancient (and should be removed). If there are anyother instances of this in the documentation please change to an equivelant page on gem5.org. In this case, gem5 building and download instructions can be found here: http://www.gem5.org/documentation/general_docs/building]
+
+[[Bobby] What version of Python are you using? I'm assuming Python2? Or does the GUI work with Python3? Either way, it's a prerequisite for running this.]
 
 ### 3.2 Basic Setup
 
 To begin the setup process, clone the [repository](https://github.com/afarooqui98/gem5_GUI) directly into the gem5 directory. Once complete, enter into the gem5\_GUI directory and download the dependencies using:
 
+[[Bobby] pip3 is for Python3, no? Are we using python3?]
 ```pip3 install -r requirements.txt```
 
 ### 3.3 Running the application
@@ -115,6 +130,7 @@ Once the dependencies are installed, users can run the GUI with the command:
 
 ```<gem5.opt path> gui.py```
 
+[[Bobby] It might be nice to have that "help with setup and running issues" in this document, even if it is a bit redundant]
 See the README.md file in the repository for help with setup and running issues.
 
 ## 4. Features and Functionality
@@ -127,13 +143,13 @@ Attached below is a view of the GUI on successful launch:
 
 On the left side lies the **catalog view** as well as the **attribute view**.
 
-The former is used to select a SimObject, and the latter will be used to configure a selected SimObject. The majority of the screen is populated by the **canvas**. This is where most of the user interaction will occur, and where users will build their system. The menu bar contains multiple convenience functions typical to GUI software, from copy-pasting to file saving, but there are also tabs for **debugging** , **running** , and **importing**. These are key functions of the GUI that work in tandem with gem5 to provide the users with the ability to check their system configuration, import both ui objects and configured subclasses, and instantiate their systems. Underneath the top menu is a button that allows the user to draw ports between objects
+The former is used to select a SimObject, and the latter will be used to configure a selected SimObject. The majority of the screen is populated by the **canvas**. This is where most of the user interaction will occur, and where users will build their system. The menu bar contains multiple convenience functions typical to GUI software, from copy-pasting to file saving, but there are also tabs for **debugging** , **running** , and **importing**. These are key functions of the GUI that work in tandem with gem5 to provide the users with the ability to check their system configuration, import both ui objects and configured subclasses, and instantiate their systems. [[Bobby] It took me a few attempts to understand what the following sentance meant. How about "The buttom for drawing ports between objects can be found directly below the 'File' menu button"]. Underneath the top menu is a button that allows the user to draw ports between objects
 
 ### 4.2 Catalog View
 
 **![](https://lh5.googleusercontent.com/iv-iXWbl-zvDkwHlkJ9Adlp4xjj-vP9g_kb4yZYRMtSTrtOUnrlsVTdY73JieBOCWHBDno7JHm0YxuohtawUyQ5tb1EjewX45XU6Q5Z8NOC8WoIYGeZECXX4tcqR5dfbEmMt7Hp6)**
 
-The catalog holds all the available SimObjects. Users can maneuver the tree view by specific category or search for an object at the top search bar. Double clicking an object places what we call a SymObject on the canvas. This is a GUI representation of an m5 SimObject that allows a user to interact with it in a tactile way.
+The catalog holds all the available SimObjects. Users can maneuver the tree view by specific category or search for an object via the search bar. Double clicking an object places what we call a SymObject on the canvas. A SymObject is a GUI representation of an gem5 SimObject that allows a user to interact with it in a tactile way.
 
 ### 4.3 Attribute Table
 
@@ -143,13 +159,13 @@ Selecting an object brings up its attribute table. This table lists the object n
 
 ### 4.4 Wiring
 
-To enable wire drawing, click the wire icon between the menu and the catalog. While in wire drawing mode, objects cannot be interacted with. Clicking this button changes the cursor to a cross hair, allowing the user to connect ports with wires. Failing to connect two ports or connecting incompatible ports will result in an error message. Right clicking a wire brings up a context menu, which will allow for deletion and inspection (printing information about the end connections).
+To enable wire drawing, click the wire icon between the menu and the catalog. While in wire drawing mode, objects cannot be interacted with. Clicking this button changes the cursor to a cross hair, allowing the user to connect ports with wires. Failing to connect two ports or connecting incompatible ports will result in an error message. Right clicking a wire brings up a context menu, which will allow for deletion and inspection.
 
 **![](https://lh5.googleusercontent.com/k3X4PbsV-p_0oNeMGzexuSvBhwoxifQ28G0GGwRPh3QdDB7Q_zl1dCq-dSx7yF7OOA5lsIbB2maPyrQl_yaHlal2H-QIfMKeph4FpgnbwPfTdk0qWnVR9CFmdGq7VeEDV1wT5I9Q)**
 
 ### 4.5 Context
 
-An important part of understanding the gem5 GUI is the way user context works. Whenever an object is created or selected, it is set as the current selected SymObject. Objects that are selected are typically highlighted green, unless there are required attributes that need to be set by the user; then, the object is red. Any time an object is selected, the user can move it around freely and resize it in the canvas, and its attributes are populated in the attribute table. Finally, it&#39;s important to note that wiring _is not_ dependent on the current context, so any ports for any objects may be connected to others regardless of whether they are in context.
+An important part of understanding the gem5 GUI is the way user context works. Whenever an object is created or selected, it is set as the current selected SymObject. Selected objects are typically highlighted in green, unless there are required attributes that need to be set by the user; then, the object is red. Any time an object is selected, the user can move it around freely and resize it in the canvas, with its attributes populated in the attribute table. Finally, it&#39;s important to note that wiring _is not_ dependent on the current context, so any ports for any objects may be connected to others regardless of whether they are in context.
 
 ### 4.6 Menu Overview
 The menu contains tools to interact with the GUI. Most of these correspond to self explanatory standard window functionality, and all options in the menu correspond to a keyboard shortcut.
@@ -158,19 +174,19 @@ The menu contains tools to interact with the GUI. Most of these correspond to se
 
 **![](https://lh3.googleusercontent.com/w7zPXdpEmfvKHBrRCVVazTPXdZGHD4JeemIjvkwXMbomtK5lTdlMmlwplL3d6lF66SYRkinzCPXO1FbHSE4Ou-RjZbbX17yxBO1zkqwt6NBYw23eF7eRHQUiYMHP_WxubpwfzqVR)**
 
-The run tab contains the instantiate and simulate option. Note that it is greyed out until a user drops in at least a root object to prevent the user from instantiating without a root. Once the instantiate button is pressed, the user _must_ save the file (since objects cannot be modified once instantiated), after which the results of instantiation are displayed on the command line. Once instantiation is executed, the user can interact with the simulate button, which will again show output on the command line.
+The run tab contains the instantiate and simulate option. Please note both are greyed out until a user drops in at least a root object to prevent the user from instantiating without a root. Once the instantiate button is pressed, the user _must_ save the file (since objects cannot be modified once instantiated), after which the results of instantiation are displayed within the command line. Once instantiation is complete, the user can press the simulate button, which will begin the simulation of the design with the output in the command line interface.
 
 ### 4.8 Debug
 
 **![](https://lh4.googleusercontent.com/Plh1yAE1Sx3wgVY3w-fHRgmEh1ZyY2uCe0O2SX1984lYe4kgiUJH-C6_2aLZngWX0-eraXf8m--xC--ouErySfQJFGbAkLe-TuzNa3O5QKRf6F-UAThoJ5oyWi0KRsgLLH6LQVU2)**
 
-By pressing the Debug button on the toolbar, the debug window will appear on the right side of the GUI. There will be two checkboxes: &quot;Log to File&quot; and &quot;Log to Stdout,&quot; with the former being set automatically. Logging to file will send debug and error messages to a file which can be renamed at any time in the text below. Logging to stdout will print these messages in the Terminal application running the GUI. Below these options is a table full of debug flags that are native to the gem5 system. These flags can be set and unset, and result in gem5 debug messages related to the flag set. They are also searchable by an accompanying search bar.
+By pressing the Debug button on the toolbar, the debug window will appear on the right side of the GUI. There will be two checkboxes: &quot;Log to File&quot; and &quot;Log to Stdout,&quot; with the former being set automatically. Logging to file will send debug and error messages to a file which can be renamed at any time in the text below. Logging to stdout will print these messages in the Terminal application running the GUI. Below these options is a table of debug flags that native to the gem5 system. These flags can be set and unset, and result in different gem5 debug messages. They are also searchable by an accompanying search bar.
 
 ### 4.9 Import and Export UI Objects
 
 **![](https://lh3.googleusercontent.com/siEBwmcd6tGS7QHymwpDtJK7Is0zEQFH30jnCnhSTcjVKfo7rD3oPJskbw_Cty_lu05ifpWIkkwO3wKJqMoDKqtL7XqrEgVqwAXp9X57DmRIjZqkMRpErWt1kLeJYvXZ9Qn2YftK)**
 
-Under file, we have import and export UI object, which allow users to save and load clusters of SymObjects. Exporting saves the configuration as a .obj file, which has a JSON format. Importing places the custom object in the catalog, allowing for the same access methods as regular SimObjects.
+Under file, we have import and export UI object, which allow users to save and load clusters of SymObjects. Exporting saves the configuration as a .obj file, which is in a JSON format [[Bobby] Remind me again, why are we saving to .obj even if this is in a JSON format?]. Importing places the custom object in the catalog, allowing for the same access methods as regular SimObjects.
 
 ### 4.10 Import SimObject
 
@@ -234,6 +250,7 @@ Could Haves:
 
 ### 6.2 Technology Survey
 
+[[Bobby] I take it this is still under construction? I'll just ignore it for now]
 #### 6.2.1 Virtual Machine
 
 Parallels
@@ -286,7 +303,7 @@ Debian
   - cons:
     - not as aesthetic as other technologies
 
-### 6.3 FAQ
+### 6.3 FAQ [[Bobby] Good! I like this!]
 
 #### 6.3.1 How do I know if I am in the wire drawing mode or selection mode?
 
@@ -319,10 +336,11 @@ Debian
 
 ## 7. Future
 
-Over the development timeline, we faced roadblocks and came up with new ideas, so we were not able to accomplish everything we initially planned to do. Future development can address these features, as well as others that may be desired:
+Over the course of development, we have faced hurdles and came up with new ideas which we later implemented. We were therefore unable to allocate time to develop everything we had originally planned. Future development should focus on these features, as well as others that we believe are desired:
 
 - Export to multiple file formats (current instantiation generates config.json)
-- Visualization of simulation results, comparison to other simulations
+- Visualization of simulation results, with comparison to other simulations
 - Parameterize objects to allow for running multiple simulations in parallel and comparing results / identifying optimal parameter values
 
-Although we did our best to address bugs we came across during development and user testing, the fact of the matter is a sandbox application with few restrictions on the user such as this GUI will yield numerous bugs through unforeseen usage. If you come across a bug let us know by opening an [issue](https://github.com/afarooqui98/gem5_GUI/issues), submitting a [pull request](https://github.com/afarooqui98/gem5_GUI/pulls), or contacting us or the gem5 team directly. Please try to document the steps resulting in a fault, as well as including a screenshot of the terminal.
+[[Bobby] Here, and in other parts of this document, you state users need to do this all through Github. Are we not going to upload this to Gerrit soon? If so, please update this documentation accordingly].
+We have did our best to address bugs during development and through user testing. If you encounter a bug, please let us know by an [issue](https://github.com/afarooqui98/gem5_GUI/issues), submitting a [pull request](https://github.com/afarooqui98/gem5_GUI/pulls), or contacting us or the gem5 team directly [[Bobby] How?]. Please try to document the steps resulting in a fault, as well as including a screenshot of the terminal.
