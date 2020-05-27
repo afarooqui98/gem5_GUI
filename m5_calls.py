@@ -42,7 +42,6 @@ from m5.objects import *
 from m5.params import *
 from m5.proxy import AttrProxy
 
-
 def portsCompatible(parent, child):
     """ Checks if two port values are compatible for connections """
     compatible = False
@@ -52,7 +51,6 @@ def portsCompatible(parent, child):
         e = sys.exc_info()[0]
         logging.error("Error on port connection %s" % e.__name__)
     return compatible
-
 
 def getPortInfo(m5_object):
     """ Given a gem5 object class create a dictionary containing info on
@@ -143,6 +141,10 @@ def get_obj_lists():
 def isSimObjectParam(param_info):
     """ Given metadata of parameter see if it is a SimObject Param"""
     return issubclass(param_info["Type"], SimObject)
+
+def isSimObject(object):
+    """ Given an object, return if it's a SimObject type"""
+    return issubclass(object, SimObject)
 
 def setParamValue(simobject, symobject, param, param_info, m5_children):
     """ Set a certain param for the simobject instance. This entails multiple
@@ -273,7 +275,6 @@ def instantiate_model():
         logging.error("Instantiate error on proxy param by %s" % e.__name__)
         return True
 
-
 def simulate():
     """ Simulate the model on the gui """
     try:
@@ -285,7 +286,6 @@ def simulate():
         e = sys.exc_info()[0]
         logging.error("Simulation error caused by %s" % e.__name__)
         return True
-
 
 def getRoot():
     """ Singleton type fn for Root simobject instance """
