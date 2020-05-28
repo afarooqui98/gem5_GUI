@@ -27,6 +27,7 @@
 #
 
 import copy
+import sys
 
 from PySide2.QtCore import *
 from PySide2.QtGui import *
@@ -160,13 +161,15 @@ class SymObject(QGraphicsItemGroup):
         """returns a list of symObject names sorted with their x coordinate"""
         sorted_names = []
         for i in range(0, len(self.state.symObjects)):
-            sorted_names.append(self.getMin(sorted_names))
+            new_object = self.getMin(sorted_names)
+            if new_object:
+                sorted_names.append(new_object)
 
         return sorted_names
 
     def getMin(self, sorted):
         """return the name of the next sym object"""
-        min = 1750
+        min = sys.maxint
         object_name = None
         for key in self.state.symObjects:
             item = self.state.symObjects[key]
