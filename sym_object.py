@@ -139,9 +139,9 @@ class SymObject(QGraphicsItemGroup):
         self.setPos(self.scene.width() / 2 - self.width,
                     self.scene.height() / 2 -self.height)
 
-        # iterate through existing objects and check if current object overlaps
-        # with any of them
-        for key in self.state.symObjects:
+        # iterate through existing objects from left to right and check if
+        # current object overlaps with any of them
+        for key in self.getSortedNames():
             item = self.state.symObjects[key]
             if self.doesOverlap(item):
                 self.setPos(item.scenePos().x() + item.width + 20,
@@ -155,6 +155,27 @@ class SymObject(QGraphicsItemGroup):
         del self.state.selectedSymObjects[:]
         self.state.selectedSymObjects.append(self)
         self.updateHandlesPos()
+
+    def getSortedNames(self):
+        '''returns a list of symObject names sorted with their x coordinate'''
+        sorted = []
+        for i in range(0, len(self.state.symObjects)):
+            sorted.append(self.getMin(sorted))
+
+        return sorted
+
+    def getMin(self, sorted):
+        '''return the name of the next sym object'''
+        min = 1750
+        object = None
+        for key in self.state.symObjects:
+            item = self.state.symObjects[key]
+            if item.name not in sorted and item.x < min:
+                min = item.x
+                object = item.name
+
+        return object
+
 
     def contextMenuEvent(self, event):
         """ Create a context menu for the symo object """
