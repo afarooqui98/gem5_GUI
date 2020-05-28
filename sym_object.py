@@ -157,25 +157,24 @@ class SymObject(QGraphicsItemGroup):
         self.updateHandlesPos()
 
     def getSortedNames(self):
-        '''returns a list of symObject names sorted with their x coordinate'''
-        sorted = []
+        """returns a list of symObject names sorted with their x coordinate"""
+        sorted_names = []
         for i in range(0, len(self.state.symObjects)):
-            sorted.append(self.getMin(sorted))
+            sorted_names.append(self.getMin(sorted_names))
 
-        return sorted
+        return sorted_names
 
     def getMin(self, sorted):
-        '''return the name of the next sym object'''
+        """return the name of the next sym object"""
         min = 1750
-        object = None
+        object_name = None
         for key in self.state.symObjects:
             item = self.state.symObjects[key]
             if item.name not in sorted and item.x < min:
                 min = item.x
-                object = item.name
+                object_name = item.name
 
-        return object
-
+        return object_name
 
     def contextMenuEvent(self, event):
         """ Create a context menu for the symo object """
