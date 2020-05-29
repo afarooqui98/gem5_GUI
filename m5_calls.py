@@ -176,7 +176,7 @@ def setParamValue(sym_catalog, simobject, symobject, param, param_info, m5_child
             setattr(simobject, param, str(value))
         else:
             # Note: he gem5 compiler seems to handle cases where the value
-            # is not another simobject by just comverting the value to a string
+            # is not another simobject by just converting the value to a str
             setattr(simobject, param, str(param_info["Value"]))
     else:
         # If the user has not changed and there is a default
