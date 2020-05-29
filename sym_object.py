@@ -27,6 +27,7 @@
 #
 
 import copy
+import sys
 
 from PySide2.QtCore import *
 from PySide2.QtGui import *
@@ -139,9 +140,9 @@ class SymObject(QGraphicsItemGroup):
         self.setPos(self.scene.width() / 2 - self.width,
                     self.scene.height() / 2 -self.height)
 
-        # iterate through existing objects and check if current object overlaps
-        # with any of them
-        for key in self.state.symObjects:
+        # iterate through existing objects from left to right and check if
+        # current object overlaps with any of them
+        for key in self.getSortedNames():
             item = self.state.symObjects[key]
             if self.doesOverlap(item):
                 self.setPos(item.scenePos().x() + item.width + 20,
@@ -155,6 +156,28 @@ class SymObject(QGraphicsItemGroup):
         del self.state.selectedSymObjects[:]
         self.state.selectedSymObjects.append(self)
         self.updateHandlesPos()
+
+    def getSortedNames(self):
+        """returns a list of symObject names sorted with their x coordinate"""
+        sorted_names = []
+        for i in range(0, len(self.state.symObjects)):
+            new_object = self.getMin(sorted_names)
+            if new_object:
+                sorted_names.append(new_object)
+
+        return sorted_names
+
+    def getMin(self, sorted):
+        """return the name of the next sym object"""
+        min = sys.maxint
+        object_name = None
+        for key in self.state.symObjects:
+            item = self.state.symObjects[key]
+            if item.name not in sorted and item.x < min:
+                min = item.x
+                object_name = item.name
+
+        return object_name
 
     def contextMenuEvent(self, event):
         """ Create a context menu for the symo object """
