@@ -29,6 +29,7 @@
 import inspect
 import logging
 import os
+import re
 import sys
 
 from gui_views.state import get_path
@@ -146,7 +147,7 @@ def isSimObject(object):
     """ Given an object, return if it's a SimObject type"""
     return issubclass(object, SimObject)
 
-def setParamValue(simobject, symobject, param, param_info, m5_children):
+def setParamValue(sym_catalog, simobject, symobject, param, param_info, m5_children):
     """ Set a certain param for the simobject instance. This entails multiple
         checks to see how the value of the param is set """
     # Check if the user changed the parameter's value ie the type of the value
@@ -160,9 +161,22 @@ def setParamValue(simobject, symobject, param, param_info, m5_children):
                 if sym == param_info["Value"]:
                     setattr(simobject, param, sim)
                     break
+        elif '.' in param_info['Value']:
+            # case where value is value of another object's param
+            # ex: param_info['Value'] = 'system.mem_ranges[0]'
+            obj_val = str(param_info['Value']).split('.')
+            obj_param = obj_val[-1] # name of param
+            obj_ref = obj_val[-2] # name of object being referenced
+            index = None
+            if obj_param[-1] == ']': # param has index
+                obj_param, index = obj_param.rstrip(']').split('[')
+            value = sym_catalog[obj_ref].instanceParams[obj_param]['Value']
+            if index is not None:
+                value = value.strip('][').split(', ')[int(index)]
+            setattr(simobject, param, str(value))
         else:
             # Note: he gem5 compiler seems to handle cases where the value
-            # is not another simobject by just comverting the value to a string
+            # is not another simobject by just converting the value to a str
             setattr(simobject, param, str(param_info["Value"]))
     else:
         # If the user has not changed and there is a default
@@ -196,7 +210,7 @@ def traverseParams(sym_catalog, symobject, simobject):
 
     # Setting the paramerters for the object instance
     for param, param_info in symobject.instanceParams.items():
-        setParamValue(simobject, symobject, param, param_info, m5_children)
+        setParamValue(sym_catalog, simobject, symobject, param, param_info, m5_children)
 
     # Recurse for the objects children
     for m_child in m5_children:
