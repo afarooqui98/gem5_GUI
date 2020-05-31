@@ -7,7 +7,6 @@
 - [1. Preface](#preface)
   * [1.1 README](#readme)
   * [1.2 Audience](#audience)
-  * [1.3 Contact Us](#contact-us)
 - [2. Overview](#overview)
   * [2.1 Background](#background)
   * [2.2 Description](#description)
@@ -47,28 +46,7 @@
 This user guide covers setup, installation, and usage of the gem5 GUI. The purpose of this guide is to provide users with a high-level understanding of the features and components of the GUI, answer any questions about its operation, and highlight differences between the configuring architectural simulations via scripts and via the gem5 GUI.
 
 ### 1.2 Audience
-
-This user guide is meant for both existing gem5 users looking to develop simulations using the GUI [[Bobby] Do you really want to frame this as en entry point for beginners? I feel that's a bit out-of-scope. I'd make this more broad, something like "This user guide is intended for those who wish to carry out architectural simulations using gem5's GUI interface, as opposed to the use of configuration scripts"] and new users who are unfamiliar with how gem5 works]. For new users, highlighted terms and sections will indicate background information necessary for understanding the proper usage of the GUI. Experienced users can skip these sections.
-
-### 1.3 Contact Us
-
-[[Bobby] Very brave of you... are you sure? :)]
-
-- Ahmed Farooqui
-
-	- [amfarooqui@ucdavis.edu](mailto:amfarooqui@ucdavis.edu)
-
-- Ravishdeep Singh
-
-	- [ravishdeep10@gmail.com](mailto:ravishdeep10@gmail.com)
-
--  Rohit Dhamankar
-
-	- [rohit.dhamankar@gmail.com](mailto:rohit.dhamankar@gmail.com)
-
-- Shivam Desai
-
-	- [shivamd50@gmail.com](mailto:shivamd50@gmail.com)
+This user guide is intended for those who wish to carry out architectural simulations using gem5's GUI interface, as opposed to the use of configuration scripts and new users who are unfamiliar with how gem5 works. For new users, highlighted terms and sections will indicate background information necessary for understanding the proper usage of the GUI. Experienced users can skip these sections.
 
 
 ## Overview
@@ -81,22 +59,21 @@ Currently, gem5 is an open source project used to simulate computer architecture
 
 ### 2.2 Description
 
-[[Bobby] I think we could afford to be more high-level here and save the details fo the exact layout for later in the document (the following "Approach" section and the "GUI overview" seems most appropriate for this). Very rough starting point: "We developed a user interface whichs allows users to search through a library of simobject, configure them, and place them in an architectural heirarchy to then be instantiate and simulated..."]
+We developed a user interface whichs allows users to search through a library of simobject, configure them, and place them in an architectural heirarchy to then be instantiate and simulated. Users can then save these heirarchies in UI files that they can load later and edit further. 
 
-We developed a user interface that allows users to search for simobjects in a left hand catalog, place them in the canvas, and move them around to create an architectural hierarchy that can then be instantiated and simulated. Selecting an object allows a user to modify parameters in the attribute table on the bottom left. Placing objects inside other objects establishes a parent-child relationship. Drawing wires using the wire tool allows for port connections between objects.
 
-### 2.3 Approach [[Bobby] Can we rename this? This seems more like "Design" than approach]
+### 2.3 Design
 
 [[Bobby] Reading back over this (2nd pass), I still don't really know what this section is about. What's its purpose? What key points are we trying to communicate here? It seems redundant given the sections that follow it]
 
 [[Bobby] I'd rephrase this below. The diagram is helpful in describing your approach. I wouldn't cast it aside by mentioning it was a first-draft or some kind of diagram you found useful early on. You also slip into past tense here a lot ("Our GUI had a distinct front-end and back-end"), does it not so much anymore? If so, explain, or make it present tense --- likewise for elsewhere in the document if applicable]
 
-The image below was our initial diagramming of the basic structure of the GUI, as well as a very high level overview of interaction with our &quot;back-end&quot;, which in this case was the gem5 repository. Our GUI had a distinct front-end and back-end, which were linked by a State class and the SymObject class.
 
-Front-end: The primary UI interaction and design comprise the front end. Dragging and dropping objects, selecting them, and highlighting multiple objects are all part of the front-end. The classes that encapsulate this behavior are LineDrawers, which allow the user to draw ports between objects; GraphicScene, which allows the interaction between the SymObject instance; and multiple different View classes that represent each portion of the user interface. The State class is used to maintain real-time information about the context of the GUI that is accessible across files. As most of the objects built were subclassed from PySide, most of these objects were either QWidgets or QMainWindows.
+The image below represents the basic structure of the GUI, as well as a very high level overview of interaction with our &quot;back-end&quot;, which in this case was the gem5 repository. Our GUI has a distinct front-end and back-end, which are linked by a State class and the SymObject class.
 
-Back-end: The front and back-end are tightly coupled. Any of the objects selected and dragged to the canvas are mapped to [[Bobby] You've mentioned SimObjects at least once before this point. Could we have a definition further up when it's first declared also?] &quot;SimObjects.&quot; These &quot;SimObjects&quot; define the schema and function of a particular computer architectural entity, like a CPU, for example. We refer to this list of objects as the &quot;catalog&quot; which dynamically loads all of the SimObjects at program initialization. Users are then able to select the component they want from the catelog via a categorized and searchable menu. Each selected object os its own instance of a specific SimObject. Each of these objects contain varying parameters including some that have default values and others that need to be specified by the user. The description of the objects and their parameters are also loaded from gem5 and can be viewed via tooltips. Furthermore, users can use the gem5 guo to save their work and subsequently export to a file format suited for running in the gem5 simulation environment. [[Bobby] Can you state what those file formats are?]. 
 ![](https://lh3.googleusercontent.com/wjVauYFnztL0aIxrHWjf-dgybE87O4_nTb2dcB3mOpZezpZfnenHZ8csDD0EOwaGaCWd_c1Ysb6HSWvdz-mbfKwMAkVXUMrjLwsyyg4A2aR-Pl3OSn_T2r-zHbBRMiNR1s6pEdnF)
+
+
 
 ### 2.4 Technical Specifications
 
@@ -111,7 +88,7 @@ We decided to develop the GUI using Python. Therefore, the natural choice was to
 
 [[Bobby] This reads a bit 'clunky' to me. Consider rephrasing to something like "The gem5 GUI builds atop gem5. gem5 must be compiled and run within a linux operating system..."
 
-gem5 requires the linux operating system to run, [[Bobby] Let's not undersell ourselves, this is gem5 restriction, not specifically one with the GUI] ~~so the GUI does not support cross platform developmen~~. You need to have a compiled gem5 installation on your machine as well. Visit [gem5 download](http://www.m5sim.org/Download) for instructions on how to setup gem5.
+The gem5 GUI builds atop gem5. gem5 must be compiled and run within a linux operating system. [[Bobby] Let's not undersell ourselves, this is gem5 restriction, not specifically one with the GUI] ~~so the GUI does not support cross platform developmen~~. You need to have a compiled gem5 installation on your machine as well. Visit [gem5 download](http://www.gem5.org/documentation/general_docs/building) for instructions on how to setup gem5.
 
 [[Bobby] Please don't reference m5sim.org. It's ancient (and should be removed). If there are anyother instances of this in the documentation please change to an equivelant page on gem5.org. In this case, gem5 building and download instructions can be found here: http://www.gem5.org/documentation/general_docs/building]
 
@@ -143,7 +120,7 @@ Attached below is a view of the GUI on successful launch:
 
 On the left side lies the **catalog view** as well as the **attribute view**.
 
-The former is used to select a SimObject, and the latter will be used to configure a selected SimObject. The majority of the screen is populated by the **canvas**. This is where most of the user interaction will occur, and where users will build their system. The menu bar contains multiple convenience functions typical to GUI software, from copy-pasting to file saving, but there are also tabs for **debugging** , **running** , and **importing**. These are key functions of the GUI that work in tandem with gem5 to provide the users with the ability to check their system configuration, import both ui objects and configured subclasses, and instantiate their systems. [[Bobby] It took me a few attempts to understand what the following sentance meant. How about "The buttom for drawing ports between objects can be found directly below the 'File' menu button"]. Underneath the top menu is a button that allows the user to draw ports between objects
+The former is used to select a SimObject, and the latter will be used to configure a selected SimObject. The majority of the screen is populated by the **canvas**. This is where most of the user interaction will occur, and where users will build their system. The menu bar contains multiple convenience functions typical to GUI software, from copy-pasting to file saving, but there are also tabs for **debugging** , **running** , and **importing**. These are key functions of the GUI that work in tandem with gem5 to provide the users with the ability to check their system configuration, import both ui objects and configured subclasses, and instantiate their systems. The buttom for drawing ports between objects can be found directly below the 'File' menu button.
 
 ### 4.2 Catalog View
 
@@ -186,7 +163,7 @@ By pressing the Debug button on the toolbar, the debug window will appear on the
 
 **![](https://lh3.googleusercontent.com/siEBwmcd6tGS7QHymwpDtJK7Is0zEQFH30jnCnhSTcjVKfo7rD3oPJskbw_Cty_lu05ifpWIkkwO3wKJqMoDKqtL7XqrEgVqwAXp9X57DmRIjZqkMRpErWt1kLeJYvXZ9Qn2YftK)**
 
-Under file, we have import and export UI object, which allow users to save and load clusters of SymObjects. Exporting saves the configuration as a .obj file, which is in a JSON format [[Bobby] Remind me again, why are we saving to .obj even if this is in a JSON format?]. Importing places the custom object in the catalog, allowing for the same access methods as regular SimObjects.
+Under file, we have import and export UI object, which allow users to save and load clusters of SymObjects. Exporting saves the configuration as a .obj file, which is in a JSON format (to differntiate these types of files we use the .obj extension). Importing places the custom object in the catalog, allowing for the same access methods as regular SimObjects.
 
 ### 4.10 Import SimObject
 
@@ -250,7 +227,8 @@ Could Haves:
 
 ### 6.2 Technology Survey
 
-[[Bobby] I take it this is still under construction? I'll just ignore it for now]
+The Technology Survey contains some of our drafts of what technologies and stack to use during our braintsorming sessions for the GUI.
+
 #### 6.2.1 Virtual Machine
 
 Parallels
