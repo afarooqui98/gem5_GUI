@@ -34,8 +34,7 @@
   * [6.1 Requirements](#requirements)
   * [6.2 Technology Survey](#technology-survey)
   * [6.3 FAQ](#faq)
-  * [6.4 Github Repository](#github-repository)
-  * [6.5 Glossary](#glossary)
+  * [6.4 Glossary](#glossary)
 - [7. Future](#future)
 
 
@@ -49,7 +48,7 @@ This user guide covers setup, installation, and usage of the gem5 GUI. The purpo
 This user guide is intended for those who wish to carry out architectural simulations using gem5's GUI interface, as opposed to the use of configuration scripts and new users who are unfamiliar with how gem5 works. For new users, highlighted terms and sections will indicate background information necessary for understanding the proper usage of the GUI. Experienced users can skip these sections.
 
 
-## Overview
+## 2. Overview
 
 ![](https://cdn.fbsbx.com/v/t59.2708-21/100914476_177123480350163_4173079852171132928_n.gif?_nc_cat=106&_nc_sid=041f46&_nc_ohc=7tJE3wy0YPAAX-M2Pxs&_nc_ht=cdn.fbsbx.com&oh=173b2536760b7a324eb0ad9e959a22f9&oe=5ECEF05B)
 
@@ -64,15 +63,9 @@ We developed a user interface whichs allows users to search through a library of
 
 ### 2.3 Design
 
-[[Bobby] Reading back over this (2nd pass), I still don't really know what this section is about. What's its purpose? What key points are we trying to communicate here? It seems redundant given the sections that follow it]
-
-[[Bobby] I'd rephrase this below. The diagram is helpful in describing your approach. I wouldn't cast it aside by mentioning it was a first-draft or some kind of diagram you found useful early on. You also slip into past tense here a lot ("Our GUI had a distinct front-end and back-end"), does it not so much anymore? If so, explain, or make it present tense --- likewise for elsewhere in the document if applicable]
-
-
 The image below represents the basic structure of the GUI, as well as a very high level overview of interaction with our &quot;back-end&quot;, which in this case was the gem5 repository. Our GUI has a distinct front-end and back-end, which are linked by a State class and the SymObject class.
 
 ![](https://lh3.googleusercontent.com/wjVauYFnztL0aIxrHWjf-dgybE87O4_nTb2dcB3mOpZezpZfnenHZ8csDD0EOwaGaCWd_c1Ysb6HSWvdz-mbfKwMAkVXUMrjLwsyyg4A2aR-Pl3OSn_T2r-zHbBRMiNR1s6pEdnF)
-
 
 
 ### 2.4 Technical Specifications
@@ -86,19 +79,12 @@ We decided to develop the GUI using Python. Therefore, the natural choice was to
 
 ### 3.1 Prerequisites
 
-[[Bobby] This reads a bit 'clunky' to me. Consider rephrasing to something like "The gem5 GUI builds atop gem5. gem5 must be compiled and run within a linux operating system..."
-
-The gem5 GUI builds atop gem5. gem5 must be compiled and run within a linux operating system. [[Bobby] Let's not undersell ourselves, this is gem5 restriction, not specifically one with the GUI] ~~so the GUI does not support cross platform developmen~~. You need to have a compiled gem5 installation on your machine as well. Visit [gem5 download](http://www.gem5.org/documentation/general_docs/building) for instructions on how to setup gem5.
-
-[[Bobby] Please don't reference m5sim.org. It's ancient (and should be removed). If there are anyother instances of this in the documentation please change to an equivelant page on gem5.org. In this case, gem5 building and download instructions can be found here: http://www.gem5.org/documentation/general_docs/building]
-
-[[Bobby] What version of Python are you using? I'm assuming Python2? Or does the GUI work with Python3? Either way, it's a prerequisite for running this.]
+The gem5 GUI builds atop gem5. gem5 must be compiled and run within a linux operating system. Due to gem5 being linux native, this GUI can not be developed cross-platform. You need to have a compiled gem5 installation on your machine. Visit [gem5 download](http://www.gem5.org/documentation/general_docs/building) for instructions on how to setup gem5. You also need **Python3** in order to run the GUI as well. 
 
 ### 3.2 Basic Setup
 
 To begin the setup process, clone the [repository](https://github.com/afarooqui98/gem5_GUI) directly into the gem5 directory. Once complete, enter into the gem5\_GUI directory and download the dependencies using:
 
-[[Bobby] pip3 is for Python3, no? Are we using python3?]
 ```pip3 install -r requirements.txt```
 
 ### 3.3 Running the application
@@ -106,9 +92,6 @@ To begin the setup process, clone the [repository](https://github.com/afarooqui9
 Once the dependencies are installed, users can run the GUI with the command:
 
 ```<gem5.opt path> gui.py```
-
-[[Bobby] It might be nice to have that "help with setup and running issues" in this document, even if it is a bit redundant]
-See the README.md file in the repository for help with setup and running issues.
 
 ## 4. Features and Functionality
 
@@ -227,7 +210,7 @@ Could Haves:
 
 ### 6.2 Technology Survey
 
-The Technology Survey contains some of our drafts of what technologies and stack to use during our braintsorming sessions for the GUI.
+The Technology Survey contains some of our early brainstorming of what stack to use for the developmet of the GUI.
 
 #### 6.2.1 Virtual Machine
 
@@ -281,7 +264,7 @@ Debian
   - cons:
     - not as aesthetic as other technologies
 
-### 6.3 FAQ [[Bobby] Good! I like this!]
+### 6.3 FAQ 
 
 #### 6.3.1 How do I know if I am in the wire drawing mode or selection mode?
 
@@ -299,13 +282,8 @@ Debian
 
 - The resize handles of the object are included in the collision detection between objects, so if they overlap (even when invisible) the GUI will interpret the action as placing an object in another.
 
-### 6.4 Github Repository
 
-[https://github.com/afarooqui98/gem5\_GUI.git](https://github.com/afarooqui98/gem5_GUI.git)
-
-### 6.5 Glossary
-
-- gem5: a computer architecture simulator
+### 6.4 Glossary
 
 - SimObject: a standard gem5 object
 - SymObject: a UI object with a pointer to the gem5 SimObject
@@ -320,5 +298,3 @@ Over the course of development, we have faced hurdles and came up with new ideas
 - Visualization of simulation results, with comparison to other simulations
 - Parameterize objects to allow for running multiple simulations in parallel and comparing results / identifying optimal parameter values
 
-[[Bobby] Here, and in other parts of this document, you state users need to do this all through Github. Are we not going to upload this to Gerrit soon? If so, please update this documentation accordingly].
-We have did our best to address bugs during development and through user testing. If you encounter a bug, please let us know by an [issue](https://github.com/afarooqui98/gem5_GUI/issues), submitting a [pull request](https://github.com/afarooqui98/gem5_GUI/pulls), or contacting us or the gem5 team directly [[Bobby] How?]. Please try to document the steps resulting in a fault, as well as including a screenshot of the terminal.
