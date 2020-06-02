@@ -44,6 +44,7 @@ from connection import *
 from dialogs import *
 from gui_views import state
 from m5_calls import *
+from connection import *
 
 class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def __init__(self, layout, state, window):
@@ -473,6 +474,9 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         new_object = self.state.symObjects[object_name]
         delete_button_height = new_object.deleteButton.boundingRect().height()
         num_ports = len(new_object.instancePorts)
+        # no ports, nothing to copy
+        if not num_ports:
+            return
         y_offset = (new_object.height - delete_button_height) / num_ports
         new_x = new_object.scenePos().x() + new_object.width * 7 / 8
         for name, connection in selectedObject.uiConnections.items():
