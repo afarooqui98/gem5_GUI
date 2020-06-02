@@ -40,6 +40,7 @@ from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from graphic_scene import *
 
+from connection import *
 from dialogs import *
 from gui_views import state
 from m5_calls import *
@@ -410,11 +411,14 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
     def pasteButtonPressed(self):
         if not self.state.copyState:
             return
-
+        
+        suffixList = []
+        index = 0
         for selectedObject in self.state.copiedObjects:
-            self.copy_sym_object(selectedObject)
+            suffixList.append(self.copy_sym_object(selectedObject))
         for selectedObject in self.state.copiedObjects:
-            self.copyConnection(selectedObject)
+            self.copyConnection(selectedObject, suffixList[index])
+            index += 1
 
         self.state.copyState = False
         self.state.removeHighlight()
@@ -424,16 +428,24 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
     def copy_sym_object(self, selectedObject):
         object_name = selectedObject.name + "_copy"
+        suffix = "_copy"
+        while object_name in self.state.symObjects:
+            object_name += "_copy" #add suffix iteratively until
+            suffix += "_copy"
+
         new_object = self.state.scene.addObjectToScene("component",
                                 selectedObject.componentName, object_name)
         #copy over parent - child relationship info
         if selectedObject.parentName:
-            parent_name = selectedObject.parentName + "_copy"
+            parent_name = selectedObject.parentName + suffix
             if parent_name in self.state.symObjects:
                 parent = self.state.symObjects[parent_name]
                 parent.addSubObject(new_object)
+                for key, value in parent.instanceParams.items():
+                    if value["Value"] == selectedObject.name:
+                        value["Value"] = object_name
                 new_object.parentName = parent_name
-
+        
         #copy backend info
         new_object.instancePorts = copy.deepcopy(selectedObject.instancePorts)
         new_object.instanceParams = \
@@ -452,9 +464,12 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         new_object.instantiateSimObject()
         self.state.symObjects[object_name] = new_object
+        
+        return suffix
 
-    def copyConnection(self, selectedObject):
-        object_name = selectedObject.name + "_copy"
+    def copyConnection(self, selectedObject, suffix):
+        object_name = selectedObject.name + suffix
+
         new_object = self.state.symObjects[object_name]
         delete_button_height = new_object.deleteButton.boundingRect().height()
         num_ports = len(new_object.instancePorts)
@@ -465,7 +480,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 continue
             new_y = delete_button_height
 
-            object_name2 = self.state.symObjects[name[1]].name + "_copy"
+            object_name2 = self.state.symObjects[name[1]].name + suffix
             object2 = self.state.symObjects[object_name2]
             delete_button_height2 = object2.deleteButton.boundingRect().height()
             num_ports2 = len(object2.instancePorts)
