@@ -412,7 +412,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         if not self.state.copyState:
             return
         
-        suffixList = []
+        suffixList = [] #keep track of all the copy names, in order to find in copyConnection
         index = 0
         for selectedObject in self.state.copiedObjects:
             suffixList.append(self.copy_sym_object(selectedObject))
