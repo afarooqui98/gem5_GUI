@@ -163,8 +163,9 @@ class LineDrawer(QWidget):
         key1 = ("parent", child.name, parent_port_name, child_port_name)
         key2 = ("child", parent.name, child_port_name, parent_port_name)
         # sets up backend port information
-        if portsCompatible(parent.instancePorts[parent_port_name]['Value'],
-            child.instancePorts[child_port_name]['Value']):
+
+        if portsCompatible(parent.instancePorts[parent_port_name]['Default'],
+            child.instancePorts[child_port_name]['Default']):
             parent.uiConnections[key1] = Connection(self.pos1, self.pos2,
                     parent_port_num, child_port_num)
             child.uiConnections[key2] = Connection(self.pos1, self.pos2,
