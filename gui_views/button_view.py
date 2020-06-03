@@ -194,6 +194,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.updateObjs(tree, instances, name)
 
     def importObjs(self):
+        """Import a subclassed SimObject into the current catalog library"""
         try:
             # Open file path dialog
             full_path = QFileDialog.getOpenFileName(None, 'Open file',
@@ -375,7 +376,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 self.createChildList(child, subObjects)
 
     def newButtonPressed(self):
-        # check if any changes have been made - to save before closing
+        """check if any changes have been made - to save before closing"""
         if not self.state.mostRecentSaved:
             dialog = saveChangesDialog("opening a new file", self.state)
             if dialog.exec_():
@@ -388,6 +389,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.redo.setEnabled(False)
 
     def copyButtonPressed(self):
+        """initiate copy procedure"""
         logging.debug("copy button pressed")
         if not len(self.state.selectedSymObjects):
             return
@@ -403,6 +405,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             self.addChildren(selectedObject)
 
     def addChildren(self, object):
+        """connect objects to subobjects"""
         for child_name in object.connectedObjects:
             child = self.state.symObjects[child_name]
             if not child in self.state.copiedObjects:
@@ -410,13 +413,14 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                 self.addChildren(child)
 
     def pasteButtonPressed(self):
+        """paste button procedure: paste object, then paste object connections"""
         if not self.state.copyState:
             return
-        
+
         suffixList = [] #keep track of all the copy names, in order to find in copyConnection
         index = 0
         for selectedObject in self.state.copiedObjects:
-            suffixList.append(self.copy_sym_object(selectedObject))
+            suffixList.append(self.copySymObject(selectedObject))
         for selectedObject in self.state.copiedObjects:
             self.copyConnection(selectedObject, suffixList[index])
             index += 1
@@ -427,7 +431,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
         self.state.lineDrawer.update()
         self.state.addToHistory()
 
-    def copy_sym_object(self, selectedObject):
+    def copySymObject(self, selectedObject):
+        """copy SymObject data"""
         object_name = selectedObject.name + "_copy"
         suffix = "_copy"
         while object_name in self.state.symObjects:
@@ -446,7 +451,7 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
                     if value["Value"] == selectedObject.name:
                         value["Value"] = object_name
                 new_object.parentName = parent_name
-        
+
         #copy backend info
         new_object.instancePorts = copy.deepcopy(selectedObject.instancePorts)
         new_object.instanceParams = \
@@ -465,10 +470,11 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
 
         new_object.instantiateSimObject()
         self.state.symObjects[object_name] = new_object
-        
+
         return suffix
 
     def copyConnection(self, selectedObject, suffix):
+        """copy connection data"""
         object_name = selectedObject.name + suffix
 
         new_object = self.state.symObjects[object_name]
@@ -548,8 +554,8 @@ class ButtonView(): #export, draw line, save and load self.stateuration buttons
             val).rotate(0))
         self.state.scene.resizeScene()
 
-    # creates a python file that can be run with gem5
     def exportButtonPressed(self):
+        """creates a python file that can be run with gem5"""
         dlg = instantiateDialog(self.state)
         if dlg.exec_():
             logging.debug("Export Success!")
